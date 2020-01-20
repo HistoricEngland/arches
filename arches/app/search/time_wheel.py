@@ -63,6 +63,8 @@ class TimeWheel(object):
                 interval = date_tier["interval"]
                 name = date_tier["name"]
                 within_range = True
+                nodegroups = self.get_permitted_nodegroups(user) if "root" in date_tier else None
+
                 if "root" in date_tier:
                     high_date = int(high_date) + interval
                 for period in range(int(low_date), int(high_date), interval):
@@ -71,7 +73,6 @@ class TimeWheel(object):
                     if 'range' in date_tier:
                         within_range = min_period >= date_tier['range']["min"] and max_period <= date_tier['range']["max"]
                     period_name = "{0} ({1} - {2})".format(name, min_period, max_period)
-                    nodegroups = self.get_permitted_nodegroups(user) if "root" in date_tier else None
                     period_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_period).lower,
                         lte=ExtendedDateFormat(max_period).lower,
                         permitted_nodegroups=nodegroups)

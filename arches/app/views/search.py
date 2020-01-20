@@ -55,28 +55,26 @@ except ImportError:
 class SearchView(MapBaseManagerView):
 
     def get(self, request):
+
+        allowed_nodegroups = get_nodegroups_by_perm(request.user, 'models.read_nodegroup')
+
         saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
-        date_nodes = models.Node.objects.filter(Q(datatype='date') | Q(datatype='edtf'), graph__isresource=True, graph__isactive=True)
+        
+        # only allow date nodes that the user has permission to read
+        searchable_date_nodes = models.Node.objects.filter(Q(datatype='date') | Q(datatype='edtf'), nodegroup__in=allowed_nodegroups, graph__isresource=True, graph__isactive=True)
+        
         resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
         searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)
-        resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
+        
         datatypes = models.DDataType.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
+        
         # only allow cards that the user has permission to read
-        searchable_cards = []
-        for card in resource_cards:
-            if request.user.has_perm('read_nodegroup', card.nodegroup):
-                searchable_cards.append(card)
-
-        # only allow date nodes that the user has permission to read
-        searchable_date_nodes = []
-        for node in date_nodes:
-            if request.user.has_perm('read_nodegroup', node.nodegroup):
-                searchable_date_nodes.append(node)
+        searchable_cards = models.CardModel.objects.filter(nodegroup__in=allowed_nodegroups, graph__isresource=True, graph__isactive=True)
 
         context = self.get_context_data(
             resource_cards=JSONSerializer().serialize(searchable_cards),
@@ -93,7 +91,7 @@ class SearchView(MapBaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             user_is_reviewer=request.user.groups.filter(name='Resource Reviewer').exists()
         )
-
+        
         graphs = JSONSerializer().serialize(
             context['resource_graphs'],
             exclude=['functions',
@@ -114,7 +112,7 @@ class SearchView(MapBaseManagerView):
             'title': _('Searching the Database'),
             'template': 'search-help',
         }
-
+        
         return render(request, 'views/search.htm', context)
 
 

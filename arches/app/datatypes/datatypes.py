@@ -635,7 +635,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         elif node.config is None:
             return None
         
-        if not preview: (not layer_exists or not node.config["layerActivated"]):
+        if not preview:
             layer_exists = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).exists()
             if not layer_exists or not node.config["layerActivated"]:
                 return None

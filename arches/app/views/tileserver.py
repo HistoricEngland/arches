@@ -148,8 +148,7 @@ def seed_resource_cache():
         graph__isresource=True, datatype__in=datatypes)
     for node in nodes:
         datatype = datatype_factory.get_instance(node.datatype)
-        count = models.TileModel.objects.filter(
-            data__has_key=str(node.nodeid)).count()
+        count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id,data__has_key=str(node.nodeid)).count()
         if datatype.should_cache(node) and count > 0:
             config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
             layer = config.layers[str(node.nodeid)]

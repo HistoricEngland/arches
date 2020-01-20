@@ -99,7 +99,7 @@ class BaseDataType(object):
         }
         count = None
         if preview == True:
-            count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+            count = 0 # - performance when you have a large tile table is poor - use prefab geoms. #models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id,data__has_key=str(node.nodeid)).count()
             if count == 0:
                 source_config = {
                     "type": "geojson",

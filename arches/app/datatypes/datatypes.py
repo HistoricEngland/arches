@@ -634,9 +634,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
-        if not preview and (count < 1 or not node.config["layerActivated"]):
-            return None
+        
+        if not preview: (not layer_exists or not node.config["layerActivated"]):
+            layer_exists = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).exists()
+            if not layer_exists or not node.config["layerActivated"]:
+                return None
 
         source_name = "resources-%s" % node.nodeid
         layer_name = "%s - %s" % (node.graph.name, node.name)

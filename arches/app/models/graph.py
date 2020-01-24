@@ -20,14 +20,16 @@ import uuid
 import json
 import pyprind
 from copy import copy, deepcopy
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
-
 
 class Graph(models.GraphModel):
     """
@@ -65,6 +67,7 @@ class Graph(models.GraphModel):
         self._functions = []
         self._card_constraints = []
         self._constraints_x_nodes = []
+        self.temp_node_name = _("New Node")
 
         if args:
             if isinstance(args[0], dict):
@@ -344,8 +347,14 @@ class Graph(models.GraphModel):
             for nodegroup in self.get_nodegroups():
                 nodegroup.save()
 
+            se = SearchEngineFactory().create()
+            datatype_factory = DataTypeFactory()
             for node in self.nodes.values():
                 node.save()
+                datatype = datatype_factory.get_instance(node.datatype)
+                datatype_mapping = datatype.get_es_mapping(node.nodeid)
+                if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
+                    se.create_mapping("resources", body=datatype_mapping)
 
             for edge in self.edges.values():
                 edge.save()
@@ -517,13 +526,13 @@ class Graph(models.GraphModel):
         """
 
         node_names = [node.name for node in self.nodes.values()]
-        temp_node_name = _("New Node")
+        temp_node_name = self.temp_node_name
         if temp_node_name in node_names:
             i = 1
-            temp_node_name = "{0}_{1}".format(_("New Node"), i)
+            temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
             while temp_node_name in node_names:
                 i += 1
-                temp_node_name = "{0}_{1}".format(_("New Node"), i)
+                temp_node_name = "{0}_{1}".format(self.temp_node_name, i)
 
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
@@ -785,6 +794,14 @@ class Graph(models.GraphModel):
                 self._nodegroups_to_delete = [old_node.nodegroup]
                 # remove a card
                 self.cards = {card_id: card for card_id, card in self.cards.items() if card.nodegroup_id != old_node.nodegroup_id}
+
+        try:
+            new_card = models.CardModel.objects.get(name=old_node.name, nodegroup=new_node.nodegroup)
+            for cardid, card in self.cards.items():
+                if cardid == new_card.cardid:
+                    card.name = new_node.name
+        except ObjectDoesNotExist:
+            pass
 
         return {"card": new_card, "node": new_node}
 
@@ -1316,18 +1333,17 @@ class Graph(models.GraphModel):
                     )
 
         def validate_fieldname(fieldname, fieldnames):
-            chars = set("`~!@#$%^&*()-+=[{]}\|;:<,>./?")
             if node.fieldname == "":
-                raise GraphValidationError(_("Field Name must not be blank."), 1008)
-            if any((c in chars) for c in fieldname):
-                raise GraphValidationError(_("Field Name must contain only alpha-numeric characters or underscores."), 1010)
+                raise GraphValidationError(_("Field name must not be blank."), 1008)
+            if fieldname.replace("_", "").isalnum() is False:
+                raise GraphValidationError(_("Field name must contain only alpha-numeric characters or underscores."), 1010)
             if fieldname[0] == "_" or fieldname[0].isdigit():
-                raise GraphValidationError(_("Field Name must begin with alphabet letter"), 1011)
+                raise GraphValidationError(_("Field name cannot begin with an underscore or number"), 1011)
             if len(fieldname) > 10:
                 fieldname = fieldname[:10]
             try:
                 dupe = fieldnames[fieldname]
-                raise GraphValidationError(_("Field Name must be unique to the graph."), 1009)
+                raise GraphValidationError(_(f"Field name must be unique to the graph; '{fieldname}' already exists."), 1009)
             except KeyError as e:
                 fieldnames[fieldname] = True
 

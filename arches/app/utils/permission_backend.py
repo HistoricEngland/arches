@@ -8,7 +8,7 @@ from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 from django.core.cache import cache
 
-cache_timeout_secs = 60
+cache_timeout_secs = 600 # TODO: make a system setting
 
 class PermissionBackend(ObjectPermissionBackend):
 

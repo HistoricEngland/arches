@@ -25,7 +25,13 @@ class PermissionBackend(ObjectPermissionBackend):
         support, user_obj = check_user_support(user_obj)
         if not support:
             return False
-        
+
+        # check no access...
+        if perm is not "no_access_to_nodegroup":
+            does_not_have_access = self.has_perm(user_obj, "no_access_to_nodegroup", obj)
+            if does_not_have_access:
+                return False
+
         #get objects this user has the given perm explicitly assigned
         key_obj_user_perms = f"obj_user_perms_key_{str(user_obj.pk)}_{slugify(str(perm), separator='_')}"
         #try:
@@ -38,7 +44,7 @@ class PermissionBackend(ObjectPermissionBackend):
             objects_for_user = get_objects_for_user(user_obj, f'models.{perm}')
             
             for obj_user_perm in objects_for_user:
-                obj_user_perms.append(obj.pk)
+                obj_user_perms.append(str(obj_user_perm.pk))
 
             #cache this to speed up in future
             cache.set(key_obj_user_perms, obj_user_perms, cache_timeout_secs)
@@ -54,7 +60,7 @@ class PermissionBackend(ObjectPermissionBackend):
         #        return False
         #    else:
         #        return perm in explicitly_defined_perms
-        if obj.pk in obj_user_perms:
+        if str(obj.pk) in obj_user_perms:
             return True
         else:
             key_default_perms = f"key_default_user_perms_{str(user_obj.pk)}"
@@ -92,13 +98,19 @@ def get_groups_for_object(perm, obj):
         #            return True
         #    return False
         #get objects this user has the given perm explicitly assigned
+        # check no access...
+        if perm is not "no_access_to_nodegroup":
+            does_not_have_access = has_group_perm(group, "no_access_to_nodegroup", obj)
+            if does_not_have_access:
+                return False
+
         key_obj_group_perms = f"obj_group_perms_key_{str(group.pk)}_{slugify(str(perm), separator='_')}"
         obj_group_perms = cache.get(key_obj_group_perms)
         if obj_group_perms is None:
             obj_group_perms = []
             objects_for_group = get_objects_for_group(group, f'models.{perm}')
             for obj_group_perm in objects_for_group:
-                obj_group_perms.append(obj.pk)
+                obj_group_perms.append(str(obj_group_perm.pk))
         
         #cache this to speed up in future
         cache.set(key_obj_group_perms, obj_group_perms, cache_timeout_secs)
@@ -109,7 +121,7 @@ def get_groups_for_object(perm, obj):
         #        return False
         #    else:
         #        return perm in explicitly_defined_perms
-        if obj.pk in obj_group_perms:
+        if str(obj.pk) in obj_group_perms:
             return True
         else:
             key_default_perms = f"key_default_group_perms_{group.pk}"

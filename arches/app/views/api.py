@@ -35,7 +35,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
-from arches.app.utils.data_management.resources.formats.format import ResourceImportReporter
 from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts

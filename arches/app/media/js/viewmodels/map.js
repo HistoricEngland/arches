@@ -258,7 +258,15 @@ define([
                         self.isFeatureClickable
                     );
                     if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
-                    map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                    
+                    if(document.getElementById('drawSelect')){
+                        var drawToolSelected = document.getElementById('drawSelect').value;
+                        if(drawToolSelected = 'draw_polygon' && document.getElementById('drawSelect').selectedIndex != '-1'){
+                            map.getCanvas().style.cursor = 'crosshair';
+                        }
+                    } else {
+                        map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                    }
                 });
 
                 map.on('click', function(e) {

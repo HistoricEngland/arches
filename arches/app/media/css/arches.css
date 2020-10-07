@@ -4589,6 +4589,8 @@ ul.jqtree_common li.jqtree-folder {
 
 .profile-header {
     font-size: 21px;
+    text-align: left;
+    margin-top:5px;
 }
 
 .account-summary {
@@ -4689,9 +4691,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .project-search-widget {
-    position: absolute;
-    top: -45px;
-    width: 250px;
+    max-width: 250px;
 }
 
 .profile-default-message-panel {

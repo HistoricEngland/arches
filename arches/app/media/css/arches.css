@@ -11358,6 +11358,9 @@ a.tree-display-tool, a.tree-display-tool:hover {
     .page-rdm #aside-container {
         position: relative !important;
     }
+    .profile-toolbar .report-toolbar-title {
+        margin-top: 50px;
+    }
 }
 
 @media screen and (max-width: 768px) {

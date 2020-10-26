@@ -1,6 +1,6 @@
-define([], function() {
-    return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
-        color = color || "#F0C200";
+define([], function () {
+    return function (resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
+        color = color || "#8B40DF";
         var strokecolor = "#fff";
         var overviewzoom = 11;
         var minzoom = 15;
@@ -17,32 +17,32 @@ define([], function() {
             "id": "select-feature-polygon-fill",
             "type": "fill",
             "minzoom": overviewzoom,
-            "filter": ['all',[
+            "filter": ['all', [
                 "==", "$type", "Polygon"
             ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+                    "!=", "resourceinstanceid", resourceId
+                ]],
             "paint": {
                 "fill-color": color,
                 "fill-outline-color": color,
-                "fill-opacity": 0.2
+                "fill-opacity": 0.5
             },
             "layout": {
-                "visibility": visible ? "visible": "none"
+                "visibility": visible ? "visible" : "none"
             }
-        },  {
+        }, {
             "id": "select-feature-polygon-under-stroke",
             "type": "line",
             "minzoom": minzoom,
-            "filter": ['all',[
+            "filter": ['all', [
                 "==", "$type", "Polygon"
             ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+                    "!=", "resourceinstanceid", resourceId
+                ]],
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
-                "visibility": visible ? "visible": "none"
+                "visibility": visible ? "visible" : "none"
             },
             "paint": {
                 "line-color": strokecolor,
@@ -52,15 +52,15 @@ define([], function() {
             "id": "select-feature-polygon-stroke",
             "type": "line",
             "minzoom": overviewzoom,
-            "filter": ['all',[
+            "filter": ['all', [
                 "==", "$type", "Polygon"
             ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+                    "!=", "resourceinstanceid", resourceId
+                ]],
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
-                "visibility": visible ? "visible": "none"
+                "visibility": visible ? "visible" : "none"
             },
             "paint": {
                 "line-color": color,
@@ -70,15 +70,15 @@ define([], function() {
             "id": "select-feature-line",
             "type": "line",
             "minzoom": minzoom,
-            "filter": ['all',[
+            "filter": ['all', [
                 "==", "$type", "LineString"
             ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+                    "!=", "resourceinstanceid", resourceId
+                ]],
             "layout": {
                 "line-cap": "round",
                 "line-join": "round",
-                "visibility": visible ? "visible": "none"
+                "visibility": visible ? "visible" : "none"
             },
             "paint": {
                 "line-color": color,
@@ -88,37 +88,37 @@ define([], function() {
             "id": "select-feature-point-point-stroke",
             "type": "circle",
             "minzoom": minzoom,
-            "filter": ['all',[
+            "filter": ['all', [
                 "==", "$type", "Point"
             ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+                    "!=", "resourceinstanceid", resourceId
+                ]],
             "paint": {
                 "circle-radius": 6,
                 "circle-opacity": 1,
                 "circle-color": "#fff"
             },
             "layout": {
-                "visibility": visible ? "visible": "none"
+                "visibility": visible ? "visible" : "none"
             }
         }, {
             "id": "select-feature-point",
             "type": "circle",
             "minzoom": minzoom,
-            "filter": ['all',[
+            "filter": ['all', [
                 "==", "$type", "Point"
             ], [
-                "!=", "resourceinstanceid", resourceId
-            ]],
+                    "!=", "resourceinstanceid", resourceId
+                ]],
             "paint": {
                 "circle-radius": 4,
                 "circle-color": color
             },
             "layout": {
-                "visibility": visible ? "visible": "none"
+                "visibility": visible ? "visible" : "none"
             }
         }];
-        layers.forEach(function(layer) {
+        layers.forEach(function (layer) {
             layer["source"] = source;
             if (sourceLayer) layer["source-layer"] = sourceLayer;
         });

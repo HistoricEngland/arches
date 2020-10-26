@@ -365,8 +365,8 @@ define([
                         ['!=', 'mode', 'static']
                     ],
                     'paint': {
-                        'fill-color': '#000000',//'#3bb2d0',
-                        'fill-outline-color': '#E0E0E0', //'#3bb2d0',
+                        'fill-color': '#D60DA3',//'#3bb2d0',
+                        'fill-outline-color': '#D60DA3', //'#3bb2d0',
                         'fill-opacity': 0.2
                     }
                 },
@@ -380,8 +380,8 @@ define([
                         ['==', '$type', 'Polygon']
                     ],
                     'paint': {
-                        'fill-color': '#D60DA3', //'#fbb03b',
-                        'fill-outline-color': '#D60DA3', //'#fbb03b',
+                        'fill-color': '#8B40DF', //'#fbb03b',
+                        'fill-outline-color': '#8B40DF', //'#fbb03b',
                         'fill-opacity': 0.1
                     }
                 },
@@ -395,7 +395,7 @@ define([
                         ['==', 'meta', 'midpoint']],
                     'paint': {
                         'circle-radius': 3,
-                        'circle-color': '#D60DA3'//'#fbb03b'
+                        'circle-color': '#8B40DF'//'#fbb03b'
                     }
                 },
                 {
@@ -413,7 +413,7 @@ define([
                         'line-join': 'round'
                     },
                     'paint': {
-                        'line-color': '#000000',//'#3bb2d0',
+                        'line-color': '#D60DA3',//'#3bb2d0',
                         'line-width': 2
                     }
                 },
@@ -431,7 +431,7 @@ define([
                         'line-join': 'round'
                     },
                     'paint': {
-                        'line-color': '#D60DA3', //'#fbb03b',
+                        'line-color': '#8B40DF', //'#fbb03b',
                         'line-dasharray': [0.2, 2],
                         'line-width': 2
                     }
@@ -451,7 +451,7 @@ define([
                         'line-join': 'round'
                     },
                     'paint': {
-                        'line-color': '#E0E0E0',//'#3bb2d0',
+                        'line-color': '#D60DA3',//'#3bb2d0',
                         'line-width': 2
                     }
                 },
@@ -469,7 +469,7 @@ define([
                         'line-join': 'round'
                     },
                     'paint': {
-                        'line-color': '#D60DA3',//'#fbb03b',
+                        'line-color': '#8B40DF',//'#fbb03b',
                         'line-dasharray': [0.2, 2],
                         'line-width': 2
                     }
@@ -501,7 +501,7 @@ define([
                     ],
                     'paint': {
                         'circle-radius': 3,
-                        'circle-color': '#D60DA3'//'#fbb03b'
+                        'circle-color': '#8B40DF'//'#fbb03b'
                     }
                 },
                 {
@@ -534,7 +534,7 @@ define([
                     ],
                     'paint': {
                         'circle-radius': 3,
-                        'circle-color': '#E0E0E0'//'#3bb2d0'
+                        'circle-color': '#D60DA3'//'#3bb2d0'
                     }
                 },
                 {
@@ -563,7 +563,7 @@ define([
                         ['==', 'active', 'true']],
                     'paint': {
                         'circle-radius': 5,
-                        'circle-color': '#D60DA3' //'#fbb03b'
+                        'circle-color': '#8B40DF' //'#fbb03b'
                     }
                 },
                 {

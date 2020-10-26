@@ -383,9 +383,9 @@ define([
                     ['!=', 'mode', 'static']
                 ],
                 'paint': {
-                    'fill-color': '#E0E0E0', //'#3bb2d0',
+                    'fill-color': '#D60DA3', //'#3bb2d0',
                     'fill-outline-color': '#000000', //'#3bb2d0',
-                    'fill-opacity': 1
+                    'fill-opacity': 0.5
                 }
             },
             {
@@ -395,9 +395,9 @@ define([
                 'type': 'fill',
                 'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
                 'paint': {
-                    'fill-color': '#D60DA3', //'#fbb03b',
-                    'fill-outline-color': '#D60DA3', //'#fbb03b',
-                    'fill-opacity': 0.1
+                    'fill-color': '#8B40DF', //'#fbb03b',
+                    'fill-outline-color': '#8B40DF', //'#fbb03b',
+                    'fill-opacity': 0.2
                 }
             },
             {
@@ -410,7 +410,7 @@ define([
                     ['==', 'meta', 'midpoint']],
                 'paint': {
                     'circle-radius': 3,
-                    'circle-color': '#D60DA3' //'#fbb03b'
+                    'circle-color': '#8B40DF' //'#fbb03b'  
                 }
             },
             {
@@ -428,7 +428,7 @@ define([
                     'line-join': 'round'
                 },
                 'paint': {
-                    'line-color': '#000000', //'#3bb2d0',
+                    'line-color': '#D60DA3', //'#3bb2d0',
                     'line-width': 2
                 }
             },
@@ -443,7 +443,7 @@ define([
                     'line-join': 'round'
                 },
                 'paint': {
-                    'line-color': '#D60DA3', //'#fbb03b',
+                    'line-color': '#8B40DF', //'#fbb03b',
                     'line-dasharray': [0.2, 2],
                     'line-width': 2
                 }
@@ -463,7 +463,7 @@ define([
                     'line-join': 'round'
                 },
                 'paint': {
-                    'line-color': '#000000', //'#3bb2d0',
+                    'line-color': '#D60DA3', //'#3bb2d0',
                     'line-width': 2
                 }
             },
@@ -481,7 +481,7 @@ define([
                     'line-join': 'round'
                 },
                 'paint': {
-                    'line-color': '#D60DA3', //'#fbb03b',
+                    'line-color': '#8B40DF', //'#fbb03b',
                     'line-dasharray': [0.2, 2],
                     'line-width': 2
                 }
@@ -513,7 +513,7 @@ define([
                 ],
                 'paint': {
                     'circle-radius': 3,
-                    'circle-color': '#D60DA3' //'#fbb03b'
+                    'circle-color': '#8B40DF' //'#fbb03b'
                 }
             },
             {
@@ -546,7 +546,7 @@ define([
                 ],
                 'paint': {
                     'circle-radius': 3,
-                    'circle-color': '#3bb2d0'
+                    'circle-color': '#D60DA3'
                 }
             },
             {
@@ -575,7 +575,7 @@ define([
                     ['==', 'active', 'true']],
                 'paint': {
                     'circle-radius': 5,
-                    'circle-color': '#D60DA3' //'#fbb03b'
+                    'circle-color': '#8B40DF' //'#fbb03b'
                 }
             },
             {
@@ -585,8 +585,8 @@ define([
                 'type': 'fill',
                 'filter': ['all', ['==', 'mode', 'static'], ['==', '$type', 'Polygon']],
                 'paint': {
-                    'fill-color': '#404040',
-                    'fill-outline-color': '#404040',
+                    'fill-color': '#D60DA3',
+                    'fill-outline-color': '#D60DA3',
                     'fill-opacity': 0.1
                 }
             },
@@ -601,7 +601,7 @@ define([
                     'line-join': 'round'
                 },
                 'paint': {
-                    'line-color': '#404040',
+                    'line-color': '#D60DA3',
                     'line-width': 2
                 }
             },
@@ -616,7 +616,7 @@ define([
                     'line-join': 'round'
                 },
                 'paint': {
-                    'line-color': '#404040',
+                    'line-color': '#D60DA3',
                     'line-width': 2
                 }
             },
@@ -628,7 +628,7 @@ define([
                 'filter': ['all', ['==', 'mode', 'static'], ['==', '$type', 'Point']],
                 'paint': {
                     'circle-radius': 5,
-                    'circle-color': '#404040'
+                    'circle-color': '#D60DA3'
                 }
             }
         ];

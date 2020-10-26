@@ -15,11 +15,11 @@ define([
     'uuid',
     'geojsonhint',
     'codemirror/mode/javascript/javascript'
-], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint) {
+], function ($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
-            initialize: function(options) {
+            initialize: function (options) {
                 var self = this;
                 options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
@@ -35,6 +35,8 @@ define([
                     }
                 };
 
+                //Set the style of the filter buffer
+                // #fff = white; #646464 = mid grey
                 options.layers = ko.observable(
                     [
                         {
@@ -65,22 +67,22 @@ define([
                                 "line-join": "round"
                             },
                             "paint": {
-                                "line-color": "#3bb2d0",
+                                "line-color": "#646464",
                                 "line-width": 2
                             }
                         },
                         {
-                        "id": "geojson-search-buffer",
-                        "type": "fill",
-                        "layout": {
-                            "visibility": "visible"
-                        },
-                        "paint": {
-                            "fill-color": "#3bb2d0",
-                            "fill-outline-color": "#3bb2d0",
-                            "fill-opacity": 0.2
-                        },
-                        "source": "geojson-search-buffer-data"
+                            "id": "geojson-search-buffer",
+                            "type": "fill",
+                            "layout": {
+                                "visibility": "visible"
+                            },
+                            "paint": {
+                                "fill-color": "#ffffff",
+                                "fill-outline-color": "#ffffff",
+                                "fill-opacity": 0.2
+                            },
+                            "source": "geojson-search-buffer-data"
                         }
                     ]
                 );
@@ -89,7 +91,7 @@ define([
 
                 MapComponentViewModel.apply(this, [options]);
 
-                this.updateLayers = function(layers) {
+                this.updateLayers = function (layers) {
                     var map = self.map();
                     var style = map.getStyle();
                     style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
@@ -113,24 +115,24 @@ define([
                 this.bufferUnits = [{
                     name: 'meters',
                     val: 'm'
-                },{
+                }, {
                     name: 'feet',
                     val: 'ft'
                 }];
 
-                this.mapLinkData.subscribe(function(data) {
+                this.mapLinkData.subscribe(function (data) {
                     this.zoomToGeoJSON(data);
-                },this);
+                }, this);
 
                 var bins = binFeatureCollection(this.searchAggregations);
 
-                this.geoJSONString.subscribe(function(geoJSONString) {
+                this.geoJSONString.subscribe(function (geoJSONString) {
                     this.geoJSONErrors(this.getGeoJSONErrors(geoJSONString));
-                    if(this.geoJSONErrors().length === 0){
+                    if (this.geoJSONErrors().length === 0) {
                         var geoJSON = JSON.parse(geoJSONString);
                         // remove any extra geometries as only one geometry is allowed for search
                         geoJSON.features = geoJSON.features.slice(0, 1);
-                        if(geoJSON.features.length > 0){
+                        if (geoJSON.features.length > 0) {
                             var extent = geojsonExtent(geoJSON);
                             var bounds = new mapboxgl.LngLatBounds(extent);
                             this.map().fitBounds(bounds, {
@@ -142,23 +144,23 @@ define([
                     }
                 }, this);
 
-                this.getGeoJSONErrors = function(geoJSONString) {
+                this.getGeoJSONErrors = function (geoJSONString) {
                     var hint = geojsonhint.hint(geoJSONString);
                     var errors = [];
-                    try{
+                    try {
                         var geoJSON = JSON.parse(geoJSONString);
-                        if (geoJSON.features.length > 1){
+                        if (geoJSON.features.length > 1) {
                             hint.push({
                                 "level": 'warning',
                                 "message": 'Only one feature is allowed for search filtering.  Ignorning all all but the first feature.'
                             });
                         }
                         var feature = geoJSON.features[0];
-                        if (!!feature.properties && !!feature.properties.buffer){
+                        if (!!feature.properties && !!feature.properties.buffer) {
                             var buffer = feature.properties.buffer;
-                            try{
+                            try {
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if(bufferWidth < 0 || bufferWidth > this.maxBuffer){
+                                if (bufferWidth < 0 || bufferWidth > this.maxBuffer) {
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -169,9 +171,9 @@ define([
                                 });
                             }
 
-                            try{
+                            try {
                                 var bufferUnit = buffer.unit;
-                                if(bufferUnit !== 'ft' && bufferUnit !== 'm'){
+                                if (bufferUnit !== 'ft' && bufferUnit !== 'm') {
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -183,11 +185,11 @@ define([
                             }
                         }
 
-                         if (!!feature.properties && !!feature.properties.inverted){
+                        if (!!feature.properties && !!feature.properties.inverted) {
                             var inverted = feature.properties.inverted;
-                            try{
+                            try {
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if(inverted !== true && inverted !== false){
+                                if (inverted !== true && inverted !== false) {
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -198,8 +200,8 @@ define([
                                 });
                             }
                         }
-                    }finally{
-                        hint.forEach(function(item) {
+                    } finally {
+                        hint.forEach(function (item) {
                             if (item.level !== 'message') {
                                 errors.push(item);
                             }
@@ -240,9 +242,9 @@ define([
 
                 this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
 
-                this.drawMode.subscribe(function(selectedDrawTool){
-                    if(!!selectedDrawTool){
-                        if(selectedDrawTool === 'extent'){
+                this.drawMode.subscribe(function (selectedDrawTool) {
+                    if (!!selectedDrawTool) {
+                        if (selectedDrawTool === 'extent') {
                             this.searchByExtent();
                         } else {
                             this.draw.changeMode(selectedDrawTool);
@@ -251,19 +253,19 @@ define([
                     }
                 }, this);
 
-                this.searchResults.timestamp.subscribe(function(timestamp) {
-                    if(this.pageLoaded) {
+                this.searchResults.timestamp.subscribe(function (timestamp) {
+                    if (this.pageLoaded) {
                         this.updateResults();
                     }
                 }, this);
 
-                var updateSearchResultPointLayer = function() {
+                var updateSearchResultPointLayer = function () {
                     var pointSource = self.map().getSource('search-results-points');
                     var agg = ko.unwrap(self.searchAggregations);
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
-                    _.each(agg.results, function(result) {
-                        _.each(result._source.points, function(point) {
+                    _.each(agg.results, function (result) {
+                        _.each(result._source.points, function (point) {
                             var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
                                 resourceinstanceid: result._id,
                                 highlight: result._id === mouseoverInstanceId
@@ -276,7 +278,7 @@ define([
                     pointSource.setData(pointsFC);
                 };
 
-                this.updateSearchResultsLayers = function() {
+                this.updateSearchResultsLayers = function () {
                     if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
                         var geojsonFC = self.filter.feature_collection();
                         var extent = geojsonExtent(geojsonFC);
@@ -289,7 +291,7 @@ define([
                     }
                     var features = [];
                     var agg = ko.unwrap(self.searchAggregations);
-                    _.each(agg.geo_aggs.grid.buckets, function(cell) {
+                    _.each(agg.geo_aggs.grid.buckets, function (cell) {
                         var pt = geohash.decode(cell.key);
                         var feature = turf.point([pt.lon, pt.lat], {
                             doc_count: cell.doc_count
@@ -299,8 +301,8 @@ define([
                     var pointsFC = turf.featureCollection(features);
 
                     var aggregated = turf.collect(ko.unwrap(bins), pointsFC, 'doc_count', 'doc_count');
-                    _.each(aggregated.features, function(feature) {
-                        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i, ii) {
+                    _.each(aggregated.features, function (feature) {
+                        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function (i, ii) {
                             return i + ii;
                         }, 0);
                     });
@@ -318,22 +320,22 @@ define([
                 };
 
                 this.filters[componentName](this);
-                this.map.subscribe(function(){
+                this.map.subscribe(function () {
                     this.setupDraw();
                     this.restoreState();
 
-                    var filterUpdated = ko.computed(function() {
+                    var filterUpdated = ko.computed(function () {
                         return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
                     }, this);
-                    filterUpdated.subscribe(function() {
+                    filterUpdated.subscribe(function () {
                         this.updateQuery();
                     }, this);
 
-                    this.buffer.subscribe(function(val) {
+                    this.buffer.subscribe(function (val) {
                         this.updateFilter();
                     }, this);
 
-                    this.bufferUnit.subscribe(function(val) {
+                    this.bufferUnit.subscribe(function (val) {
                         this.updateFilter();
                     }, this);
 
@@ -348,237 +350,293 @@ define([
                 }, this);
             },
             drawStyles: [
+                // Set the styles for the drawing point, line and polygon in filter
+                // Colour while active should be fill and line: #D60DA3 (purple)
+                // Colour while inactive should be fill: #E0E0E0 (mid-grey) and line: #000000 (black)
+                // Colour while static should be fill: and line:
                 {
-                  'id': 'gl-draw-polygon-fill-inactive',
-                  'type': 'fill',
-                  'filter': ['all',
-                    ['==', 'active', 'false'],
-                    ['==', '$type', 'Polygon'],
-                    ['!=', 'mode', 'static']
-                  ],
-                  'paint': {
-                    'fill-color': '#3bb2d0',
-                    'fill-outline-color': '#3bb2d0',
-                    'fill-opacity': 0.1
-                  }
+                    // This sets the colour for the polygon and its outline once 
+                    // the filter has been applied.
+                    'id': 'gl-draw-polygon-fill-inactive',
+                    'type': 'fill',
+                    'filter': ['all',
+                        ['==', 'active', 'false'],
+                        ['==', '$type', 'Polygon'],
+                        ['!=', 'mode', 'static']
+                    ],
+                    'paint': {
+                        'fill-color': '#000000',//'#3bb2d0',
+                        'fill-outline-color': '#E0E0E0', //'#3bb2d0',
+                        'fill-opacity': 0.2
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-fill-active',
-                  'type': 'fill',
-                  'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
-                  'paint': {
-                    'fill-color': '#D60DA3', //'#fbb03b',
-                    'fill-outline-color': '#D60DA3', //'#fbb03b',
-                    'fill-opacity': 0.1
-                  }
+                    // This sets the colour for the polygon and its outline while
+                    // the filter is being drawn
+                    'id': 'gl-draw-polygon-fill-active',
+                    'type': 'fill',
+                    'filter': ['all',
+                        ['==', 'active', 'true'],
+                        ['==', '$type', 'Polygon']
+                    ],
+                    'paint': {
+                        'fill-color': '#D60DA3', //'#fbb03b',
+                        'fill-outline-color': '#D60DA3', //'#fbb03b',
+                        'fill-opacity': 0.1
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-midpoint',
-                  'type': 'circle',
-                  'filter': ['all',
-                    ['==', '$type', 'Point'],
-                    ['==', 'meta', 'midpoint']],
-                  'paint': {
-                    'circle-radius': 3,
-                    'circle-color': '#fbb03b'
-                  }
+                    // This sets the colour of the point at the centre 
+                    // of the polygon
+                    'id': 'gl-draw-polygon-midpoint',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', '$type', 'Point'],
+                        ['==', 'meta', 'midpoint']],
+                    'paint': {
+                        'circle-radius': 3,
+                        'circle-color': '#D60DA3'//'#fbb03b'
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-stroke-inactive',
-                  'type': 'line',
-                  'filter': ['all',
-                    ['==', 'active', 'false'],
-                    ['==', '$type', 'Polygon'],
-                    ['!=', 'mode', 'static']
-                  ],
-                  'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                  },
-                  'paint': {
-                    'line-color': '#3bb2d0',
-                    'line-width': 2
-                  }
+                    // This sets the properties of the polygon outline
+                    // once the filter has been applied.
+                    'id': 'gl-draw-polygon-stroke-inactive',
+                    'type': 'line',
+                    'filter': ['all',
+                        ['==', 'active', 'false'],
+                        ['==', '$type', 'Polygon'],
+                        ['!=', 'mode', 'static']
+                    ],
+                    'layout': {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#000000',//'#3bb2d0',
+                        'line-width': 2
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-stroke-active',
-                  'type': 'line',
-                  'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
-                  'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                  },
-                  'paint': {
-                    'line-color': '#D60DA3', //'#fbb03b',
-                    'line-dasharray': [0.2, 2],
-                    'line-width': 2
-                  }
+                    // This sets the properties of the polygon outline while
+                    // the filter is being drawn.
+                    'id': 'gl-draw-polygon-stroke-active',
+                    'type': 'line',
+                    'filter': ['all',
+                        ['==', 'active', 'true'],
+                        ['==', '$type', 'Polygon']
+                    ],
+                    'layout': {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#D60DA3', //'#fbb03b',
+                        'line-dasharray': [0.2, 2],
+                        'line-width': 2
+                    }
                 },
                 {
-                  'id': 'gl-draw-line-inactive',
-                  'type': 'line',
-                  'filter': ['all',
-                    ['==', 'active', 'false'],
-                    ['==', '$type', 'LineString'],
-                    ['!=', 'mode', 'static']
-                  ],
-                  'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                  },
-                  'paint': {
-                    'line-color': '#3bb2d0',
-                    'line-width': 2
-                  }
+                    // This sets the properties of the polyline
+                    // once the filter has been applied.
+                    'id': 'gl-draw-line-inactive',
+                    'type': 'line',
+                    'filter': ['all',
+                        ['==', 'active', 'false'],
+                        ['==', '$type', 'LineString'],
+                        ['!=', 'mode', 'static']
+                    ],
+                    'layout': {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#E0E0E0',//'#3bb2d0',
+                        'line-width': 2
+                    }
                 },
                 {
-                  'id': 'gl-draw-line-active',
-                  'type': 'line',
-                  'filter': ['all',
-                    ['==', '$type', 'LineString'],
-                    ['==', 'active', 'true']
-                  ],
-                  'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                  },
-                  'paint': {
-                    'line-color': '#D60DA3', //'#fbb03b',
-                    'line-dasharray': [0.2, 2],
-                    'line-width': 2
-                  }
+                    // This sets the properties of the polyline
+                    // as the filter is being drawn.
+                    'id': 'gl-draw-line-active',
+                    'type': 'line',
+                    'filter': ['all',
+                        ['==', '$type', 'LineString'],
+                        ['==', 'active', 'true']
+                    ],
+                    'layout': {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#D60DA3',//'#fbb03b',
+                        'line-dasharray': [0.2, 2],
+                        'line-width': 2
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
-                  'type': 'circle',
-                  'filter': ['all',
-                    ['==', 'meta', 'vertex'],
-                    ['==', '$type', 'Point'],
-                    ['!=', 'mode', 'static']
-                  ],
-                  'paint': {
-                    'circle-radius': 5,
-                    'circle-color': '#fff'
-                  }
+                    // This sets the properties of the polygon and polyline vertices outlines 
+                    // once the filter has been drawn.
+                    'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', 'meta', 'vertex'],
+                        ['==', '$type', 'Point'],
+                        ['!=', 'mode', 'static']
+                    ],
+                    'paint': {
+                        'circle-radius': 5,
+                        'circle-color': '#fff'
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-and-line-vertex-inactive',
-                  'type': 'circle',
-                  'filter': ['all',
-                    ['==', 'meta', 'vertex'],
-                    ['==', '$type', 'Point'],
-                    ['!=', 'mode', 'static']
-                  ],
-                  'paint': {
-                    'circle-radius': 3,
-                    'circle-color': '#fbb03b'
-                  }
+                    // This sets the properties of the polygon and polyline vertices 
+                    // once the filter has been drawn.
+                    'id': 'gl-draw-polygon-and-line-vertex-inactive',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', 'meta', 'vertex'],
+                        ['==', '$type', 'Point'],
+                        ['!=', 'mode', 'static']
+                    ],
+                    'paint': {
+                        'circle-radius': 3,
+                        'circle-color': '#D60DA3'//'#fbb03b'
+                    }
                 },
                 {
-                  'id': 'gl-draw-point-point-stroke-inactive',
-                  'type': 'circle',
-                  'filter': ['all',
-                    ['==', 'active', 'false'],
-                    ['==', '$type', 'Point'],
-                    ['==', 'meta', 'feature'],
-                    ['!=', 'mode', 'static']
-                  ],
-                  'paint': {
-                    'circle-radius': 5,
-                    'circle-opacity': 1,
-                    'circle-color': '#fff'
-                  }
+                    // This sets the properties of the point outline 
+                    // once the filter has been drawn.
+                    'id': 'gl-draw-point-point-stroke-inactive',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', 'active', 'false'],
+                        ['==', '$type', 'Point'],
+                        ['==', 'meta', 'feature'],
+                        ['!=', 'mode', 'static']
+                    ],
+                    'paint': {
+                        'circle-radius': 5,
+                        'circle-opacity': 1,
+                        'circle-color': '#fff'
+                    }
                 },
                 {
-                  'id': 'gl-draw-point-inactive',
-                  'type': 'circle',
-                  'filter': ['all',
-                    ['==', 'active', 'false'],
-                    ['==', '$type', 'Point'],
-                    ['==', 'meta', 'feature'],
-                    ['!=', 'mode', 'static']
-                  ],
-                  'paint': {
-                    'circle-radius': 3,
-                    'circle-color': '#3bb2d0'
-                  }
+                    // This sets the properties of the point
+                    // once the filter has been drawn.
+                    'id': 'gl-draw-point-inactive',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', 'active', 'false'],
+                        ['==', '$type', 'Point'],
+                        ['==', 'meta', 'feature'],
+                        ['!=', 'mode', 'static']
+                    ],
+                    'paint': {
+                        'circle-radius': 3,
+                        'circle-color': '#E0E0E0'//'#3bb2d0'
+                    }
                 },
                 {
-                  'id': 'gl-draw-point-stroke-active',
-                  'type': 'circle',
-                  'filter': ['all',
-                    ['==', '$type', 'Point'],
-                    ['==', 'active', 'true'],
-                    ['!=', 'meta', 'midpoint']
-                  ],
-                  'paint': {
-                    'circle-radius': 7,
-                    'circle-color': '#fff'
-                  }
+                    // This sets the properties of the point outline 
+                    // while the filter is being drawn.
+                    'id': 'gl-draw-point-stroke-active',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', '$type', 'Point'],
+                        ['==', 'active', 'true'],
+                        ['!=', 'meta', 'midpoint']
+                    ],
+                    'paint': {
+                        'circle-radius': 7,
+                        'circle-color': '#fff'
+                    }
                 },
                 {
-                  'id': 'gl-draw-point-active',
-                  'type': 'circle',
-                  'filter': ['all',
-                    ['==', '$type', 'Point'],
-                    ['!=', 'meta', 'midpoint'],
-                    ['==', 'active', 'true']],
-                  'paint': {
-                    'circle-radius': 5,
-                    'circle-color': '#fbb03b'
-                  }
+                    // This sets the properties of the point
+                    // while the filter is being drawn.
+                    'id': 'gl-draw-point-active',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', '$type', 'Point'],
+                        ['!=', 'meta', 'midpoint'],
+                        ['==', 'active', 'true']],
+                    'paint': {
+                        'circle-radius': 5,
+                        'circle-color': '#D60DA3' //'#fbb03b'
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-fill-static',
-                  'type': 'fill',
-                  'filter': ['all', ['==', 'mode', 'static'], ['==', '$type', 'Polygon']],
-                  'paint': {
-                    'fill-color': '#404040',
-                    'fill-outline-color': '#404040',
-                    'fill-opacity': 0.1
-                  }
+                    // This sets the colour for the polygon and its outline once
+                    // the draw mode has been changed to 'static'
+                    'id': 'gl-draw-polygon-fill-static',
+                    'type': 'fill',
+                    'filter': ['all',
+                        ['==', 'mode', 'static'],
+                        ['==', '$type', 'Polygon']
+                    ],
+                    'paint': {
+                        'fill-color': '#D60DA3',//'#404040',
+                        'fill-outline-color': '#D60DA3', //'#404040',
+                        'fill-opacity': 0.1
+                    }
                 },
                 {
-                  'id': 'gl-draw-polygon-stroke-static',
-                  'type': 'line',
-                  'filter': ['all', ['==', 'mode', 'static'], ['==', '$type', 'Polygon']],
-                  'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                  },
-                  'paint': {
-                    'line-color': '#404040',
-                    'line-width': 2
-                  }
+                    // This sets the properties of the polygon outline once
+                    // the draw mode has been changed to 'static'
+                    'id': 'gl-draw-polygon-stroke-static',
+                    'type': 'line',
+                    'filter': ['all',
+                        ['==', 'mode', 'static'],
+                        ['==', '$type', 'Polygon']
+                    ],
+                    'layout': {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#D60DA3', //'#404040',
+                        'line-width': 2
+                    }
                 },
                 {
-                  'id': 'gl-draw-line-static',
-                  'type': 'line',
-                  'filter': ['all', ['==', 'mode', 'static'], ['==', '$type', 'LineString']],
-                  'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                  },
-                  'paint': {
-                    'line-color': '#404040',
-                    'line-width': 2
-                  }
+                    // This sets the properties of the polyline once 
+                    // the draw mode has been changed to 'static'
+                    'id': 'gl-draw-line-static',
+                    'type': 'line',
+                    'filter': ['all',
+                        ['==', 'mode', 'static'],
+                        ['==', '$type', 'LineString']
+                    ],
+                    'layout': {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#D60DA3', //'#404040',
+                        'line-width': 2
+                    }
                 },
                 {
-                  'id': 'gl-draw-point-static',
-                  'type': 'circle',
-                  'filter': ['all', ['==', 'mode', 'static'], ['==', '$type', 'Point']],
-                  'paint': {
-                    'circle-radius': 5,
-                    'circle-color': '#404040'
-                  }
+                    // This sets the properties of the point once 
+                    // the draw mode has been changed to 'static'
+                    'id': 'gl-draw-point-static',
+                    'type': 'circle',
+                    'filter': ['all',
+                        ['==', 'mode', 'static'],
+                        ['==', '$type', 'Point']
+                    ],
+                    'paint': {
+                        'circle-radius': 5,
+                        'circle-color': '#D60DA3', //'#404040'
+                    }
                 }
-            ], 
-            setupDraw: function() {
+            ],
+            setupDraw: function () {
                 var self = this;
                 var modes = MapboxDraw.modes;
                 modes.static = {
-                    toDisplayFeatures: function(state, geojson, display) {
+                    toDisplayFeatures: function (state, geojson, display) {
                         display(geojson);
                     }
                 };
@@ -588,9 +646,9 @@ define([
                     styles: self.drawStyles
                 });
                 this.map().addControl(this.draw);
-                this.map().on('draw.create', function(e) {
-                    self.draw.getAll().features.forEach(function(feature){
-                        if(feature.id !== e.features[0].id){
+                this.map().on('draw.create', function (e) {
+                    self.draw.getAll().features.forEach(function (feature) {
+                        if (feature.id !== e.features[0].id) {
                             self.draw.delete(feature.id);
                         }
                     })
@@ -598,7 +656,7 @@ define([
                     self.updateFilter();
                     self.drawMode(undefined);
                 });
-                this.map().on('draw.update', function(e) {
+                this.map().on('draw.update', function (e) {
                     self.searchGeometries(e.features);
                     self.updateFilter();
                 });
@@ -607,7 +665,7 @@ define([
                 });
             },
 
-            searchByExtent: function() {
+            searchByExtent: function () {
                 if (_.contains(this.drawModes, this.drawMode())) {
                     this.draw.deleteAll();
                 }
@@ -645,7 +703,7 @@ define([
                 return res;
             },
 
-            updateFilter: function(){
+            updateFilter: function () {
                 if (this.buffer() < 0) {
                     this.buffer(0);
                 }
@@ -657,8 +715,8 @@ define([
                     this.buffer(max);
                 }
 
-                this.searchGeometries().forEach(function(feature){
-                    if(!feature.properties){
+                this.searchGeometries().forEach(function (feature) {
+                    if (!feature.properties) {
                         feature.properties = {};
                     }
                     feature.properties.buffer = {
@@ -673,23 +731,23 @@ define([
                 });
             },
 
-            editGeoJSON: function(feature) {
+            editGeoJSON: function (feature) {
                 var geoJSON = feature();
                 var geoJSONString = JSON.stringify(geoJSON, null, 4);
                 this.geoJSONString(geoJSONString);
             },
 
-            updateGeoJSON: function() {
+            updateGeoJSON: function () {
                 if (this.geoJSONErrors().length === 0) {
                     var geoJSON = JSON.parse(this.geoJSONString());
                     this.draw.set(geoJSON);
                     this.searchGeometries(geoJSON.features);
-                    geoJSON.features.forEach(function(feature){
-                        if(!!feature.properties && !!feature.properties.buffer){
+                    geoJSON.features.forEach(function (feature) {
+                        if (!!feature.properties && !!feature.properties.buffer) {
                             this.buffer(parseInt(feature.properties.buffer.width, 10));
                             this.bufferUnit(feature.properties.buffer.unit);
                         }
-                        if(!!feature.properties && feature.properties.hasOwnProperty('inverted')){
+                        if (!!feature.properties && feature.properties.hasOwnProperty('inverted')) {
                             this.filter.inverted(feature.properties.inverted);
                         }
                     }, this);
@@ -698,8 +756,8 @@ define([
                 }
             },
 
-            zoomToGeoJSON: function(data) {
-                var mapData = data.properties.geometries.reduce(function(fc1, fc2) {
+            zoomToGeoJSON: function (data) {
+                var mapData = data.properties.geometries.reduce(function (fc1, fc2) {
                     fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
                     return fc1;
                 }, {
@@ -715,7 +773,7 @@ define([
                 });
             },
 
-            updateQuery: function() {
+            updateQuery: function () {
                 var self = this;
                 var queryObj = this.query();
                 if (this.filter.feature_collection().features.length > 0) {
@@ -730,7 +788,7 @@ define([
                 this.query(queryObj);
             },
 
-            restoreState: function() {
+            restoreState: function () {
                 var query = this.query();
                 var buffer = 10;
                 var bufferUnit = 'm';
@@ -763,21 +821,21 @@ define([
                 this.pageLoaded = true;
             },
 
-            updateResults: function() {
-                if (!!this.searchResults.results){
+            updateResults: function () {
+                if (!!this.searchResults.results) {
                     this.searchAggregations({
                         results: this.searchResults.results.hits.hits,
                         geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
                     });
                     this.fitToAggregationBounds();
                 }
-                if(!!this.searchResults[componentName]) {
+                if (!!this.searchResults[componentName]) {
                     var buffer = this.searchResults[componentName].search_buffer;
                     this.map().getSource('geojson-search-buffer-data').setData(buffer);
                 }
             },
 
-            clear: function(reset_features) {
+            clear: function (reset_features) {
                 this.filter.feature_collection({
                     "type": "FeatureCollection",
                     "features": []
@@ -791,7 +849,7 @@ define([
                 this.searchGeometries([]);
             },
 
-            fitToAggregationBounds: function() {
+            fitToAggregationBounds: function () {
                 var agg = this.searchAggregations();
                 var aggBounds;
                 if (agg && agg.geo_aggs.bounds.bounds && this.map()) {

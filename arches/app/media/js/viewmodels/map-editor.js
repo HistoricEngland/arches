@@ -112,7 +112,7 @@ define([
             var tool;
             _.find(self.featureLookup, function(value) {
                 var selectedTool = value.selectedTool();
-                if(selectedTool) tool = selectedTool;
+                if (selectedTool) tool = selectedTool;
             });
             return tool;
         });
@@ -168,7 +168,7 @@ define([
                 type: 'FeatureCollection',
                 features: drawFeatures
             });
-            params.fitBoundsOptions =  {padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
+            params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
         params.activeTab = 'editor';
         params.sources = Object.assign({

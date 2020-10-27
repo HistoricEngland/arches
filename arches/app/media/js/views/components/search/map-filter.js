@@ -122,7 +122,7 @@ define([
 
                 this.mapLinkData.subscribe(function(data) {
                     this.zoomToGeoJSON(data);
-                }, this);
+                },this);
 
                 var bins = binFeatureCollection(this.searchAggregations);
 
@@ -185,7 +185,7 @@ define([
                             }
                         }
 
-                        if(!!feature.properties && !!feature.properties.inverted){
+                        if (!!feature.properties && !!feature.properties.inverted){
                             var inverted = feature.properties.inverted;
                             try{
                                 var bufferWidth = parseInt(buffer.width, 10);
@@ -279,7 +279,7 @@ define([
                 };
 
                 this.updateSearchResultsLayers = function() {
-                    if(self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
+                    if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
                         var geojsonFC = self.filter.feature_collection();
                         var extent = geojsonExtent(geojsonFC);
                         var bounds = new mapboxgl.LngLatBounds(extent);
@@ -693,7 +693,7 @@ define([
                 this.drawMode(undefined);
             },
 
-            useMaxBuffer: function(unit, buffer, maxBuffer) {
+            useMaxBuffer: function (unit, buffer, maxBuffer) {
                 res = false;
                 if (unit === 'ft') {
                     res = (buffer * 0.3048) > maxBuffer
@@ -776,8 +776,8 @@ define([
             updateQuery: function() {
                 var self = this;
                 var queryObj = this.query();
-                if(this.filter.feature_collection().features.length > 0) {
-                    if(this.getFilter('term-filter').hasTag(this.type) === false) {
+                if (this.filter.feature_collection().features.length > 0) {
+                    if (this.getFilter('term-filter').hasTag(this.type) === false) {
                         this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                     }
                     this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();

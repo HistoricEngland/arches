@@ -20,8 +20,8 @@ define([], function() {
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], [
-                    "!=", "resourceinstanceid", resourceId
-                ]],
+                "!=", "resourceinstanceid", resourceId
+            ]],
             "paint": {
                 "fill-color": color,
                 "fill-outline-color": color,

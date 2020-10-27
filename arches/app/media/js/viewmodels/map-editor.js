@@ -11,7 +11,7 @@ define([
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate){
+], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
@@ -73,7 +73,7 @@ define([
                 self.draw.changeMode('simple_select');
                 self.selectedFeatureIds([]);
             } else {
-                if(tool){
+                if (tool) {
                     self.draw.changeMode(tool);
                     self.map().draw_mode = tool;
                 }
@@ -96,7 +96,7 @@ define([
                         self.draw.trash();
                         self.draw.changeMode('simple_select');
                     } else if (tool) {
-                        _.each(self.featureLookup, function(value, key){
+                        _.each(self.featureLookup, function(value, key) {
                             if (key !== id) {
                                 value.selectedTool(null);
                             }
@@ -110,14 +110,14 @@ define([
 
         this.selectedTool = ko.pureComputed(function() {
             var tool;
-            _.find(self.featureLookup, function(value){
+            _.find(self.featureLookup, function(value) {
                 var selectedTool = value.selectedTool();
                 if(selectedTool) tool = selectedTool;
             });
             return tool;
         });
 
-        this.editing = ko.pureComputed(function(){
+        this.editing = ko.pureComputed(function() {
             return !!(self.selectedFeatureIds().length > 0 || self.selectedTool());
         });
 
@@ -168,7 +168,7 @@ define([
                 type: 'FeatureCollection',
                 features: drawFeatures
             });
-            params.fitBoundsOptions = {padding: { top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
+            params.fitBoundsOptions =  {padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
         params.activeTab = 'editor';
         params.sources = Object.assign({
@@ -196,7 +196,7 @@ define([
                 "fill-opacity": 0.1
             },
             "source": "geojson-editor-data"
-        }, {
+        },  {
             // Base colour for the stroke outline of the polygon
             "id": "geojson-editor-polygon-stroke-base",
 
@@ -211,7 +211,7 @@ define([
                 "line-width": 4
             },
             "source": "geojson-editor-data"
-        }, {
+        },  {
             // Main colour for the stroke outline of the polygon
             "id": "geojson-editor-polygon-stroke",
             "type": "line",
@@ -799,7 +799,7 @@ define([
         };
 
         self.selectFeature = function(feature) {
-            try{
+            try {
                 var geometry = JSON.parse(feature.properties.geojson);
                 var newFeature = {
                     "type": "Feature",
@@ -807,7 +807,7 @@ define([
                     "geometry": geometry
                 };
                 addSelectFeatures([newFeature]);
-            } catch(e){
+            } catch(e) {
                 $.getJSON(feature.properties.geojson, function(data) {
                     addSelectFeatures(data.features);
                 });

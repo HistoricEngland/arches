@@ -184,7 +184,9 @@ define([
         if (params.layers) {
             extendedLayers = params.layers;
         }
+
         var geojsonLayers = [{
+            /// Fill colour of the polygon once it has been completed
             "id": "geojson-editor-polygon-fill",
             "type": "fill",
             "filter": ["==", "$type", "Polygon"],
@@ -195,7 +197,9 @@ define([
             },
             "source": "geojson-editor-data"
         },  {
+            // Base colour for the stroke outline of the polygon
             "id": "geojson-editor-polygon-stroke-base",
+
             "type": "line",
             "filter": ["==", "$type", "Polygon"],
             "layout": {
@@ -208,6 +212,7 @@ define([
             },
             "source": "geojson-editor-data"
         },  {
+            // Main colour for the stroke outline of the polygon
             "id": "geojson-editor-polygon-stroke",
             "type": "line",
             "filter": ["==", "$type", "Polygon"],
@@ -221,6 +226,7 @@ define([
             },
             "source": "geojson-editor-data"
         }, {
+            // Colour for the polyline
             "id": "geojson-editor-line",
             "type": "line",
             "filter": ["==", "$type", "LineString"],
@@ -234,6 +240,7 @@ define([
             },
             "source": "geojson-editor-data"
         }, {
+            // Colour for the stroke outline of the point
             "id": "geojson-editor-point-point-stroke",
             "type": "circle",
             "filter": ["==", "$type", "Point"],
@@ -360,6 +367,271 @@ define([
                 self.geoJSONString(undefined);
             }
         };
+        this.drawStyles = [
+            // Set the styles for the drawing point, line and polygon in filter
+            // Colour while active should be fill and line: #D60DA3(purple)
+            // Colour while inactive should be fill: #E0E0E0(mid-grey) and line: #000000(black)
+            // Colour while static should be fill: and line:
+            {
+                // This sets the colour for the polygon and its outline once
+                // the filter has been applied.
+                'id': 'gl-draw-polygon-fill-inactive',
+                'type': 'fill',
+                'filter': ['all',
+                    ['==', 'active', 'false'],
+                    ['==', '$type', 'Polygon'],
+                    ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                    'fill-color': '#D60DA3', //'#3bb2d0',
+                    'fill-outline-color': '#000000', //'#3bb2d0',
+                    'fill-opacity': 0.5
+                }
+            },
+            {
+                // This sets the colour for the polygon and its outline while
+                // the filter is being drawn
+                'id': 'gl-draw-polygon-fill-active',
+                'type': 'fill',
+                'filter': ['all',['==', 'active', 'true'],['==', '$type', 'Polygon']],
+                'paint': {
+                    'fill-color': '#8B40DF', //'#fbb03b',
+                    'fill-outline-color': '#8B40DF', //'#fbb03b',
+                    'fill-opacity': 0.2
+                }
+            },
+            {
+                // This sets the colour of the point at the centre
+                // of the polygon
+                'id': 'gl-draw-polygon-midpoint',
+                'type': 'circle',
+                'filter': ['all',
+                    ['==', '$type', 'Point'],
+                    ['==', 'meta', 'midpoint']],
+                'paint': {
+                    'circle-radius': 3,
+                    'circle-color': '#8B40DF' //'#fbb03b'
+                }
+            },
+            {
+                // This sets the properties of the polygon outline
+                // once the filter has been applied.
+                'id': 'gl-draw-polygon-stroke-inactive',
+                'type': 'line',
+                'filter': ['all',
+                    ['==', 'active', 'false'],
+                    ['==', '$type', 'Polygon'],
+                    ['!=', 'mode', 'static']
+                ],
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'paint': {
+                    'line-color': '#D60DA3', //'#3bb2d0',
+                    'line-width': 2
+                }
+            },
+            {
+                // This sets the properties of the polygon outline while
+                // the filter is being drawn.
+                'id': 'gl-draw-polygon-stroke-active',
+                'type': 'line',
+                'filter': ['all',['==', 'active', 'true'],['==', '$type', 'Polygon']],
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'paint': {
+                    'line-color': '#8B40DF', //'#fbb03b',
+                    'line-dasharray': [0.2, 2],
+                    'line-width': 2
+                }
+            },
+            {
+                // This sets the properties of the polyline
+                // once the filter has been applied.
+                'id': 'gl-draw-line-inactive',
+                'type': 'line',
+                'filter': ['all',
+                    ['==', 'active', 'false'],
+                    ['==', '$type', 'LineString'],
+                    ['!=', 'mode', 'static']
+                ],
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'paint': {
+                    'line-color': '#D60DA3', //'#3bb2d0',
+                    'line-width': 2
+                }
+            },
+            {
+                // This sets the properties of the polyline
+                // as the filter is being drawn.
+                'id': 'gl-draw-line-active',
+                'type': 'line',
+                'filter': ['all',
+                    ['==', '$type', 'LineString'],
+                    ['==', 'active', 'true']
+                ],
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'paint': {
+                    'line-color': '#8B40DF', //'#fbb03b',
+                    'line-dasharray': [0.2, 2],
+                    'line-width': 2
+                }
+            },
+            {
+                // This sets the properties of the polygon and polyline vertices outlines
+                // once the filter has been drawn.
+                'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
+                'type': 'circle',
+                'filter': ['all',
+                    ['==', 'meta', 'vertex'],
+                    ['==', '$type', 'Point'],
+                    ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': '#fff'
+                }
+            },
+            {
+                // This sets the properties of the polygon and polyline vertices
+                // once the filter has been drawn.
+                'id': 'gl-draw-polygon-and-line-vertex-inactive',
+                'type': 'circle',
+                'filter': ['all',
+                    ['==', 'meta', 'vertex'],
+                    ['==', '$type', 'Point'],
+                    ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                    'circle-radius': 3,
+                    'circle-color': '#8B40DF' //'#fbb03b'
+                }
+            },
+            {
+                // This sets the properties of the point outline
+                // once the filter has been drawn.
+                'id': 'gl-draw-point-point-stroke-inactive',
+                'type': 'circle',
+                'filter': ['all',
+                    ['==', 'active', 'false'],
+                    ['==', '$type', 'Point'],
+                    ['==', 'meta', 'feature'],
+                    ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-opacity': 1,
+                    'circle-color': '#fff'
+                }
+            },
+            {
+                // This sets the properties of the point
+                // once the filter has been drawn.
+                'id': 'gl-draw-point-inactive',
+                'type': 'circle',
+                'filter': ['all',
+                    ['==', 'active', 'false'],
+                    ['==', '$type', 'Point'],
+                    ['==', 'meta', 'feature'],
+                    ['!=', 'mode', 'static']
+                ],
+                'paint': {
+                    'circle-radius': 3,
+                    'circle-color': '#D60DA3'
+                }
+            },
+            {
+                // This sets the properties of the point outline
+                // while the filter is being drawn.
+                'id': 'gl-draw-point-stroke-active',
+                'type': 'circle',
+                'filter': ['all',
+                    ['==', '$type', 'Point'],
+                    ['==', 'active', 'true'],
+                    ['!=', 'meta', 'midpoint']
+                ],
+                'paint': {
+                    'circle-radius': 7,
+                    'circle-color': '#fff'
+                }
+            },
+            {
+                // This sets the properties of the point
+                // while the filter is being drawn.
+                'id': 'gl-draw-point-active',
+                'type': 'circle',
+                'filter': ['all',
+                    ['==', '$type', 'Point'],
+                    ['!=', 'meta', 'midpoint'],
+                    ['==', 'active', 'true']],
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': '#8B40DF' //'#fbb03b'
+                }
+            },
+            {
+                // This sets the colour for the polygon and its outline once
+                // the draw mode has been changed to 'static'
+                'id': 'gl-draw-polygon-fill-static',
+                'type': 'fill',
+                'filter': ['all',['==', 'mode', 'static'],['==', '$type', 'Polygon']],
+                'paint': {
+                    'fill-color': '#D60DA3',
+                    'fill-outline-color': '#D60DA3',
+                    'fill-opacity': 0.1
+                }
+            },
+            {
+                // This sets the properties of the polygon outline once
+                // the draw mode has been changed to 'static'
+                'id': 'gl-draw-polygon-stroke-static',
+                'type': 'line',
+                'filter': ['all',['==', 'mode', 'static'],['==', '$type', 'Polygon']],
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'paint': {
+                    'line-color': '#D60DA3',
+                    'line-width': 2
+                }
+            },
+            {
+                // This sets the properties of the polyline once
+                // the draw mode has been changed to 'static'
+                'id': 'gl-draw-line-static',
+                'type': 'line',
+                'filter': ['all',['==', 'mode', 'static'],['==', '$type', 'LineString']],
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'paint': {
+                    'line-color': '#D60DA3',
+                    'line-width': 2
+                }
+            },
+            {
+                // This sets the properties of the point once
+                // the draw mode has been changed to 'static'
+                'id': 'gl-draw-point-static',
+                'type': 'circle',
+                'filter': ['all',['==', 'mode', 'static'],['==', '$type', 'Point']],
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': '#D60DA3'
+                }
+            }
+        ];
 
         var setupDraw = function(map) {
             var modes = MapboxDraw.modes;
@@ -374,7 +646,8 @@ define([
             };
             self.draw = new MapboxDraw({
                 displayControlsDefault: false,
-                modes: modes
+                modes: modes,
+                styles: self.drawStyles
             });
             map.addControl(self.draw);
             self.draw.set({
@@ -461,18 +734,18 @@ define([
                         ko.unwrap(widget.config.geometryTypes).map(function(type) {
                             var option = {};
                             switch (ko.unwrap(type.id)) {
-                            case 'Point':
-                                option.value = 'draw_point';
-                                option.text = 'Add point';
-                                break;
-                            case 'Line':
-                                option.value = 'draw_line_string';
-                                option.text = 'Add line';
-                                break;
-                            case 'Polygon':
-                                option.value = 'draw_polygon';
-                                option.text = 'Add polygon';
-                                break;
+                                case 'Point':
+                                    option.value = 'draw_point';
+                                    option.text = 'Add point';
+                                    break;
+                                case 'Line':
+                                    option.value = 'draw_line_string';
+                                    option.text = 'Add line';
+                                    break;
+                                case 'Polygon':
+                                    option.value = 'draw_polygon';
+                                    option.text = 'Add polygon';
+                                    break;
                             }
                             return option;
                         })

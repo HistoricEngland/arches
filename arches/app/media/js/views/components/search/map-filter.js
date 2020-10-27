@@ -15,11 +15,11 @@ define([
     'uuid',
     'geojsonhint',
     'codemirror/mode/javascript/javascript'
-], function ($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint) {
+], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint){
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
-            initialize: function (options) {
+            initialize: function(options){
                 var self = this;
                 options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
@@ -89,9 +89,9 @@ define([
 
                 options.search = true;
 
-                MapComponentViewModel.apply(this, [options]);
+                MapComponentViewModel.apply(this,[options]);
 
-                this.updateLayers = function (layers) {
+                this.updateLayers = function(layers){
                     var map = self.map();
                     var style = map.getStyle();
                     style.layers = self.draw ? layers.concat(self.draw.options.styles) : layers;
@@ -120,19 +120,19 @@ define([
                     val: 'ft'
                 }];
 
-                this.mapLinkData.subscribe(function (data) {
+                this.mapLinkData.subscribe(function(data){
                     this.zoomToGeoJSON(data);
                 }, this);
 
                 var bins = binFeatureCollection(this.searchAggregations);
 
-                this.geoJSONString.subscribe(function (geoJSONString) {
+                this.geoJSONString.subscribe(function(geoJSONString){
                     this.geoJSONErrors(this.getGeoJSONErrors(geoJSONString));
-                    if (this.geoJSONErrors().length === 0) {
+                    if(this.geoJSONErrors().length === 0){
                         var geoJSON = JSON.parse(geoJSONString);
                         // remove any extra geometries as only one geometry is allowed for search
                         geoJSON.features = geoJSON.features.slice(0, 1);
-                        if (geoJSON.features.length > 0) {
+                        if(geoJSON.features.length > 0){
                             var extent = geojsonExtent(geoJSON);
                             var bounds = new mapboxgl.LngLatBounds(extent);
                             this.map().fitBounds(bounds, {
@@ -144,23 +144,23 @@ define([
                     }
                 }, this);
 
-                this.getGeoJSONErrors = function (geoJSONString) {
+                this.getGeoJSONErrors = function(geoJSONString){
                     var hint = geojsonhint.hint(geoJSONString);
                     var errors = [];
-                    try {
+                    try{
                         var geoJSON = JSON.parse(geoJSONString);
-                        if (geoJSON.features.length > 1) {
+                        if(geoJSON.features.length > 1){
                             hint.push({
                                 "level": 'warning',
                                 "message": 'Only one feature is allowed for search filtering.  Ignorning all all but the first feature.'
                             });
                         }
                         var feature = geoJSON.features[0];
-                        if (!!feature.properties && !!feature.properties.buffer) {
+                        if(!!feature.properties && !!feature.properties.buffer){
                             var buffer = feature.properties.buffer;
-                            try {
+                            try{
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if (bufferWidth < 0 || bufferWidth > this.maxBuffer) {
+                                if(bufferWidth < 0 || bufferWidth > this.maxBuffer){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -171,9 +171,9 @@ define([
                                 });
                             }
 
-                            try {
+                            try{
                                 var bufferUnit = buffer.unit;
-                                if (bufferUnit !== 'ft' && bufferUnit !== 'm') {
+                                if(bufferUnit !== 'ft' && bufferUnit !== 'm'){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -185,11 +185,11 @@ define([
                             }
                         }
 
-                        if (!!feature.properties && !!feature.properties.inverted) {
+                        if(!!feature.properties && !!feature.properties.inverted){
                             var inverted = feature.properties.inverted;
-                            try {
+                            try{
                                 var bufferWidth = parseInt(buffer.width, 10);
-                                if (inverted !== true && inverted !== false) {
+                                if(inverted !== true && inverted !== false){
                                     throw new Error('Whoops!');
                                 }
                             }
@@ -200,9 +200,9 @@ define([
                                 });
                             }
                         }
-                    } finally {
-                        hint.forEach(function (item) {
-                            if (item.level !== 'message') {
+                    }finally{
+                        hint.forEach(function(item){
+                            if(item.level !== 'message'){
                                 errors.push(item);
                             }
                         });
@@ -242,9 +242,9 @@ define([
 
                 this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
 
-                this.drawMode.subscribe(function (selectedDrawTool) {
-                    if (!!selectedDrawTool) {
-                        if (selectedDrawTool === 'extent') {
+                this.drawMode.subscribe(function(selectedDrawTool){
+                    if(!!selectedDrawTool){
+                        if(selectedDrawTool === 'extent'){
                             this.searchByExtent();
                         } else {
                             this.draw.changeMode(selectedDrawTool);
@@ -253,19 +253,19 @@ define([
                     }
                 }, this);
 
-                this.searchResults.timestamp.subscribe(function (timestamp) {
-                    if (this.pageLoaded) {
+                this.searchResults.timestamp.subscribe(function(timestamp){
+                    if(this.pageLoaded){
                         this.updateResults();
                     }
                 }, this);
 
-                var updateSearchResultPointLayer = function () {
+                var updateSearchResultPointLayer = function(){
                     var pointSource = self.map().getSource('search-results-points');
                     var agg = ko.unwrap(self.searchAggregations);
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
-                    _.each(agg.results, function (result) {
-                        _.each(result._source.points, function (point) {
+                    _.each(agg.results, function(result){
+                        _.each(result._source.points, function(point){
                             var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
                                 resourceinstanceid: result._id,
                                 highlight: result._id === mouseoverInstanceId
@@ -278,8 +278,8 @@ define([
                     pointSource.setData(pointsFC);
                 };
 
-                this.updateSearchResultsLayers = function () {
-                    if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
+                this.updateSearchResultsLayers = function(){
+                    if(self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0){
                         var geojsonFC = self.filter.feature_collection();
                         var extent = geojsonExtent(geojsonFC);
                         var bounds = new mapboxgl.LngLatBounds(extent);
@@ -291,7 +291,7 @@ define([
                     }
                     var features = [];
                     var agg = ko.unwrap(self.searchAggregations);
-                    _.each(agg.geo_aggs.grid.buckets, function (cell) {
+                    _.each(agg.geo_aggs.grid.buckets, function(cell){
                         var pt = geohash.decode(cell.key);
                         var feature = turf.point([pt.lon, pt.lat], {
                             doc_count: cell.doc_count
@@ -301,8 +301,8 @@ define([
                     var pointsFC = turf.featureCollection(features);
 
                     var aggregated = turf.collect(ko.unwrap(bins), pointsFC, 'doc_count', 'doc_count');
-                    _.each(aggregated.features, function (feature) {
-                        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function (i, ii) {
+                    _.each(aggregated.features, function(feature){
+                        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i, ii){
                             return i + ii;
                         }, 0);
                     });
@@ -320,30 +320,30 @@ define([
                 };
 
                 this.filters[componentName](this);
-                this.map.subscribe(function () {
+                this.map.subscribe(function(){
                     this.setupDraw();
                     this.restoreState();
 
-                    var filterUpdated = ko.computed(function () {
+                    var filterUpdated = ko.computed(function(){
                         return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
                     }, this);
-                    filterUpdated.subscribe(function () {
+                    filterUpdated.subscribe(function(){
                         this.updateQuery();
                     }, this);
 
-                    this.buffer.subscribe(function (val) {
+                    this.buffer.subscribe(function(val){
                         this.updateFilter();
                     }, this);
 
-                    this.bufferUnit.subscribe(function (val) {
+                    this.bufferUnit.subscribe(function(val){
                         this.updateFilter();
                     }, this);
 
                     this.searchAggregations.subscribe(this.updateSearchResultsLayers, this);
-                    if (ko.isObservable(bins)) {
+                    if(ko.isObservable(bins)){
                         bins.subscribe(this.updateSearchResultsLayers, this);
                     }
-                    if (this.searchAggregations()) {
+                    if(this.searchAggregations()){
                         this.updateSearchResultsLayers();
                     }
                     this.mouseoverInstanceId.subscribe(updateSearchResultPointLayer);
@@ -355,7 +355,7 @@ define([
                 // Colour while inactive should be fill: #E0E0E0 (mid-grey) and line: #000000 (black)
                 // Colour while static should be fill: and line:
                 {
-                    // This sets the colour for the polygon and its outline once 
+                    // This sets the colour for the polygon and its outline once
                     // the filter has been applied.
                     'id': 'gl-draw-polygon-fill-inactive',
                     'type': 'fill',
@@ -386,7 +386,7 @@ define([
                     }
                 },
                 {
-                    // This sets the colour of the point at the centre 
+                    // This sets the colour of the point at the centre
                     // of the polygon
                     'id': 'gl-draw-polygon-midpoint',
                     'type': 'circle',
@@ -475,7 +475,7 @@ define([
                     }
                 },
                 {
-                    // This sets the properties of the polygon and polyline vertices outlines 
+                    // This sets the properties of the polygon and polyline vertices outlines
                     // once the filter has been drawn.
                     'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
                     'type': 'circle',
@@ -490,7 +490,7 @@ define([
                     }
                 },
                 {
-                    // This sets the properties of the polygon and polyline vertices 
+                    // This sets the properties of the polygon and polyline vertices
                     // once the filter has been drawn.
                     'id': 'gl-draw-polygon-and-line-vertex-inactive',
                     'type': 'circle',
@@ -505,7 +505,7 @@ define([
                     }
                 },
                 {
-                    // This sets the properties of the point outline 
+                    // This sets the properties of the point outline
                     // once the filter has been drawn.
                     'id': 'gl-draw-point-point-stroke-inactive',
                     'type': 'circle',
@@ -538,7 +538,7 @@ define([
                     }
                 },
                 {
-                    // This sets the properties of the point outline 
+                    // This sets the properties of the point outline
                     // while the filter is being drawn.
                     'id': 'gl-draw-point-stroke-active',
                     'type': 'circle',
@@ -600,7 +600,7 @@ define([
                     }
                 },
                 {
-                    // This sets the properties of the polyline once 
+                    // This sets the properties of the polyline once
                     // the draw mode has been changed to 'static'
                     'id': 'gl-draw-line-static',
                     'type': 'line',
@@ -618,7 +618,7 @@ define([
                     }
                 },
                 {
-                    // This sets the properties of the point once 
+                    // This sets the properties of the point once
                     // the draw mode has been changed to 'static'
                     'id': 'gl-draw-point-static',
                     'type': 'circle',
@@ -632,11 +632,11 @@ define([
                     }
                 }
             ],
-            setupDraw: function () {
+            setupDraw: function(){
                 var self = this;
                 var modes = MapboxDraw.modes;
                 modes.static = {
-                    toDisplayFeatures: function (state, geojson, display) {
+                    toDisplayFeatures: function(state, geojson, display){
                         display(geojson);
                     }
                 };
@@ -646,9 +646,9 @@ define([
                     styles: self.drawStyles
                 });
                 this.map().addControl(this.draw);
-                this.map().on('draw.create', function (e) {
-                    self.draw.getAll().features.forEach(function (feature) {
-                        if (feature.id !== e.features[0].id) {
+                this.map().on('draw.create', function(e){
+                    self.draw.getAll().features.forEach(function(feature){
+                        if(feature.id !== e.features[0].id){
                             self.draw.delete(feature.id);
                         }
                     })
@@ -656,17 +656,17 @@ define([
                     self.updateFilter();
                     self.drawMode(undefined);
                 });
-                this.map().on('draw.update', function (e) {
+                this.map().on('draw.update', function(e){
                     self.searchGeometries(e.features);
                     self.updateFilter();
                 });
-                this.map().on("draw.modechange", function (e) {
+                this.map().on("draw.modechange", function(e){
                     self.map().draw_mode = e.mode;
                 });
             },
 
-            searchByExtent: function () {
-                if (_.contains(this.drawModes, this.drawMode())) {
+            searchByExtent: function(){
+                if(_.contains(this.drawModes, this.drawMode())){
                     this.draw.deleteAll();
                 }
                 var bounds = this.map().getBounds();
@@ -693,9 +693,9 @@ define([
                 this.drawMode(undefined);
             },
 
-            useMaxBuffer: function (unit, buffer, maxBuffer) {
+            useMaxBuffer: function(unit, buffer, maxBuffer){
                 res = false;
-                if (unit === 'ft') {
+                if(unit === 'ft'){
                     res = (buffer * 0.3048) > maxBuffer
                 } else {
                     res = buffer > maxBuffer
@@ -703,20 +703,20 @@ define([
                 return res;
             },
 
-            updateFilter: function () {
-                if (this.buffer() < 0) {
+            updateFilter: function(){
+                if(this.buffer() < 0){
                     this.buffer(0);
                 }
 
                 var useMaxBuffer = this.useMaxBuffer(this.bufferUnit(), this.buffer(), this.maxBuffer);
                 var buffer = this.buffer();
-                if (useMaxBuffer) {
+                if(useMaxBuffer){
                     max = this.bufferUnit() === 'ft' ? 328084 : this.maxBuffer;
                     this.buffer(max);
                 }
 
-                this.searchGeometries().forEach(function (feature) {
-                    if (!feature.properties) {
+                this.searchGeometries().forEach(function(feature){
+                    if(!feature.properties){
                         feature.properties = {};
                     }
                     feature.properties.buffer = {
@@ -731,23 +731,23 @@ define([
                 });
             },
 
-            editGeoJSON: function (feature) {
+            editGeoJSON: function(feature){
                 var geoJSON = feature();
                 var geoJSONString = JSON.stringify(geoJSON, null, 4);
                 this.geoJSONString(geoJSONString);
             },
 
-            updateGeoJSON: function () {
-                if (this.geoJSONErrors().length === 0) {
+            updateGeoJSON: function(){
+                if(this.geoJSONErrors().length === 0){
                     var geoJSON = JSON.parse(this.geoJSONString());
                     this.draw.set(geoJSON);
                     this.searchGeometries(geoJSON.features);
-                    geoJSON.features.forEach(function (feature) {
-                        if (!!feature.properties && !!feature.properties.buffer) {
+                    geoJSON.features.forEach(function(feature){
+                        if(!!feature.properties && !!feature.properties.buffer){
                             this.buffer(parseInt(feature.properties.buffer.width, 10));
                             this.bufferUnit(feature.properties.buffer.unit);
                         }
-                        if (!!feature.properties && feature.properties.hasOwnProperty('inverted')) {
+                        if(!!feature.properties && feature.properties.hasOwnProperty('inverted')){
                             this.filter.inverted(feature.properties.inverted);
                         }
                     }, this);
@@ -756,8 +756,8 @@ define([
                 }
             },
 
-            zoomToGeoJSON: function (data) {
-                var mapData = data.properties.geometries.reduce(function (fc1, fc2) {
+            zoomToGeoJSON: function(data){
+                var mapData = data.properties.geometries.reduce(function(fc1, fc2){
                     fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
                     return fc1;
                 }, {
@@ -773,11 +773,11 @@ define([
                 });
             },
 
-            updateQuery: function () {
+            updateQuery: function(){
                 var self = this;
                 var queryObj = this.query();
-                if (this.filter.feature_collection().features.length > 0) {
-                    if (this.getFilter('term-filter').hasTag(this.type) === false) {
+                if(this.filter.feature_collection().features.length > 0){
+                    if(this.getFilter('term-filter').hasTag(this.type) === false){
                         this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                     }
                     this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();
@@ -788,15 +788,15 @@ define([
                 this.query(queryObj);
             },
 
-            restoreState: function () {
+            restoreState: function(){
                 var query = this.query();
                 var buffer = 10;
                 var bufferUnit = 'm';
                 var inverted = false;
                 var hasSpatialFilter = false;
-                if (componentName in query) {
+                if(componentName in query){
                     var mapQuery = JSON.parse(query[componentName]);
-                    if (mapQuery.features.length > 0) {
+                    if(mapQuery.features.length > 0){
                         hasSpatialFilter = true;
                         var properties = mapQuery.features[0].properties;
                         inverted = properties.inverted;
@@ -814,28 +814,28 @@ define([
                 this.buffer = ko.observable(buffer).extend({ deferred: true });
                 this.bufferUnit = ko.observable(bufferUnit).extend({ deferred: true });
                 this.filter.inverted = ko.observable(inverted).extend({ deferred: true });
-                if (hasSpatialFilter) {
+                if(hasSpatialFilter){
                     this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                 }
                 this.updateResults();
                 this.pageLoaded = true;
             },
 
-            updateResults: function () {
-                if (!!this.searchResults.results) {
+            updateResults: function(){
+                if(!!this.searchResults.results){
                     this.searchAggregations({
                         results: this.searchResults.results.hits.hits,
                         geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
                     });
                     this.fitToAggregationBounds();
                 }
-                if (!!this.searchResults[componentName]) {
+                if(!!this.searchResults[componentName]){
                     var buffer = this.searchResults[componentName].search_buffer;
                     this.map().getSource('geojson-search-buffer-data').setData(buffer);
                 }
             },
 
-            clear: function (reset_features) {
+            clear: function(reset_features){
                 this.filter.feature_collection({
                     "type": "FeatureCollection",
                     "features": []
@@ -849,10 +849,10 @@ define([
                 this.searchGeometries([]);
             },
 
-            fitToAggregationBounds: function () {
+            fitToAggregationBounds: function(){
                 var agg = this.searchAggregations();
                 var aggBounds;
-                if (agg && agg.geo_aggs.bounds.bounds && this.map()) {
+                if(agg && agg.geo_aggs.bounds.bounds && this.map()){
                     aggBounds = agg.geo_aggs.bounds.bounds;
                     var bounds = [
                         [

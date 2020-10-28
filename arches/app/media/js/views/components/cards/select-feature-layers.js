@@ -1,6 +1,6 @@
 define([], function() {
     return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
-        color = color || "#F0C200";
+        color = color || "#8B40DF";
         var strokecolor = "#fff";
         var overviewzoom = 11;
         var minzoom = 15;
@@ -25,7 +25,7 @@ define([], function() {
             "paint": {
                 "fill-color": color,
                 "fill-outline-color": color,
-                "fill-opacity": 0.2
+                "fill-opacity": 0.5
             },
             "layout": {
                 "visibility": visible ? "visible": "none"

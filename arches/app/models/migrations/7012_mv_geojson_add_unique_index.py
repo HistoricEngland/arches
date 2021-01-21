@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-            DROP MATERIALIZED VIEW mv_geojson_geoms CASCADE;
+            DROP MATERIALIZED VIEW mv_geojson_geoms;
             CREATE MATERIALIZED VIEW mv_geojson_geoms AS
                 SELECT public.uuid_generate_v1mc() AS uid,
                     t.tileid,

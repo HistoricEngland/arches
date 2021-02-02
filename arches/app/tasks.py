@@ -88,7 +88,7 @@ def export_search_results(self, userid, request_values, format):
 def refresh_materialized_view(self):
     cursor = connection.cursor()
     sql = """
-        REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY mv_geojson_geoms;
     """
     cursor.execute(sql)
     response = {"taskid": self.request.id}

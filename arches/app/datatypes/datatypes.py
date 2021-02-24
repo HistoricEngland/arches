@@ -988,7 +988,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "addtomap": node.config["addToMap"],
         }
 
-    def after_update_all(self):
+    '''def after_update_all(self):
         from arches.app.tasks import refresh_materialized_view, log_error
 
         celery_worker_running = task_management.check_if_celery_available()
@@ -1000,6 +1000,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 REFRESH MATERIALIZED VIEW CONCURRENTLY mv_geojson_geoms;
             """
             cursor.execute(sql)
+    '''
 
 
 class FileListDataType(BaseDataType):

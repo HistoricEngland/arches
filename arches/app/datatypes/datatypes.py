@@ -999,7 +999,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             sql = """
                 REFRESH MATERIALIZED VIEW CONCURRENTLY mv_geojson_geoms;
             """
-            cursor.execute(sql)
+            #cursor.execute(sql)
+
 
 
 class FileListDataType(BaseDataType):

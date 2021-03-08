@@ -997,9 +997,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         elif settings.AUTO_REFRESH_GEOM_VIEW:
             cursor = connection.cursor()
             sql = """
-                REFRESH MATERIALIZED VIEW CONCURRENTLY mv_geojson_geoms;
+                REFRESH MATERIALIZED VIEW mv_geojson_geoms;
             """
-            cursor.execute(sql)
+            #cursor.execute(sql)
+
 
 
 class FileListDataType(BaseDataType):

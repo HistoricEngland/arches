@@ -192,12 +192,7 @@ class Resource(models.ResourceInstance):
         # need to handle if the bulk load is appending tiles to existing resources/
         existing_resources = Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources])
         existing_resources_ids = [existing_resource.resourceinstanceid for existing_resource in existing_resources]
-
-        #existing_tiles = TileModel.objects.filter(tileid__in=[tile.tileid for tile in tiles])
-        #existing_tiles_ids = [existing_tile.tileid for existing_tile in existing_tiles]
-
         resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
-        #tiles_to_create = [tile for tile in tiles if tile.tileid not in existing_tiles_ids]
 
         start = time()
         Resource.objects.bulk_create(resources_to_create)
@@ -213,12 +208,12 @@ class Resource(models.ResourceInstance):
             resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
         except:
             pass
-        
+
         logger.info("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
 
-        #refetch new AND updated resources and index
+        # refetch new AND updated resources and index
         for resource in Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]):
-            
+
             start = time()
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
@@ -465,7 +460,13 @@ class Resource(models.ResourceInstance):
         return errors
 
     def get_related_resources(
-        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
+        self,
+        lang="en-US",
+        limit=settings.RELATED_RESOURCES_EXPORT_LIMIT,
+        start=0,
+        page=0,
+        user=None,
+        resourceinstance_graphid=None,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -512,10 +513,11 @@ class Resource(models.ResourceInstance):
             return query.search(index=RESOURCE_RELATIONS_INDEX)
 
         resource_relations = get_relations(
-            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
+            resourceinstanceid=self.resourceinstanceid,
+            start=start,
+            limit=limit,
+            resourceinstance_graphid=resourceinstance_graphid,
         )
-
-        
 
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()

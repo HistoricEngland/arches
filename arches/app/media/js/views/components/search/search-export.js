@@ -11,6 +11,7 @@ function($, ko, arches) {
             this.total = params.total;
             this.query = params.query;
             this.downloadStarted = ko.observable(false);
+            this.reportlink = ko.observable(true);
             this.format = ko.observable('tilecsv');
             this.precision = ko.observable(6);
             this.result = ko.observable();
@@ -24,6 +25,7 @@ function($, ko, arches) {
                 var urlparams = ko.unwrap(self.query);
                 urlparams.format = self.format();
                 urlparams.precision = self.precision();
+                urlparams.reportlink = self.reportlink();
                 urlparams.total = self.total();
                 url = url + '?' + $.param(urlparams);
                 return url;
@@ -42,6 +44,7 @@ function($, ko, arches) {
                 var payload = ko.unwrap(this.query);
                 self.downloadPending(true);
                 payload.format = this.format();
+                payload.reportlink = this.reportlink();
                 payload.precision = this.precision();
                 payload.total = this.total();
                 payload.email = this.emailInput();

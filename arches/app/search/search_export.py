@@ -34,8 +34,10 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.response import JSONResponse
 import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
+from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
+
 
 
 class SearchResultsExporter(object):
@@ -45,6 +47,7 @@ class SearchResultsExporter(object):
         search_request.GET = search_request.GET.copy()
         search_request.GET["tiles"] = True
         search_request.GET["export"] = True
+        self.report_link = search_request.GET.get("reportlink", False)
         self.format = search_request.GET.get("format", "tilecsv")
         self.compact = search_request.GET.get("compact", True)
         self.precision = int(search_request.GET.get("precision", 5))
@@ -56,7 +59,7 @@ class SearchResultsExporter(object):
         self.output = {}
         self.set_precision = GeoUtils().set_precision
 
-    def export(self, format):
+    def export(self, format, report_link):
         ret = []
         search_res_json = SearchView.search_results(self.search_request)
         if search_res_json.status_code == 500:
@@ -81,15 +84,26 @@ class SearchResultsExporter(object):
 
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
+
+
+            if report_link == "true":
+                for resource in resources["output"]:
+                    resource["Link"] = str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/report/" + str(resource["resourceid"])
+
             if format == "geojson":
                 headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+                if (report_link == "true") and ("Link" not in headers):
+                    headers.append("Link")
                 ret = self.to_geojson(resources["output"], headers=headers, name=graph.name)
                 return ret, ""
 
             if format == "tilecsv":
                 headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+                if (report_link == "true") and ("Link" not in headers):
+                    headers.append("Link")
                 headers.append("resourceid")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
+
             if format == "shp":
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
                 missing_field_names = []
@@ -101,10 +115,13 @@ class SearchResultsExporter(object):
                     message = _("Shapefile are fieldnames required for the following nodes: {0}".format(", ".join(missing_field_names)))
                     logger.error(message)
                     raise (Exception(message))
-
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
+                if (report_link == "true") and ({"fieldname": "Link", "datatype": "str"} not in headers):
+                    headers.append({"fieldname": "Link", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
+
+
 
         full_path = self.search_request.get_full_path()
         search_request_path = self.search_request.path if full_path is None else full_path

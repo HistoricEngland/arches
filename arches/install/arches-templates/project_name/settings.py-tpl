@@ -95,6 +95,13 @@ INSTALLED_APPS = (
 
 ALLOWED_HOSTS = []
 
+# This is the namespace to use for export of data (for RDF/XML for example)
+# and also used to create the report link in data export files.
+# Ideally this should point to the url where you host your site
+# Make sure to use a trailing slash
+
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
+
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 

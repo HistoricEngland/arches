@@ -203,6 +203,8 @@ class Resource(models.ResourceInstance):
         start = time()
         for resource in resources_to_create:
             resource.save_edit(edit_type="create")
+        for resource in existing_resources:
+            resource.save_edit(edit_type="append")
 
         try:
             resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")

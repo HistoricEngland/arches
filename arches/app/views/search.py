@@ -213,8 +213,10 @@ def export_results(request):
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     app_name = settings.APP_NAME
     if total > download_limit and format != "geojson":
-        if (settings.RESTRICT_BG_EXPORT_ANON == True) and (request.user.username == 'anonymous'):
-            message = _("Your search exceeds the {download_limit} instance download limit.  Anonymous users cannot run an export exceeding this limit. Please sign in with your {app_name} account or refine your search").format(**locals())
+        if (settings.RESTRICT_BG_EXPORT_ANON == True) and (request.user.username == "anonymous"):
+            message = _(
+                "Your search exceeds the {download_limit} instance download limit.  Anonymous users cannot run an export exceeding this limit. Please sign in with your {app_name} account or refine your search"
+            ).format(**locals())
             return JSONResponse({"success": False, "message": message})
         
         else:
@@ -223,7 +225,9 @@ def export_results(request):
                 request_values = dict(request.GET)
                 request_values["path"] = request.get_full_path()
                 result = tasks.export_search_results.apply_async(
-                    (request.user.id, request_values, format, report_link), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                    (request.user.id, request_values, format, report_link),
+                    link=tasks.update_user_task_record.s(),
+                    link_error=tasks.log_error.s(),
                 )
                 message = _(
                     "{total} instances have been submitted for export. \
@@ -231,7 +235,9 @@ def export_results(request):
                 ).format(**locals())
                 return JSONResponse({"success": True, "message": message})
             else:
-                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
+                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(
+                    **locals()
+                )
                 return JSONResponse({"success": False, "message": message})
 
     elif format == "tilexl":

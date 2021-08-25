@@ -217,7 +217,6 @@ def export_results(request):
                 "Your search exceeds the {download_limit} instance download limit.  Anonymous users cannot run an export exceeding this limit. Please sign in with your {app_name} account or refine your search"
             ).format(**locals())
             return JSONResponse({"success": False, "message": message})
-        
         else:
             celery_worker_running = task_management.check_if_celery_available()
             if celery_worker_running is True:

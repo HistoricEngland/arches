@@ -6,7 +6,7 @@
 
     <div class="search-listing" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
         <h3 class="search-listing-title">
-            <a class="search-candidate-title" data-bind="attr: {​​​​​​​​ href: $parent.viewReport.bind($parent)}​​​​​​​​" target="_blank">
+            <a class="search-candidate-title" data-bind="attr: { href: $parent.viewReport.bind($parent) }" target="_blank">
                 <i class="search-listing-icon" data-bind="css: iconclass"></i>
                 <span data-bind="text: displayname"></span>
             </a>

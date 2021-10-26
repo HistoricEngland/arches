@@ -217,11 +217,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             },
 
             viewReport: function(resourceinstance){
-                window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
+                //window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
+                return arches.urls.resource_report + resourceinstance.resourceinstanceid;
             },
 
             editResource: function(resourceinstance){
-                window.open(arches.urls.resource_editor + resourceinstance.resourceinstanceid);
+                //window.open(arches.urls.resource_editor + resourceinstance.resourceinstanceid);
+                return arches.urls.resource_editor + resourceinstance.resourceinstanceid;
             },
 
             zoomToFeature: function(evt){

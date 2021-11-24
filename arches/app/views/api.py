@@ -286,6 +286,21 @@ class GeoJSON(APIBase):
         include_geojson_link = bool(request.GET.get("include_geojson_link", False))
         use_display_values = bool(request.GET.get("use_display_values", False))
         geometry_type = request.GET.get("type", None)
+        
+        #################### simplify addition
+        simplify = bool(request.GET.get("simplify", False))
+        ####################
+
+        #################### bbox addition
+        bbox_xmin = request.GET.get("xmin", None)
+        bbox_ymin = request.GET.get("ymin", None)
+        bbox_xmax = request.GET.get("xmax", None)
+        bbox_ymax = request.GET.get("ymax", None)
+        bbox_srid = request.GET.get("in_srid", None)
+
+        print(f"... bbox info xmin:{bbox_xmin} ymin:{bbox_ymin} xmax:{bbox_xmax} ymax:{bbox_ymax} srid:{bbox_srid}")
+        ####################
+
         indent = request.GET.get("indent", None)
         limit = request.GET.get("limit", None)
         page = int(request.GET.get("page", 1))
@@ -319,7 +334,30 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = slugify(node.name, max_length=field_name_length, separator="_")
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
-        tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
+        
+        #################### bbox addition
+        if bbox_xmin is not None and bbox_ymin is not None and bbox_xmax is not None and bbox_ymax is not None and bbox_srid is not None:
+            print(f"... node_filter: {node_filter}")
+            bbox_xmin = float(bbox_xmin)
+            bbox_ymin = float(bbox_ymin)
+            bbox_xmax = float(bbox_xmax)
+            bbox_ymax = float(bbox_ymax)
+            bbox_srid = int(bbox_srid)
+            bbox_tileid_filter = self.get_bbox_tiles(
+                xmin=bbox_xmin,
+                ymin=bbox_ymin,
+                xmax=bbox_xmax,
+                ymax=bbox_ymax,
+                in_srid=bbox_srid,
+                compare_type="intersects",
+                node_filter=node_filter,
+            )
+            tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes], tileid__in=bbox_tileid_filter)
+        else:
+            print(f"... no bbox info provided ({request.build_absolute_uri()}")
+            tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
+
+        #####################
         last_page = None
         if resourceid is not None:
             tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
@@ -332,6 +370,7 @@ class GeoJSON(APIBase):
             end = start + limit
             last_page = len(tiles) < end
             tiles = tiles[start:end]
+        print(f"... tiles: {len(tiles)}")
         for tile in tiles:
             data = tile.data
             for node in nodes:
@@ -384,6 +423,52 @@ class GeoJSON(APIBase):
 
         response = JSONResponse(feature_collection, indent=indent)
         return response
+
+    def get_bbox_tiles(self, xmin, ymin, xmax, ymax, in_srid, compare_type="intersects", node_filter=[]):
+
+        if compare_type not in ["contains", "intersects"]:
+            raise ValueError("compare_type must be either 'intersects' (default) or 'contains'.")
+
+        compare_type = "&&" if compare_type == "instects" else "@"
+
+        node_compare = "IN"
+        if len(node_filter) == 0:
+            node_compare = "NOT IN"
+            node_filter = ["10000001-1000-0000-0000-000000000001"]
+
+        params = [
+            tuple(node_filter),
+            float(xmin),
+            float(ymin),
+            float(xmax),
+            float(ymax),
+            int(in_srid),
+        ]
+
+        sql = f"""
+                SELECT * FROM tiles
+                WHERE tileid IN (
+                    SELECT DISTINCT tileid
+                    FROM   geojson_geometries
+                    WHERE nodeid {node_compare} %s -- node_filter
+                        AND geom 
+                            {compare_type} -- comapre && or @
+                            ST_Transform(
+                                ST_MakeEnvelope (
+                                %s, %s, -- xmin, ymin 
+                                %s, %s, -- xmax, ymax
+                                %s), 3857
+                            ) -- srid
+                    );
+        """
+        
+        try:
+            tiles = models.TileModel.objects.raw(sql, params) #.values_list("tileid", flat=True)
+            bbox_tile_ids = [t.tileid for t in tiles]
+        except Exception as e:
+            logger.error(e)
+        print(f"... intersects: {len(bbox_tile_ids)}")
+        return bbox_tile_ids
 
 
 class MVT(APIBase):

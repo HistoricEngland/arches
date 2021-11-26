@@ -271,6 +271,35 @@ class GeoJSON(APIBase):
         else:
             return _("Unnamed Resource")
 
+    def validate_geometry_types(self, geometry_type):
+        """
+            Ensures that multipart types are included when only single part type geometries are added an
+
+        Args:
+            geometry_type (str or list): string or list of geometry types that are to be selected.
+
+
+        Returns: (list) geometry_types to be selected
+        """
+        if geometry_type is None:
+            return None
+
+        ret = []
+        if isinstance(geometry_type, str):
+            try:
+                geometry_type.split(",")
+            except:
+                geometry_type = [geometry_type]
+
+        if "Polygon" in geometry_type or "MultiPolygon" in geometry_type:
+            ret = ret + ["Polygon","MultiPolygon"]
+        if "Point" in geometry_type or "MultiPoint" in geometry_type:
+            ret = ret + ["Point","MultiPoint"]
+        if "LineString" in geometry_type or "MultiLineString" in geometry_type:
+            ret = ret + ["LineString","MultiLineString"]
+
+        return ret
+
     def get(self, request):
         datatype_factory = DataTypeFactory()
         set_precision = GeoUtils().set_precision
@@ -287,8 +316,19 @@ class GeoJSON(APIBase):
         use_display_values = bool(request.GET.get("use_display_values", False))
         geometry_type = request.GET.get("type", None)
         
+        geometry_type = self.validate_geometry_types(geometry_type=geometry_type)
+
         #################### simplify addition
         simplify = bool(request.GET.get("simplify", False))
+        ####################
+
+        #################### objectIds addition
+        esri_objectids = request.GET.get("objectids", None)
+        if esri_objectids:
+            try:
+                esri_objectids = list(map(int, esri_objectids.split(",")))
+            except:
+                esri_objectids = [int(esri_objectids)]
         ####################
 
         #################### bbox addition
@@ -298,7 +338,7 @@ class GeoJSON(APIBase):
         bbox_ymax = request.GET.get("ymax", None)
         bbox_srid = request.GET.get("in_srid", None)
 
-        print(f"... bbox info xmin:{bbox_xmin} ymin:{bbox_ymin} xmax:{bbox_xmax} ymax:{bbox_ymax} srid:{bbox_srid}")
+        logger.debug(f"... bbox info xmin:{bbox_xmin} ymin:{bbox_ymin} xmax:{bbox_xmax} ymax:{bbox_ymax} srid:{bbox_srid}")
         ####################
 
         indent = request.GET.get("indent", None)
@@ -336,25 +376,33 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
         
         #################### bbox addition
+        spatial_features = None
         if bbox_xmin is not None and bbox_ymin is not None and bbox_xmax is not None and bbox_ymax is not None and bbox_srid is not None:
-            print(f"... node_filter: {node_filter}")
-            bbox_xmin = float(bbox_xmin)
-            bbox_ymin = float(bbox_ymin)
-            bbox_xmax = float(bbox_xmax)
-            bbox_ymax = float(bbox_ymax)
-            bbox_srid = int(bbox_srid)
-            bbox_tileid_filter = self.get_bbox_tiles(
+            logger.debug(f"... node_filter: {node_filter}")
+            spatial_features = self.get_bbox_features(
                 xmin=bbox_xmin,
                 ymin=bbox_ymin,
                 xmax=bbox_xmax,
                 ymax=bbox_ymax,
                 in_srid=bbox_srid,
-                compare_type="intersects",
+                precision=precision,
                 node_filter=node_filter,
             )
-            tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes], tileid__in=bbox_tileid_filter)
         else:
-            print(f"... no bbox info provided ({request.build_absolute_uri()}")
+            logger.debug(f"... no bbox info provided ({request.build_absolute_uri()}")
+            
+        #####################
+        ##################### objectid addition
+        if esri_objectids:
+            spatial_features = self.get_objectid_features(esri_objectids=esri_objectids, precision=precision)
+        #####################
+
+        if isinstance(spatial_features, list):
+            logger.debug("... has spatial_features")
+            tiles = models.TileModel.objects.filter(tileid__in=[tile["tileid"] for tile in spatial_features])
+            #tiles.filter(nodegroup__in=[node.nodegroup for node in nodes])
+        else:
+            logger.debug("... spatial_features NOT USED")
             tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
 
         #####################
@@ -370,13 +418,25 @@ class GeoJSON(APIBase):
             end = start + limit
             last_page = len(tiles) < end
             tiles = tiles[start:end]
-        print(f"... tiles: {len(tiles)}")
-        for tile in tiles:
-            data = tile.data
+        logger.debug(f"... tiles: {len(tiles)}")
+        for tile in tiles:         
+            if spatial_features:
+                # [ ( objectid1 , feature_geojson1 ) , ( objectid2 , feature_geojson1 ), ... ]    
+                geoms = [ (feat_tile["id"], feat_tile["feature"]) for feat_tile in spatial_features if feat_tile["tileid"] in [tile.tileid]]
             for node in nodes:
+                if not spatial_features:
+                    geoms = []
+                    try:
+                        for feat_index, feat in enumerate(tile.data[str(node.pk)]["features"]):
+                            geoms.append(( int(str(i) + str(feat_index)) , feat )) # nasty way of trying to create a valid objectid 
+                    except TypeError:
+                        pass
                 try:
-                    for feature_index, feature in enumerate(data[str(node.pk)]["features"]):
-                        if geometry_type is None or geometry_type == feature["geometry"]["type"]:
+                    for feature_index, geom in enumerate(geoms):
+                        (objectid, feature) = geom
+                        #if not "properties" in feature:
+                        #    feature["properties"] = []
+                        if geometry_type is None or feature["geometry"]["type"] in geometry_type:
                             if len(nodegroups) > 0:
                                 for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
                                     for key in pt.data:
@@ -405,7 +465,7 @@ class GeoJSON(APIBase):
                             feature["properties"]["nodeid"] = node.pk
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
-                            feature["id"] = i
+                            feature["id"] = objectid
                             if precision is not None:
                                 coordinates = set_precision(feature["geometry"]["coordinates"], precision)
                                 feature["geometry"]["coordinates"] = coordinates
@@ -424,12 +484,78 @@ class GeoJSON(APIBase):
         response = JSONResponse(feature_collection, indent=indent)
         return response
 
-    def get_bbox_tiles(self, xmin, ymin, xmax, ymax, in_srid, compare_type="intersects", node_filter=[]):
+    def get_objectid_features(self, esri_objectids=None, precision=6):
+        params = [
+            int(precision),
+            tuple(esri_objectids),
+        ]
 
-        if compare_type not in ["contains", "intersects"]:
-            raise ValueError("compare_type must be either 'intersects' (default) or 'contains'.")
+        sql = f"""
+                SELECT 
+                    id, 
+                    tileid,
+                    json_build_object(
+                        'type', 'Feature',
+                        'geometry', ST_AsGeoJSON( ST_Transform(geom,4326), %s, 0 )::json,
+                        'properties', '{{}}'::json
+                    ) AS feature
+                FROM  geojson_geometries
+                WHERE id IN %s;
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(sql, params)
+            columns = [col[0] for col in cursor.description]
+            feature_list = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]      
 
-        compare_type = "&&" if compare_type == "instects" else "@"
+        logger.debug(f"... objectid select: {len(feature_list)}")
+        return feature_list
+    
+    def get_nodes_extent(self, precision=6, node_filter=[]):
+        
+        if precision is None:
+            precision = 6
+        
+        node_compare = "IN"
+        if len(node_filter) == 0:
+            node_compare = "NOT IN"
+            node_filter = ["10000001-1000-0000-0000-000000000001"]
+        
+        params = [
+            int(precision),
+            tuple(node_filter)
+        ]
+        sql = f"""
+                SELECT 
+                    json_build_object(
+                        'type', 'Feature',
+                        'geometry', ST_AsGeoJSON( 
+                                        ST_Transform(ST_SetSRID(ST_Extent(geom),3857),4326)
+                                    , %s, 0 )::json,
+                        'properties','{{}}'::json
+                    ) AS feature
+                FROM  geojson_geometries
+                GROUP BY nodeid
+                HAVING nodeid {node_compare} %s;;
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(sql, params)
+            columns = [col[0] for col in cursor.description]
+            bbox_tile_ids = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]      
+
+        logger.debug(f"... intersects: {len(bbox_tile_ids)}")
+        return bbox_tile_ids
+        pass
+
+    def get_bbox_features(self, xmin, ymin, xmax, ymax, in_srid, precision=6, node_filter=[]):
+
+        if precision is None:
+            precision = 6
 
         node_compare = "IN"
         if len(node_filter) == 0:
@@ -437,6 +563,7 @@ class GeoJSON(APIBase):
             node_filter = ["10000001-1000-0000-0000-000000000001"]
 
         params = [
+            int(precision),
             tuple(node_filter),
             float(xmin),
             float(ymin),
@@ -446,28 +573,38 @@ class GeoJSON(APIBase):
         ]
 
         sql = f"""
-                SELECT * FROM tiles
-                WHERE tileid IN (
-                    SELECT DISTINCT tileid
-                    FROM   geojson_geometries
-                    WHERE nodeid {node_compare} %s -- node_filter
-                        AND geom 
-                            {compare_type} -- comapre && or @
-                            ST_Transform(
-                                ST_MakeEnvelope (
-                                %s, %s, -- xmin, ymin 
-                                %s, %s, -- xmax, ymax
-                                %s), 3857
-                            ) -- srid
+                SELECT 
+                    id, 
+                    tileid,
+                    json_build_object(
+                        'type', 'Feature',
+                        'geometry', ST_AsGeoJSON( 
+                                            ST_Transform(geom,4326)
+                            , %s, 0 )::json,
+                        'properties', '{{}}'::json
+                    ) AS feature
+                FROM  geojson_geometries
+                WHERE nodeid {node_compare} %s -- node_filter
+                    AND ST_Intersects(geom,
+                        
+                        ST_Transform(
+                            ST_MakeEnvelope (
+                            %s, %s, -- xmin, ymin 
+                            %s, %s, -- xmax, ymax
+                            %s), 3857
+                        )
                     );
         """
-        
-        try:
-            tiles = models.TileModel.objects.raw(sql, params) #.values_list("tileid", flat=True)
-            bbox_tile_ids = [t.tileid for t in tiles]
-        except Exception as e:
-            logger.error(e)
-        print(f"... intersects: {len(bbox_tile_ids)}")
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql, params)
+            columns = [col[0] for col in cursor.description]
+            bbox_tile_ids = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]      
+
+        logger.debug(f"... intersects: {len(bbox_tile_ids)}")
         return bbox_tile_ids
 
 

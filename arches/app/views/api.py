@@ -271,12 +271,13 @@ class GeoJSON(APIBase):
         else:
             return _("Unnamed Resource")
 
-    def validate_geometry_types(self, geometry_type):
+    def validate_geometry_types(self, geometry_type, include_multipart=False):
         """
-            Ensures that multipart types are included when only single part type geometries are added an
+            Ensures that multipart types are included when only single part type geometries are requested
 
         Args:
             geometry_type (str or list): string or list of geometry types that are to be selected.
+            include_multipart (bool): default False - ensures both the single and multi part types are includes if true
 
 
         Returns: (list) geometry_types to be selected
@@ -291,12 +292,13 @@ class GeoJSON(APIBase):
             except:
                 geometry_type = [geometry_type]
 
-        if "Polygon" in geometry_type or "MultiPolygon" in geometry_type:
-            ret = ret + ["Polygon","MultiPolygon"]
-        if "Point" in geometry_type or "MultiPoint" in geometry_type:
-            ret = ret + ["Point","MultiPoint"]
-        if "LineString" in geometry_type or "MultiLineString" in geometry_type:
-            ret = ret + ["LineString","MultiLineString"]
+        if include_multipart:
+            if "Polygon" in geometry_type or "MultiPolygon" in geometry_type:
+                ret = ret + ["Polygon", "MultiPolygon"]
+            if "Point" in geometry_type or "MultiPoint" in geometry_type:
+                ret = ret + ["Point", "MultiPoint"]
+            if "LineString" in geometry_type or "MultiLineString" in geometry_type:
+                ret = ret + ["LineString", "MultiLineString"]
 
         return ret
 
@@ -315,11 +317,13 @@ class GeoJSON(APIBase):
         include_geojson_link = bool(request.GET.get("include_geojson_link", False))
         use_display_values = bool(request.GET.get("use_display_values", False))
         geometry_type = request.GET.get("type", None)
-        
-        geometry_type = self.validate_geometry_types(geometry_type=geometry_type)
+
+        #################### koop service
+
+        geometry_type = self.validate_geometry_types(geometry_type=geometry_type, include_multipart=True)
 
         #################### simplify addition
-        simplify = bool(request.GET.get("simplify", False))
+        simplify = bool(request.GET.get("simplify", False)) ########################################## NEED TO IMPLEMENT IN GET_XX_FEATS
         ####################
 
         #################### objectIds addition
@@ -374,7 +378,7 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = slugify(node.name, max_length=field_name_length, separator="_")
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
-        
+
         #################### bbox addition
         spatial_features = None
         if bbox_xmin is not None and bbox_ymin is not None and bbox_xmax is not None and bbox_ymax is not None and bbox_srid is not None:
@@ -390,7 +394,7 @@ class GeoJSON(APIBase):
             )
         else:
             logger.debug(f"... no bbox info provided ({request.build_absolute_uri()}")
-            
+
         #####################
         ##################### objectid addition
         if esri_objectids:
@@ -400,7 +404,7 @@ class GeoJSON(APIBase):
         if isinstance(spatial_features, list):
             logger.debug("... has spatial_features")
             tiles = models.TileModel.objects.filter(tileid__in=[tile["tileid"] for tile in spatial_features])
-            #tiles.filter(nodegroup__in=[node.nodegroup for node in nodes])
+            tiles.filter(nodegroup__in=[node.nodegroup for node in nodes])
         else:
             logger.debug("... spatial_features NOT USED")
             tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
@@ -419,23 +423,21 @@ class GeoJSON(APIBase):
             last_page = len(tiles) < end
             tiles = tiles[start:end]
         logger.debug(f"... tiles: {len(tiles)}")
-        for tile in tiles:         
-            if spatial_features:
-                # [ ( objectid1 , feature_geojson1 ) , ( objectid2 , feature_geojson1 ), ... ]    
-                geoms = [ (feat_tile["id"], feat_tile["feature"]) for feat_tile in spatial_features if feat_tile["tileid"] in [tile.tileid]]
+        for tile in tiles:
+            if isinstance(spatial_features, list):
+                # [ ( objectid1 , feature_geojson1 ) , ( objectid2 , feature_geojson1 ), ... ]
+                geoms = [(feat_tile["id"], feat_tile["feature"]) for feat_tile in spatial_features if feat_tile["tileid"] in [tile.tileid]]
             for node in nodes:
-                if not spatial_features:
+                if not isinstance(spatial_features, list):
                     geoms = []
                     try:
                         for feat_index, feat in enumerate(tile.data[str(node.pk)]["features"]):
-                            geoms.append(( int(str(i) + str(feat_index)) , feat )) # nasty way of trying to create a valid objectid 
+                            geoms.append((int(str(i) + str(feat_index)), feat))
                     except TypeError:
                         pass
                 try:
                     for feature_index, geom in enumerate(geoms):
                         (objectid, feature) = geom
-                        #if not "properties" in feature:
-                        #    feature["properties"] = []
                         if geometry_type is None or feature["geometry"]["type"] in geometry_type:
                             if len(nodegroups) > 0:
                                 for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
@@ -505,28 +507,22 @@ class GeoJSON(APIBase):
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
             columns = [col[0] for col in cursor.description]
-            feature_list = [
-                dict(zip(columns, row))
-                for row in cursor.fetchall()
-            ]      
+            feature_list = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
         logger.debug(f"... objectid select: {len(feature_list)}")
         return feature_list
-    
+
     def get_nodes_extent(self, precision=6, node_filter=[]):
-        
+
         if precision is None:
             precision = 6
-        
+
         node_compare = "IN"
         if len(node_filter) == 0:
             node_compare = "NOT IN"
             node_filter = ["10000001-1000-0000-0000-000000000001"]
-        
-        params = [
-            int(precision),
-            tuple(node_filter)
-        ]
+
+        params = [int(precision), tuple(node_filter)]
         sql = f"""
                 SELECT 
                     json_build_object(
@@ -543,14 +539,10 @@ class GeoJSON(APIBase):
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
             columns = [col[0] for col in cursor.description]
-            bbox_tile_ids = [
-                dict(zip(columns, row))
-                for row in cursor.fetchall()
-            ]      
+            bbox_tile_ids = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
         logger.debug(f"... intersects: {len(bbox_tile_ids)}")
         return bbox_tile_ids
-        pass
 
     def get_bbox_features(self, xmin, ymin, xmax, ymax, in_srid, precision=6, node_filter=[]):
 
@@ -599,10 +591,7 @@ class GeoJSON(APIBase):
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
             columns = [col[0] for col in cursor.description]
-            bbox_tile_ids = [
-                dict(zip(columns, row))
-                for row in cursor.fetchall()
-            ]      
+            bbox_tile_ids = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
         logger.debug(f"... intersects: {len(bbox_tile_ids)}")
         return bbox_tile_ids

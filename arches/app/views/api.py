@@ -318,31 +318,27 @@ class GeoJSON(APIBase):
         use_display_values = bool(request.GET.get("use_display_values", False))
         geometry_type = request.GET.get("type", None)
 
-        #################### koop service
+        #################### Validate geometry_type ####################
 
         geometry_type = self.validate_geometry_types(geometry_type=geometry_type, include_multipart=True)
 
-        #################### simplify addition
-        simplify = bool(request.GET.get("simplify", False)) ########################################## NEED TO IMPLEMENT IN GET_XX_FEATS
-        ####################
+        outSR = int(request.GET.get("outSR", 4326))
 
-        #################### objectIds addition
+        simplify = float(request.GET.get("maxAllowableOffset", 0.0005)) ########################################## NEED TO IMPLEMENT IN GET_XX_FEATS
+        
         esri_objectids = request.GET.get("objectids", None)
         if esri_objectids:
             try:
                 esri_objectids = list(map(int, esri_objectids.split(",")))
             except:
                 esri_objectids = [int(esri_objectids)]
-        ####################
 
-        #################### bbox addition
         bbox_xmin = request.GET.get("xmin", None)
         bbox_ymin = request.GET.get("ymin", None)
         bbox_xmax = request.GET.get("xmax", None)
         bbox_ymax = request.GET.get("ymax", None)
         bbox_srid = request.GET.get("in_srid", None)
 
-        logger.debug(f"... bbox info xmin:{bbox_xmin} ymin:{bbox_ymin} xmax:{bbox_xmax} ymax:{bbox_ymax} srid:{bbox_srid}")
         ####################
 
         indent = request.GET.get("indent", None)
@@ -379,9 +375,9 @@ class GeoJSON(APIBase):
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
 
-        #################### bbox addition
+        ####################
         spatial_features = None
-        if bbox_xmin is not None and bbox_ymin is not None and bbox_xmax is not None and bbox_ymax is not None and bbox_srid is not None:
+        if bbox_xmin is not None and bbox_ymin is not None and bbox_xmax is not None and bbox_ymax is not None and bbox_srid is not None and outSR is not None:
             logger.debug(f"... node_filter: {node_filter}")
             spatial_features = self.get_bbox_features(
                 xmin=bbox_xmin,
@@ -391,14 +387,13 @@ class GeoJSON(APIBase):
                 in_srid=bbox_srid,
                 precision=precision,
                 node_filter=node_filter,
+                out_srid=outSR,
             )
         else:
             logger.debug(f"... no bbox info provided ({request.build_absolute_uri()}")
 
-        #####################
-        ##################### objectid addition
         if esri_objectids:
-            spatial_features = self.get_objectid_features(esri_objectids=esri_objectids, precision=precision)
+            spatial_features = self.get_objectid_features(esri_objectids=esri_objectids, precision=precision, out_srid=outSR)
         #####################
 
         if isinstance(spatial_features, list):
@@ -410,6 +405,8 @@ class GeoJSON(APIBase):
             tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
 
         #####################
+
+
         last_page = None
         if resourceid is not None:
             tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
@@ -486,8 +483,9 @@ class GeoJSON(APIBase):
         response = JSONResponse(feature_collection, indent=indent)
         return response
 
-    def get_objectid_features(self, esri_objectids=None, precision=6):
+    def get_objectid_features(self, esri_objectids=None, precision=6, out_srid=4326):
         params = [
+            int(out_srid),
             int(precision),
             tuple(esri_objectids),
         ]
@@ -498,7 +496,7 @@ class GeoJSON(APIBase):
                     tileid,
                     json_build_object(
                         'type', 'Feature',
-                        'geometry', ST_AsGeoJSON( ST_Transform(geom,4326), %s, 0 )::json,
+                        'geometry', ST_AsGeoJSON( ST_Transform(geom,%s), %s, 0 )::json,
                         'properties', '{{}}'::json
                     ) AS feature
                 FROM  geojson_geometries
@@ -512,7 +510,7 @@ class GeoJSON(APIBase):
         logger.debug(f"... objectid select: {len(feature_list)}")
         return feature_list
 
-    def get_nodes_extent(self, precision=6, node_filter=[]):
+    def get_nodes_extent(self, precision=6, node_filter=[], out_srid=4326):
 
         if precision is None:
             precision = 6
@@ -522,13 +520,13 @@ class GeoJSON(APIBase):
             node_compare = "NOT IN"
             node_filter = ["10000001-1000-0000-0000-000000000001"]
 
-        params = [int(precision), tuple(node_filter)]
+        params = [int(out_srid), int(precision), tuple(node_filter)]
         sql = f"""
                 SELECT 
                     json_build_object(
                         'type', 'Feature',
                         'geometry', ST_AsGeoJSON( 
-                                        ST_Transform(ST_SetSRID(ST_Extent(geom),3857),4326)
+                                        ST_Transform(ST_SetSRID(ST_Extent(geom),3857),%s)
                                     , %s, 0 )::json,
                         'properties','{{}}'::json
                     ) AS feature
@@ -544,7 +542,7 @@ class GeoJSON(APIBase):
         logger.debug(f"... intersects: {len(bbox_tile_ids)}")
         return bbox_tile_ids
 
-    def get_bbox_features(self, xmin, ymin, xmax, ymax, in_srid, precision=6, node_filter=[]):
+    def get_bbox_features(self, xmin, ymin, xmax, ymax, in_srid, precision=6, node_filter=[], out_srid=4326):
 
         if precision is None:
             precision = 6
@@ -555,6 +553,7 @@ class GeoJSON(APIBase):
             node_filter = ["10000001-1000-0000-0000-000000000001"]
 
         params = [
+            int(out_srid),
             int(precision),
             tuple(node_filter),
             float(xmin),
@@ -571,7 +570,7 @@ class GeoJSON(APIBase):
                     json_build_object(
                         'type', 'Feature',
                         'geometry', ST_AsGeoJSON( 
-                                            ST_Transform(geom,4326)
+                                            ST_Transform(geom, %s)
                             , %s, 0 )::json,
                         'properties', '{{}}'::json
                     ) AS feature

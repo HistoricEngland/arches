@@ -303,6 +303,7 @@ class GeoJSON(APIBase):
         return ret
 
     def get(self, request):
+
         datatype_factory = DataTypeFactory()
         set_precision = GeoUtils().set_precision
         resourceid = request.GET.get("resourceid", None)
@@ -319,12 +320,20 @@ class GeoJSON(APIBase):
         geometry_type = request.GET.get("type", None)
 
         #################### Validate geometry_type ####################
-
+        source = request.GET.get("source", None)
         geometry_type = self.validate_geometry_types(geometry_type=geometry_type, include_multipart=True)
 
         outSR = int(request.GET.get("outSR", 4326))
+        
+        returnCountOnly = request.GET.get("returnCountOnly", False)
+        returnCountOnly = True if returnCountOnly == "true" else False
+        
+        returnGeometry = request.GET.get("returnGeometry", True)
+        returnGeometry = True if returnGeometry == "true" else False
 
-        simplify = float(request.GET.get("maxAllowableOffset", 0.0005)) ########################################## NEED TO IMPLEMENT IN GET_XX_FEATS
+
+        offset = int(request.GET.get("offset", -1))
+        simplify = float(request.GET.get("maxAllowableOffset", 0.0005))
         
         esri_objectids = request.GET.get("objectids", None)
         if esri_objectids:
@@ -362,6 +371,10 @@ class GeoJSON(APIBase):
             node_filter.append(nodeid)
         nodes = nodes.filter(nodeid__in=node_filter)
         nodes = nodes.order_by("sortorder")
+
+        # reset node_filter to viewable nodes (permissions)
+        node_filter = [node.nodeid for node in nodes]
+
         features = []
         i = 1
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
@@ -388,12 +401,21 @@ class GeoJSON(APIBase):
                 precision=precision,
                 node_filter=node_filter,
                 out_srid=outSR,
+                geometry_type=geometry_type,
             )
         else:
-            logger.debug(f"... no bbox info provided ({request.build_absolute_uri()}")
+            logger.debug(f"... no bbox info provided")
 
-        if esri_objectids:
-            spatial_features = self.get_objectid_features(esri_objectids=esri_objectids, precision=precision, out_srid=outSR)
+        if esri_objectids and spatial_features is None:
+            spatial_features = self.get_objectid_features(esri_objectids=esri_objectids, precision=precision, out_srid=outSR, geometry_type=geometry_type)
+
+
+        if returnCountOnly and spatial_features is None:
+            spatial_features = self.get_nodeid_features(node_filter=node_filter, precision=precision, out_srid=outSR, geometry_type=geometry_type)
+
+        if source and source == "koop" and spatial_features is None:
+            spatial_features = self.get_nodeid_features(node_filter=node_filter, precision=precision, out_srid=outSR, geometry_type=geometry_type)
+        
         #####################
 
         if isinstance(spatial_features, list):
@@ -404,76 +426,95 @@ class GeoJSON(APIBase):
             logger.debug("... spatial_features NOT USED")
             tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
 
-        #####################
 
-
-        last_page = None
+        last_page = None 
         if resourceid is not None:
             tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
         tiles = [tile for tile in tiles if str(tile.resourceinstance_id) not in restricted_resource_ids]
+        
         if limit is not None:
-            start = (page - 1) * limit
-            end = start + limit
-            last_page = len(tiles) < end
-            tiles = tiles[start:end]
+            if offset > -1:
+                tiles = tiles[offset:offset+limit]
+            else:
+                start = (page - 1) * limit
+                end = start + limit
+                last_page = len(tiles) < end
+                tiles = tiles[start:end]
         logger.debug(f"... tiles: {len(tiles)}")
-        for tile in tiles:
-            if isinstance(spatial_features, list):
-                # [ ( objectid1 , feature_geojson1 ) , ( objectid2 , feature_geojson1 ), ... ]
-                geoms = [(feat_tile["id"], feat_tile["feature"]) for feat_tile in spatial_features if feat_tile["tileid"] in [tile.tileid]]
-            for node in nodes:
-                if not isinstance(spatial_features, list):
-                    geoms = []
-                    try:
-                        for feat_index, feat in enumerate(tile.data[str(node.pk)]["features"]):
-                            geoms.append((int(str(i) + str(feat_index)), feat))
+
+        
+        
+        if returnCountOnly is True:
+            logger.debug("... returnCountOnly")
+            logger.debug(f"... looping spatialfeatures")
+            for feat_tile in spatial_features:
+                feature = feat_tile["feature"]
+                feature["id"] = feat_tile["id"]
+                features.append(feat_tile["feature"])
+            logger.debug(f"... looping spatialfeatures COMPLETE")
+
+        else:
+            for tile in tiles:
+                if isinstance(spatial_features, list):
+                    # [ ( objectid1 , feature_geojson1 ) , ( objectid2 , feature_geojson1 ), ... ]
+                    geoms = [(feat_tile["id"], feat_tile["feature"]) for feat_tile in spatial_features if feat_tile["tileid"] in [tile.tileid]]
+                for node in nodes:
+                    if not isinstance(spatial_features, list):
+                        geoms = []
+                        try:
+                            for feat_index, feat in enumerate(tile.data[str(node.pk)]["features"]):
+                                geoms.append((int(str(i) + str(feat_index)), feat))
+                        except TypeError:
+                            pass
+                    try: 
+                        for feature_index, geom in enumerate(geoms):
+                            (objectid, feature) = geom
+                            if geometry_type is None or feature["geometry"]["type"] in geometry_type: ################## SHOULD FILTER GEOMTYPE IN SPAT_FEAT
+                                if len(nodegroups) > 0 : ################################################################################ don't need properties if returnCountOnly is True or no nodegroups
+                                    for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
+                                        for key in pt.data:
+                                            field_name = key if use_uuid_names else property_node_map[key]["name"]
+                                            if pt.data[key] is not None:
+                                                if use_display_values:
+                                                    property_node = property_node_map[key]["node"]
+                                                    datatype = datatype_factory.get_instance(property_node.datatype)
+                                                    value = datatype.get_display_value(pt, property_node)
+                                                else:
+                                                    value = pt.data[key]
+                                                try:
+                                                    feature["properties"][field_name].append(value)
+                                                except KeyError:
+                                                    feature["properties"][field_name] = value
+                                                except AttributeError:
+                                                    feature["properties"][field_name] = [feature["properties"][field_name], value]
+                                if returnGeometry is False or returnCountOnly is True:###############################################################################
+                                    # don't need geometries
+                                    feature["geometry"] = None
+
+                                if include_primary_name:
+                                    feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
+                                feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
+                                feature["properties"]["tileid"] = tile.pk
+                                try:
+                                    feature["properties"].pop("nodeId")
+                                except KeyError:
+                                    pass
+                                feature["properties"]["nodeid"] = node.pk
+                                if include_geojson_link:
+                                    feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
+                                feature["id"] = objectid
+                                if precision is not None and not isinstance(spatial_features, list):
+                                    coordinates = set_precision(feature["geometry"]["coordinates"], precision)
+                                    feature["geometry"]["coordinates"] = coordinates
+                                i += 1
+                                features.append(feature)
+                    except KeyError:
+                        pass
                     except TypeError:
                         pass
-                try:
-                    for feature_index, geom in enumerate(geoms):
-                        (objectid, feature) = geom
-                        if geometry_type is None or feature["geometry"]["type"] in geometry_type:
-                            if len(nodegroups) > 0:
-                                for pt in property_tiles.filter(resourceinstance_id=tile.resourceinstance_id).order_by("sortorder"):
-                                    for key in pt.data:
-                                        field_name = key if use_uuid_names else property_node_map[key]["name"]
-                                        if pt.data[key] is not None:
-                                            if use_display_values:
-                                                property_node = property_node_map[key]["node"]
-                                                datatype = datatype_factory.get_instance(property_node.datatype)
-                                                value = datatype.get_display_value(pt, property_node)
-                                            else:
-                                                value = pt.data[key]
-                                            try:
-                                                feature["properties"][field_name].append(value)
-                                            except KeyError:
-                                                feature["properties"][field_name] = value
-                                            except AttributeError:
-                                                feature["properties"][field_name] = [feature["properties"][field_name], value]
-                            if include_primary_name:
-                                feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
-                            feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
-                            feature["properties"]["tileid"] = tile.pk
-                            try:
-                                feature["properties"].pop("nodeId")
-                            except KeyError:
-                                pass
-                            feature["properties"]["nodeid"] = node.pk
-                            if include_geojson_link:
-                                feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
-                            feature["id"] = objectid
-                            if precision is not None:
-                                coordinates = set_precision(feature["geometry"]["coordinates"], precision)
-                                feature["geometry"]["coordinates"] = coordinates
-                            i += 1
-                            features.append(feature)
-                except KeyError:
-                    pass
-                except TypeError:
-                    pass
 
         feature_collection = {"type": "FeatureCollection", "features": features}
         if last_page is not None:
@@ -483,12 +524,40 @@ class GeoJSON(APIBase):
         response = JSONResponse(feature_collection, indent=indent)
         return response
 
-    def get_objectid_features(self, esri_objectids=None, precision=6, out_srid=4326):
+    def convert_geomtypes_to_postgis(self, geometry_type):
+        """
+        Converts a list of geomtypes to a list of postgis geometry types
+        """
+        postgis_geomtypes = ['NONE']
+        for geomtype in geometry_type:
+            if geomtype == "Point":
+                postgis_geomtypes.append("ST_Point")
+            elif geomtype == "LineString":
+                postgis_geomtypes.append("ST_LineString")
+            elif geomtype == "Polygon":
+                postgis_geomtypes.append("ST_Polygon")
+            elif geomtype == "MultiPoint":
+                postgis_geomtypes.append("ST_MultiPoint")
+            elif geomtype == "MultiLineString":
+                postgis_geomtypes.append("ST_MultiLinestring")
+            elif geomtype == "MultiPolygon":
+                postgis_geomtypes.append("ST_MultiPolygon")
+        return postgis_geomtypes
+
+    def get_objectid_features(self, esri_objectids=None, precision=6, out_srid=4326, simplify=None, geometry_type=None):
+
         params = [
             int(out_srid),
             int(precision),
             tuple(esri_objectids),
         ]
+
+        if geometry_type is not None:
+            geometry_type = self.convert_geomtypes_to_postgis(geometry_type)
+            params.append(tuple(geometry_type)) 
+
+        if not simplify is None:
+            params.insert(1,int(simplify))
 
         sql = f"""
                 SELECT 
@@ -496,11 +565,17 @@ class GeoJSON(APIBase):
                     tileid,
                     json_build_object(
                         'type', 'Feature',
-                        'geometry', ST_AsGeoJSON( ST_Transform(geom,%s), %s, 0 )::json,
+                        'geometry', ST_AsGeoJSON(
+                                    {'ST_SimplifyPreserveTopology(' if simplify is not None else ''}
+                                            ST_Transform(geom, %s)
+                                            {', %s)' if simplify is not None else ''}
+                                , %s, 0 )::json,
                         'properties', '{{}}'::json
                     ) AS feature
                 FROM  geojson_geometries
-                WHERE id IN %s;
+                WHERE id IN %s
+                {' AND ST_GeometryType(geom) IN %s' if not geometry_type is None else ''}
+                ORDER BY id;
         """
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
@@ -510,7 +585,55 @@ class GeoJSON(APIBase):
         logger.debug(f"... objectid select: {len(feature_list)}")
         return feature_list
 
-    def get_nodes_extent(self, precision=6, node_filter=[], out_srid=4326):
+    def get_nodeid_features(self, node_filter=[], precision=6, out_srid=4326, simplify=None, geometry_type=None):
+        
+        
+
+        if len(node_filter) == 0:
+            return []
+
+        params = [
+            int(out_srid),
+            int(precision),
+            tuple(node_filter),
+        ]
+
+        if geometry_type is not None:
+            geometry_type = self.convert_geomtypes_to_postgis(geometry_type)
+            params.append(tuple(geometry_type)) 
+
+        if not simplify is None:
+            params.insert(1,int(simplify))
+
+        sql = f"""
+                SELECT 
+                    id, 
+                    tileid,
+                    json_build_object(
+                        'type', 'Feature',
+                        'geometry', ST_AsGeoJSON(
+                                        {'ST_SimplifyPreserveTopology(' if simplify is not None else ''}
+                                                ST_Transform(geom, %s)
+                                                {', %s)' if simplify is not None else ''}
+                                    , %s, 0 )::json,
+                        'properties', '{{}}'::json
+                    ) AS feature
+                FROM  geojson_geometries
+                WHERE nodeid IN %s -- node_filter
+                {' AND ST_GeometryType(geom) IN %s' if not geometry_type is None else ''}
+                ORDER BY id;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql, params)
+            columns = [col[0] for col in cursor.description]
+            feature_list = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+        logger.debug(f"... nodeid select: {len(feature_list)}")
+        return feature_list
+
+    def get_nodes_extent(self, precision=6, node_filter=[], out_srid=4326, simplify=None, geometry_type=None):
+
 
         if precision is None:
             precision = 6
@@ -520,7 +643,16 @@ class GeoJSON(APIBase):
             node_compare = "NOT IN"
             node_filter = ["10000001-1000-0000-0000-000000000001"]
 
-        params = [int(out_srid), int(precision), tuple(node_filter)]
+        params = [
+            int(out_srid), 
+            int(precision), 
+            tuple(node_filter),
+        ]
+        
+        if geometry_type is not None:
+            geometry_type = self.convert_geomtypes_to_postgis(geometry_type)
+            params.append(tuple(geometry_type)) 
+
         sql = f"""
                 SELECT 
                     json_build_object(
@@ -532,7 +664,8 @@ class GeoJSON(APIBase):
                     ) AS feature
                 FROM  geojson_geometries
                 GROUP BY nodeid
-                HAVING nodeid {node_compare} %s;;
+                HAVING nodeid {node_compare} %s
+                {' AND ST_GeometryType(geom) IN %s' if not geometry_type is None else ''};
         """
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
@@ -542,7 +675,8 @@ class GeoJSON(APIBase):
         logger.debug(f"... intersects: {len(bbox_tile_ids)}")
         return bbox_tile_ids
 
-    def get_bbox_features(self, xmin, ymin, xmax, ymax, in_srid, precision=6, node_filter=[], out_srid=4326):
+    def get_bbox_features(self, xmin, ymin, xmax, ymax, in_srid, precision=6, node_filter=[], out_srid=4326, simplify=None, geometry_type=None):
+
 
         if precision is None:
             precision = 6
@@ -563,15 +697,24 @@ class GeoJSON(APIBase):
             int(in_srid),
         ]
 
+        if geometry_type is not None:
+            geometry_type = self.convert_geomtypes_to_postgis(geometry_type)
+            params.append(tuple(geometry_type)) 
+
+        if not simplify is None:
+            params.insert(1,int(simplify))
+
         sql = f"""
                 SELECT 
                     id, 
                     tileid,
                     json_build_object(
                         'type', 'Feature',
-                        'geometry', ST_AsGeoJSON( 
-                                            ST_Transform(geom, %s)
-                            , %s, 0 )::json,
+                        'geometry', ST_AsGeoJSON(
+                                        {'ST_SimplifyPreserveTopology(' if simplify is not None else ''}
+                                                ST_Transform(geom, %s)
+                                                {', %s)' if simplify is not None else ''}
+                                    , %s, 0 )::json,
                         'properties', '{{}}'::json
                     ) AS feature
                 FROM  geojson_geometries
@@ -584,7 +727,9 @@ class GeoJSON(APIBase):
                             %s, %s, -- xmax, ymax
                             %s), 3857
                         )
-                    );
+                    )
+                    {' AND ST_GeometryType(geom) IN %s' if not geometry_type is None else ''}
+                ORDER BY id;
         """
 
         with connection.cursor() as cursor:

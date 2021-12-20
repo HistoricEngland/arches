@@ -15,6 +15,7 @@ GRANT CONNECT ON DATABASE aher TO arches_featureservices;
 
 /*
 drop function if exists __arches__create_spatial_view;
+drop function if exists __arches__delete_spatial_view;
 drop function if exists __arches__create_attribute_view;
 drop aggregate if exists __arches__agg_get_node_display_value(in_tiledata jsonb, in_nodeid text);
 drop function if exists __arches__accum_get_node_display_value;

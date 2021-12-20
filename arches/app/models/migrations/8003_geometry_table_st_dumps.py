@@ -36,7 +36,7 @@ sql_string = """
                 FROM tiles t
                     LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
                 GROUP BY t.tileid, t.resourceinstanceid, n.nodeid
-                HAVING n.datatype = 'geojson-feature-collection'::text
+                HAVING n.datatype = 'geojson-feature-collection'::text;
 
                 RETURN TRUE;
             END;

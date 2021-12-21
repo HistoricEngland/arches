@@ -1,20 +1,6 @@
-/*
-
-CREATE ROLE arches_featureservices WITH
-  LOGIN
-  NOSUPERUSER
-  INHERIT
-  NOCREATEDB
-  NOCREATEROLE
-  NOREPLICATION
-  --ENCRYPTED PASSWORD 'md5967438f66634c78452443a93cc7293a4';
-  PASSWORD 'arches_featureservices';
-
-GRANT CONNECT ON DATABASE aher TO arches_featureservices;
-*/
-
-/*
+/* --------------- DROP ALL ---------------
 drop function if exists __arches__create_spatial_view;
+drop function if exists __arches_update_spatial_view;
 drop function if exists __arches__delete_spatial_view;
 drop function if exists __arches__create_attribute_view;
 drop aggregate if exists __arches__agg_get_node_display_value(in_tiledata jsonb, in_nodeid text);
@@ -27,6 +13,7 @@ drop function if exists __arches__get_domain_label;
 drop function if exists __arches__get_resourceinstance_label;
 drop function if exists __arches__get_nodevalue_label;
 drop function if exists __arches_slugify;
+drop role if exists arches_featureservices;
 */
 
 ----------- existing from ROB
@@ -61,12 +48,34 @@ create or replace function __arches_slugify(
 select "value"
 from "trimmed";
 $$ language sql strict immutable;
+------------------------------
 
+-- ROLE
 
+do
+$do$
+begin
+	if not exists (
+		select from pg_catalog.pg_roles
+		where  rolname = 'arches_featureservices') then
 
------------ datatype label functions
+		create role arches_featureservices with
+		login
+		nosuperuser
+		inherit
+		nocreatedb
+		nocreaterole
+		noreplication
+		--encrypted password 'md5967438f66634c78452443a93cc7293a4';
+		password 'arches_featureservices';
 
---drop function if exists __arches__get_concept_label;
+		grant connect on database aher to arches_featureservices;
+	end if;
+end
+$do$;
+
+-- FUNCTIONS
+
 create or replace function __arches__get_concept_label(concept_value text) returns text language plpgsql as $$
 declare
 	concept_label text := '';
@@ -84,7 +93,6 @@ return concept_label;
 end;
 $$;
 
---drop function if exists get_concept_list_label;
 create or replace function __arches__get_concept_list_label(concept_array jsonb) returns text language plpgsql as $$
 declare
 	concept_list text;
@@ -106,7 +114,6 @@ return concept_list;
 end;
 $$;
 
---drop function if exists __arches__get_domain_label;
 create or replace function __arches__get_domain_label(domain_value text, in_nodeid text) returns text language plpgsql as $$
 declare
 	in_node_config jsonb;
@@ -115,14 +122,12 @@ begin
  	if domain_value is null or domain_value = '' or in_nodeid = '' then
 		return '';
 	end if;	
-	
-	-- get the node config to access domaint options
+
 	select n.config
 	into in_node_config
 	from nodes n
 	where n.nodeid = in_nodeid::uuid;
-		
-	-- get the domain options text from the config
+
 	select opt.text
 		into return_label
 	from jsonb_populate_recordset(in_node_config -> 'options') opts
@@ -159,8 +164,6 @@ return return_label;
 end;
 $$;
 
-
---drop function if exists __arches__get_resourceinstance_label;
 create or replace function __arches__get_resourceinstance_label(resourceinstance_value jsonb, label_type text default 'name') returns text language plpgsql as $$
 declare
 	return_label text := '';
@@ -179,7 +182,6 @@ begin
 		raise notice 'resourceinstance_value is null';
 		return return_label;
 	end if;
-	
 	
 	target_resourceinstanceid := ((resourceinstance_value -> 0) ->> 'resourceId')::uuid;
 	if target_resourceinstanceid is null then
@@ -277,7 +279,6 @@ begin
 end;
 $$;
 
---drop function if exists __arches__get_resourceinstance_list_label;
 create or replace function __arches__get_resourceinstance_list_label(resourceinstance_value jsonb, label_type text default 'name') returns text language plpgsql as $$
 declare
 	return_label text := '';
@@ -300,8 +301,6 @@ return return_label;
 end;
 $$;
 
-
---drop function if exists __arches__get_nodevalue_label;
 create or replace function __arches__get_nodevalue_label(node_value jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
 	return_label text := '';
@@ -312,19 +311,16 @@ begin
 	if node_value is null or in_nodeid is null or in_nodeid = '' then
 		return '';
 	end if;
-	
-	-- get the target node id
+
 	select n.config ->> 'nodeid'
 	into value_nodeid
 	from nodes n
 	where n.nodeid = in_nodeid::uuid;
 
-	
-	-- get the display value for the target nodeid in the target tile
 	select __arches__get_node_display_value(t.tiledata, value_nodeid)
 	into return_label
 	from tiles t
-	where t.tileid = node_value::uuid; --node_value will be the tileid for where the data
+	where t.tileid = node_value::uuid;
 	
 	if return_label is null then
 		return_label := '';
@@ -334,9 +330,6 @@ return return_label;
 end;
 $$;
 
---######################################## display value ###################################################--
-
---drop function if exists __arches__get_node_display_value;
 create or replace function __arches__get_node_display_value(in_tiledata jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
 	display_value text := '';
@@ -350,8 +343,7 @@ begin
 	if in_tiledata is null then
 		return '';
 	end if;
-	
-	-- get node type
+
  	select n.datatype, n.config 
 	into in_node_type, in_node_config 
 	from nodes n where nodeid = in_nodeid::uuid;
@@ -364,7 +356,6 @@ begin
 		return '';
 	end if;
 	
-	-- broadly translated from the python datatype classes
 	case in_node_type
 		when 'concept' then
 			display_value := __arches__get_concept_label(in_tiledata ->> in_nodeid);
@@ -391,10 +382,10 @@ begin
 			-- 'string'
 			-- 'number'
 			-- 'date' -----------------might need to look at date formatting?
-			-- 'bngcentrepoint'
 			-- 'boolean
 			-- 'geojson-feature-collection'
 			-- 'annotation'
+			-- 'any other custom datatype - will need a pattern to handle this'
 			display_value := (in_tiledata ->> in_nodeid)::text;
 		
 		end case;
@@ -403,9 +394,6 @@ begin
 end;
 $$;
 
---###################################### aggregation functions ############################################--
-
---drop function if exists __arches__accum_get_node_display_value;
 create or replace function __arches__accum_get_node_display_value(init text, in_tiledata jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
 	display_name text := '';
@@ -429,7 +417,6 @@ begin
 end;
 $$;
 
---drop function if exists __arches__agg_get_node_display_value;
 create or replace aggregate __arches__agg_get_node_display_value(in_tiledata jsonb, in_nodeid text)
 (
 	initcond = '',
@@ -438,80 +425,13 @@ create or replace aggregate __arches__agg_get_node_display_value(in_tiledata jso
 );
 
 
--------------------------------------------------------------------
--- heritage asset geospatial_coords nodeid
--- drop materialized view if exists public.attrv_heritage_asset__87d3d7dc_f44f_11eb_bee9_a87eeabdefba;
-/*
-create materialized view attrv_heritage_asset__87d3d7dc_f44f_11eb_bee9_a87eeabdefba
-tablespace pg_default
-as
-(
-	select
-		r.resourceinstanceid
-		-------------- nodes -----------
-		,__arches__agg_get_node_display_value(distinct t_1.tiledata, '325a2f33-efe4-11eb-b0bb-a87eeabdefba')as primary_reference_number
-
-		-- 676d47f9-9c1c-11ea-9aa0-f875a44e0e11 - assetname
-		,__arches__agg_get_node_display_value(distinct t_2.tiledata, '676d47ff-9c1c-11ea-b07f-f875a44e0e11') as asset_name
-
-		-- ba345577-b554-11ea-a9ee-f875a44e0e11 - assetdescription
-		,__arches__agg_get_node_display_value(distinct t_3.tiledata, 'ba345577-b554-11ea-a9ee-f875a44e0e11') as asset_description
-
-		-- 77e8f29d-efdc-11eb-b890-a87eeabdefba - culturalperiod (resourceinstance type)
-		,__arches__agg_get_node_display_value(distinct t_4.tiledata, '77e8f29d-efdc-11eb-b890-a87eeabdefba') as cultural_period
-
-		-- 77e8f28d-efdc-11eb-afe4-a87eeabdefba - constructionphasetype (concept type)
-		,__arches__agg_get_node_display_value(distinct t_4.tiledata, '77e8f28d-efdc-11eb-afe4-a87eeabdefba') as construction_phase_type
-
-		-- b2133e72-efdc-11eb-a68d-a87eeabdefba - usephaseperiod (resourceinstance type)
-		,__arches__agg_get_node_display_value(distinct t_5.tiledata, 'b2133e72-efdc-11eb-a68d-a87eeabdefba') as use_phase_period
-
-		-- b2133e6b-efdc-11eb-aa04-a87eeabdefba - functionaltype (concept-list)
-		,__arches__agg_get_node_display_value(distinct t_5.tiledata, 'b2133e6b-efdc-11eb-aa04-a87eeabdefba') as functional_type
-		--------------------------------
-
-	from resource_instances r
-		------------filter to those with geometries-----------------------
-
-		join geojson_geometries geo on geo.resourceinstanceid = r.resourceinstanceid
-			and geo.nodeid = '87d3d7dc-f44f-11eb-bee9-a87eeabdefba'
-
-		------------node tiles-------------
-		left outer join tiles t_1 on r.resourceinstanceid = t_1.resourceinstanceid
-			and t_1.nodegroupid = '325a2f2f-efe4-11eb-9b0c-a87eeabdefba'
-		
-		left outer join tiles t_2 on r.resourceinstanceid = t_2.resourceinstanceid
-			and t_2.nodegroupid = '676d47f9-9c1c-11ea-9aa0-f875a44e0e11'
-
-		left outer join tiles t_3 on r.resourceinstanceid = t_3.resourceinstanceid
-			and t_3.nodegroupid = 'ba342e69-b554-11ea-a027-f875a44e0e11'
-
-		left outer join tiles t_4 on r.resourceinstanceid = t_4.resourceinstanceid
-			and t_4.nodegroupid = '77e8f287-efdc-11eb-a790-a87eeabdefba'
-		
-		left outer join tiles t_5 on r.resourceinstanceid = t_5.resourceinstanceid
-			and t_5.nodegroupid = 'b2133dda-efdc-11eb-ab07-a87eeabdefba'
-
-	group by
-		r.resourceinstanceid
-
-)
-with data;
-*/
-------------- create unique index to allow concurrent refresh --------------
---create unique index on attrv_heritage_asset__87d3d7dc_f44f_11eb_bee9_a87eeabdefba (resourceinstanceid);
-------------------END EXAMPLE
-
--------------- SPATVIEW CReation scripts
-
-
 create or replace function __arches_create_attribute_view(
 	spatial_view_name_slug text,
 	geometry_node_id uuid,
 	attribute_node_list text
 ) returns text
 language plpgsql 
-strict ------------------- no null inputs
+strict
 as 
 $$
 declare
@@ -521,11 +441,10 @@ declare
 	att_view 		text;
 	
 begin
-	-- defin name (attr_<spaitial_view_name)
 	att_view_name := format('attr_%s', spatial_view_name_slug);
 	raise notice 'att_view_name: %', att_view_name;
-	----------------------- generate attribute matview
 	attribute_node_list = replace(attribute_node_list,' ','');
+
 	declare
 		tmp_nodegroupid_slug text;
 		n record;
@@ -539,15 +458,14 @@ begin
 				from nodes 
 				where nodeid::text IN (select unnest(string_to_array(attribute_node_list,',')) as nodeid)
 		loop
-			-- create field
 			tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
 			node_create = node_create || 
 				format('
-				,__arches__agg_get_node_display_value(distinct tile_%s.tiledata, ''%s'') as %s
-				',
-					tmp_nodegroupid_slug,
-					n.nodeid::text,
-					__arches_slugify(n.name));
+					,__arches__agg_get_node_display_value(distinct tile_%s.tiledata, ''%s'') as %s
+					',
+						tmp_nodegroupid_slug,
+						n.nodeid::text,
+						__arches_slugify(n.name));
 			
 			if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
 				tile_create = tile_create || 
@@ -565,26 +483,19 @@ begin
 	end;
 	
 	-- pull together 
-	att_view := format('
+	att_view := format(
+		'
 		create materialized view %s 
 		tablespace pg_default
 		as
 		(
 			select 
 				r.resourceinstanceid
-				-------------- nodes -----------
 				%s
-				--------------------------------
-
 			from resource_instances r
-				------------filter to those with geometries-----------------------
-
 				join geojson_geometries geo on geo.resourceinstanceid = r.resourceinstanceid
 					and geo.nodeid = ''%s''
-
-				------------node tiles-------------
 				%s
-
 			group by
 				r.resourceinstanceid
 		)
@@ -598,8 +509,6 @@ begin
 		geometry_node_id, 
 		tile_create,
 		att_view_name);
-		
-	--raise notice 'BUILD VIEW:================== %',att_view;
 	
 	execute att_view;
 	
@@ -614,7 +523,7 @@ create or replace function __arches_create_spatial_view(
 	attribute_node_list text
 ) returns boolean
 language plpgsql 
-strict ------------------- no null inputs
+strict
 as 
 $$
 declare
@@ -626,13 +535,9 @@ declare
 	g record;
 	tmp_geom_type text;
 begin
-	-- slugify the main view name
 	sv_name_slug := __arches_slugify(spatial_view_name);
-	
-	----------------------- generate attribute matview
 	att_view_name := __arches_create_attribute_view(sv_name_slug, geometry_node_id, attribute_node_list);
-	----------------------- generate spatailview
-	
+
 	for g in select unnest(string_to_array('ST_Point,ST_LineString,ST_Polygon'::text,',')) as geometry_type
 	loop
 		if att_view_name <> 'error' then
@@ -672,11 +577,33 @@ begin
 end;
 $$;
 
+create or replace function __arches_update_spatial_view(
+	spatial_view_name text,
+	geometry_node_id uuid,
+	attribute_node_list text
+) returns boolean
+language plpgsql 
+strict 
+as 
+$$
+declare
+	success boolean := false;
+begin
+	success := __arches_delete_spatial_view(spatial_view_name);
+
+	if success = true then
+		success := __arches_create_spatial_view(spatial_view_name, geometry_node_id, attribute_node_list);
+	end if;
+
+	return success;
+end;
+$$;
+
 create or replace function __arches_delete_spatial_view(
 	spatial_view_name text
 ) returns boolean
 language plpgsql 
-strict ------------------- no null inputs
+strict
 as 
 $$
 declare
@@ -691,9 +618,6 @@ begin
 	-- slugify the main view name
 	sv_name_slug := __arches_slugify(spatial_view_name);
 	
-	
-	----------------------- delete spatailviews
-	
 	for g in select unnest(string_to_array('ST_Point,ST_LineString,ST_Polygon'::text,',')) as geometry_type
 	loop
 		tmp_geom_type := g.geometry_type;
@@ -707,7 +631,6 @@ begin
 			);
 	end loop;
 	
-	----------------------- generate attribute matview
 	att_view_name := format('attr_%s', sv_name_slug);
 	sv_delete := sv_delete || 
 			format('
@@ -725,13 +648,39 @@ begin
 end;
 $$;
 
-/*
-select __arches_create_spatial_view(
-	'h_assets',
-	'87d3d7dc-f44f-11eb-bee9-a87eeabdefba'::uuid,
-	'325a2f33-efe4-11eb-b0bb-a87eeabdefba,676d47ff-9c1c-11ea-b07f-f875a44e0e11,ba345577-b554-11ea-a9ee-f875a44e0e11,77e8f29d-efdc-11eb-b890-a87eeabdefba,77e8f28d-efdc-11eb-afe4-a87eeabdefba,b2133e72-efdc-11eb-a68d-a87eeabdefba,b2133e6b-efdc-11eb-aa04-a87eeabdefba'
-);
 
-select __arches_delete_spatial_view('h_assets');
+
+------------------------------ EXAMPLES ----------------------------------
+
+/* -- CREATE EXAMPLE
+
+select __arches_create_spatial_view(
+	'heritage_assets', -- view name
+	'87d3d7dc-f44f-11eb-bee9-a87eeabdefba'::uuid, -- target geometry node
+	'325a2f33-efe4-11eb-b0bb-a87eeabdefba,
+		676d47ff-9c1c-11ea-b07f-f875a44e0e11,
+		ba345577-b554-11ea-a9ee-f875a44e0e11,
+		77e8f29d-efdc-11eb-b890-a87eeabdefba,
+		77e8f28d-efdc-11eb-afe4-a87eeabdefba,
+		b2133e72-efdc-11eb-a68d-a87eeabdefba,
+		b2133e6b-efdc-11eb-aa04-a87eeabdefba' -- attribute nodes
+	);
+
+*/
+
+/* -- UPDATE EXAMPLE
+select __arches_update_spatial_view(
+	'heritage_assets', -- view name
+	'87d3d7dc-f44f-11eb-bee9-a87eeabdefba'::uuid, -- target geometry node
+	'325a2f33-efe4-11eb-b0bb-a87eeabdefba,
+		676d47ff-9c1c-11ea-b07f-f875a44e0e11,
+		ba345577-b554-11ea-a9ee-f875a44e0e11' -- attribute nodes
+	);
+
+*/
+
+/* -- DELETE EXAMPLE
+
+elect __arches_delete_spatial_view('heritage_assets');
 
 */

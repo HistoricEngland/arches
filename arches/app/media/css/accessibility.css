@@ -98,7 +98,8 @@ a:focus,
 }
 
 .arches-signin .panel-footer,
-.password-rule {
+.password-rule,
+.rp-no-data {
     color: #494949;
 }
 

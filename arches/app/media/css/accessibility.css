@@ -738,7 +738,8 @@ div.search-facet-item:focus {
     }
   
     .recent-edits-container,
-    .profile-summary-page {
+    .profile-summary-page,
+    .graph-designer-container {
         height: calc(100vh - 100px);
     }
 
@@ -749,5 +750,9 @@ div.search-facet-item:focus {
 
     .profile-report {
         min-height: 0;
+    }
+
+    .graph-designer-container {
+        display: inline-block;
     }
 }

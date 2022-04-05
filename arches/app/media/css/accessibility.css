@@ -715,7 +715,8 @@ div.search-facet-item:focus {
     }
 
     .resource-editor-container,
-    .graph-designer-panels-container {
+    .graph-designer-panels-container,
+    .function-manager-container {
         flex-direction: column;
     }
 
@@ -801,5 +802,19 @@ div.search-facet-item:focus {
 
     .graph-selector {
         width: auto;
+    }
+
+    .left-column-crud-container {
+        width: 100%;
+        flex: 0 0 30vh;
+    }
+
+    .function-manager-container #page-content {
+        height: 46vh;
+        overflow-y: auto;
+    }
+
+    .function-manager-container .list-wrapper {
+        overflow-x: hidden;
     }
 }

@@ -103,7 +103,8 @@ a:focus,
 
 .arches-signin .panel-footer,
 .password-rule,
-.rp-no-data {
+.rp-no-data,
+.graph-designer-tab-container .nav-tabs > li:not(.active) > a {
     color: #494949;
 }
 
@@ -116,7 +117,9 @@ a:focus,
 .search-listing-body,
 .account-tips,
 .hover-feature-metadata,
-.pagination > li > a.disabled {
+.pagination > li > a.disabled,
+.graph-designer-header,
+.graph-type {
     color: #595959;
 }
 
@@ -506,6 +509,11 @@ div.search-facet-item:focus {
 
 .profile-summary-page {
     overflow-x: hidden;
+}
+
+.graph-designer-tab-container .nav-tabs > li.active > a {
+    background: #595959;
+    color: #fff;
 }
 
 /******************************************************************/

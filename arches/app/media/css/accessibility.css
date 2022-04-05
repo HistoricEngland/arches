@@ -702,11 +702,13 @@ div.search-facet-item:focus {
         margin-left: 50px;
     }
 
-    .resource-editor-container {
+    .resource-editor-container,
+    .graph-designer-panels-container {
         flex-direction: column;
     }
 
-    .resource-editor-container .left-panel {
+    .resource-editor-container .left-panel,
+    .left-panel.graph-designer {
         flex: 0 0 30vh !important;
         overflow-y: auto;
     }
@@ -754,5 +756,38 @@ div.search-facet-item:focus {
 
     .graph-designer-container {
         display: inline-block;
+    }
+
+    .graph-designer-container #page-content {
+        padding: 0 10px 240px;
+    }
+
+    .resource-grid-main-container {
+        height: 90px;
+    }
+
+    .resource-grid-tools-container {
+        top: 48px;
+        left: inherit;
+    }
+
+    .graph-find, .resource-grid-title {
+        font-size: 1.1em;
+    }
+
+    .graph-designer-container .graph-list-header .btn-group {
+        right: 10px;
+    }
+
+    .graph-designer-panels-container .settings-panel {
+        height: calc(70vh - 155px);
+    }
+
+    .graph-designer-panels-container .settings-panel .settings-panel-body {
+        overflow-x: hidden;
+    }
+
+    .graph-selector {
+        width: auto;
     }
 }

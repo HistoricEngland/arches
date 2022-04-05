@@ -516,6 +516,10 @@ div.search-facet-item:focus {
     color: #fff;
 }
 
+.settings-panel-body .graph-designer {
+    height: calc(70vh - 205px);
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/

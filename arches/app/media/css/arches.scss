@@ -2252,6 +2252,7 @@ div.final-cons-step-separator>h4 {
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     align-items: normal;
@@ -2346,7 +2347,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel-body {
-    overflow-y: scroll;
+    overflow-y: auto;
     width: inherit;
     height: -moz-available;
     height: -webkit-fill-available;

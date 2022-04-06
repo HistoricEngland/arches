@@ -5,7 +5,7 @@
 <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
         toggleTab('manage');
     }
-}, css: {'disabled': self.card.tiles().length === 0, 
+}, css: {'disabled': self.card.tiles().length === 0,
     'active': activeTab() === 'manage'
 }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-pencil"></i>
@@ -14,7 +14,7 @@
 <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
     toggleTab('edit');
 }
-}, css: {'disabled': self.card.tiles().length === 0, 
+}, css: {'disabled': self.card.tiles().length === 0,
     'active': activeTab() === 'edit'
 }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-pencil"></i>
@@ -59,7 +59,7 @@
                                         context: 'render',
                                         loading: $parent.loading
                                         }
-                                    } --> 
+                                    } -->
                                 <!-- /ko -->
                             <!--/ko-->
                         <!--/ko-->
@@ -89,7 +89,7 @@
                                         <h3 class="rr-splash-description">{% trans "to present it in this webpage." %}</h3>
                                     </div>
                                     <!--/ko-->
-                                    
+
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top file-select loader-select">
                                         <div class="">
@@ -98,7 +98,7 @@
                                                 <span data-bind="text:$parent.displayContent().renderer.title"></span>{% trans ' loader'%}
                                             </h4>
                                             <!--/ko-->
-                                            
+
                                             <h2>{% trans 'Select File Loader' %}</h2>
                                             <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
                                             <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
@@ -115,11 +115,11 @@
                                                                 <span><i data-bind="attr:{class: ($data.iconclass +' r-select-icon')}" class="fa fa fa-user r-select-icon"></i></span>
                                                             </div>
                                                             <div class="r-desc-container">
-                                                                <p data-bind="text: $data.description" style="color: #30517a; background-color: #fdfdfd" class="r-select-desc"></p> 
-                                                            </div>  
+                                                                <p data-bind="text: $data.description" style="color: #30517a; background-color: #fdfdfd" class="r-select-desc"></p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                    
+
                                                     <!-- card Tools -->
                                                     <div class="r-select-card-footer">
                                                         <div class="">
@@ -133,17 +133,17 @@
                                             <!--/ko-->
                                         </div>
                                     </div>
-                                    <br>  
+                                    <br>
                                 </div>
                                 <div class="file-upload-footer">
                                     <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: '{% trans "Apply the same loader to all selected files in the dataset" %}'}}}"></span>
                                 </div>
                                 <!--/ko-->
                                </div>
-                    
+
                             </div>
                         </div>
-                    
+
                     </div>
 
                         <!--/ko-->
@@ -197,11 +197,12 @@
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'manage' -->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">{% trans "File Filter" %}</h2>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
@@ -259,14 +260,17 @@
         <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
     </div>
 </div>
+</div>
 <!--/ko-->
 
 <!--ko if: activeTab() === 'edit' -->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
+
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+
+<div class="workbench-card-sidepanel-body">
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">{% trans 'File Filter' %}</h2>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
@@ -284,8 +288,7 @@
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
 
-<div class="workbench-sidepanel-card-container" data-bind="css: card.model.cssclass">
-
+<div data-bind="css: card.model.cssclass">
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
         <span>{% trans 'Currently showing edits by' %}</span>
@@ -453,6 +456,7 @@
             </aside>
         </div>
     </div>
+</div>
 </div>
 
 <!--/ko-->

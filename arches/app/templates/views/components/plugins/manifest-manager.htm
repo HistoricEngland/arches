@@ -25,20 +25,19 @@
 {% block sidepanel %}
 <!--ko foreach: { data: [$data], as: 'self' }-->
 <!--ko if: activeTab() === 'manifest'-->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Service' %}</h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel"  onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Service' %}</h4>
 </div>
-
-<div class="iiif-image-tools" style="margin-top: 20px;">
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+<div class="iiif-image-tools">
     <div class="form-group">
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Title" %}</label>
         <input type="text" placeholder="Service Title" class="form-control input-lg" style="height: 36px;"
             data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
-        </div>  
-        <div class="row widget-wrapper">  
+        </div>
+        <div class="row widget-wrapper">
         <label class="control-label">{% trans "Description" %}</label>
         <textarea rows="10" type="text" placeholder='Service Description' class="form-control input-lg"
             data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
@@ -47,22 +46,22 @@
             <label class="control-label">{% trans "Attribution" %}</label>
             <input type="text" placeholder="Attribution" class="form-control input-lg" style="height: 36px;"
                 data-bind="textInput: self.manifestAttribution, valueUpdate: 'keyup'">
-            </div>  
+            </div>
         <div class="row widget-wrapper">
             <label class="control-label">{% trans "Attribution Logo" %}</label>
             <input type="text" placeholder="Attribution Logo" class="form-control input-lg" style="height: 36px;"
                 data-bind="textInput: self.manifestLogo, valueUpdate: 'keyup'">
-            </div>  
+            </div>
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Metadata" %}</label>
         <div class="manifest-metadata" style="display: flex;">
             <div style="display: flex; flex-direction: column; width: 100%;">
             <div style="padding: 3px">
-                <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;" 
+                <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;"
                 data-bind="textInput: metadataLabel, valueUpdate: 'keyup'">
             </div>
             <div style="padding: 3px">
-                 <textarea placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;" 
+                 <textarea placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;"
                 data-bind="textInput: metadataValues, valueUpdate: 'keyup'"></textarea>
             </div>
             </div>
@@ -78,16 +77,16 @@
                 },
                 beforeMove: self.beforeMove,
                 afterMove: function(){console.log('hi')}
-            }">  
+            }">
             <div class="iiif-manifest-metadata-panel" style="">
                 <div class="manifest-metadata-panel-drag"><i class="fa fa-ellipsis-v"></i></div>
                 <div style="display: flex; flex-direction: column; width: 100%;">
                 <div style="padding: 3px;">
-                    <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;" 
+                    <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;"
                     data-bind="textInput: $data.label, valueUpdate: 'keyup'">
                 </div>
                 <div style="padding: 3px">
-                    <textarea type="text" placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;" 
+                    <textarea type="text" placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;"
                     data-bind="textInput: $data.value, valueUpdate: 'keyup'"></textarea>
                 </div>
                 </div>
@@ -99,7 +98,7 @@
         </div>
     </div>
 
-    
+
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div style="display: flex;">
         <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">{% trans "Save" %}</button>
@@ -110,16 +109,17 @@
         <!--/ko-->
     </div>
 </div>
+</div>
 <!--/ko-->
 
 <!--ko if: activeTab() === 'canvas'-->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Canvases' %}</h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Canvases' %}</h4>
 </div>
 
-<div class="iiif-image-tools" style="margin-top: 20px;">
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+<div class="iiif-image-tools">
     <!--ko if: canvases().length > 0-->
     <label class="control-label">{% trans "Images" %}</label>
     <div>{% trans "Select image to delete from the image service" %}</div>
@@ -155,24 +155,25 @@
             <div id="hidden-dz-previews" style="display:none"></div>
         </div>
     </div>
-    
+
 
     <!--ko if: canvas-->
     <label class="control-label">{% trans "Selected Image Name" %}</label>
     <div>
-        <input type="text" placeholder='Image Caption' class="form-control input-lg" style="height: 36px;" 
+        <input type="text" placeholder='Image Caption' class="form-control input-lg" style="height: 36px;"
         data-bind="textInput: self.canvasLabel, valueUpdate: 'keyup'">
     </div>
     <!--/ko-->
-    
-        
-    
+
+
+
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div class="file-workbench-buttons">
             <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">{% trans "Save" %}</button>
             <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">{% trans "Cancel" %}</button>
         </div>
     </div>
+</div>
 </div>
 <!--/ko-->
 <!--/ko-->
@@ -205,8 +206,8 @@
 <!--ko if: createService -->
 <div data-bind="dropzone: dropzoneOptions4create" class="file-select loader-select" style="height: 100%;">
     <div style="
-            display:flex; 
-            flex-direction: column; 
+            display:flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100%;
@@ -214,7 +215,7 @@
     >
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
-        </div> 
+        </div>
         <h2>{% trans 'Drag & Drop Your Images Here' %}</h2>
         <h4>{% trans 'Import digital images and create a new image service' %}</h4>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
@@ -241,7 +242,7 @@
     <div style="display:flex; flex-direction: column; align-items: center;">
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-picture-o r-select-icon"></i></span>
-        </div> 
+        </div>
         <h2>{% trans 'Edit an existing Image Service' %}</h2>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column; width: 300px">
@@ -264,7 +265,7 @@
 {% block gallery_header %}
     <div>
         <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-    </div>                 
+    </div>
     <div>
         <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
             <!-- ko if: !expandGallery() -->
@@ -275,9 +276,9 @@
             <!-- /ko -->
         </span>
     </div>
-    <div 
-        class="iiif-gallery-sequence-label" 
-        style="padding:0 5px" 
+    <div
+        class="iiif-gallery-sequence-label"
+        style="padding:0 5px"
         data-bind="
             if: shouldShowEditService,
             click: toggleManifestEditor,

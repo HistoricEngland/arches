@@ -520,6 +520,10 @@ div.search-facet-item:focus {
     height: calc(70vh - 205px);
 }
 
+.function-manager-container .list-wrapper {
+    overflow-x: hidden;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -814,7 +818,9 @@ div.search-facet-item:focus {
         overflow-y: auto;
     }
 
-    .function-manager-container .list-wrapper {
-        overflow-x: hidden;
+    .ep-form-toolbar .btn::before {
+        content: "";
+        margin: 0;
+        padding: 0;
     }
 }

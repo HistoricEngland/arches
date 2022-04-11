@@ -251,24 +251,22 @@
                         <div class="form-group">
 
                             <!-- Icon search -->
-                            <div style="padding-left: 5px;">
-                                <div class="relative" style="padding: 10px 0px;">
+                            <div class="icon-search-container relative">
 
-                                    <!-- Currently selected icon -->
-                                    <div>
-                                        {% trans "Selected icon:" %}
-                                        <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + graph.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
-                                    </div>
+                                <!-- Currently selected icon -->
+                                <div>
+                                    {% trans "Selected icon:" %}
+                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + graph.iconclass(), click: function() {}"></button>
+                                </div>
 
-                                    <div style="position: absolute; left: 130px; top: 9px;">
-                                        <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value: graphSettingsViewModel.iconFilter, valueUpdate: 'keyup'">
+                                <div class="icon-search-field">
+                                    <input type="text" class="form-control" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value: graphSettingsViewModel.iconFilter, valueUpdate: 'keyup'">
 
-                                        <!-- Remove Search -->
-                                        <span class="clear-search" style="position: absolute; left: 480px; top: 5px; color: #123; font-size: 17px;"><i class="fa fa-times-circle"></i></span>
-                                    </div>
+                                    <!-- Remove Search -->
+                                    <span class="clear-search"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
-
+                            
                             <!-- Icon List -->
                             <div class="icon-list">
 

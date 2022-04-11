@@ -823,4 +823,12 @@ div.search-facet-item:focus {
         margin: 0;
         padding: 0;
     }
+
+    .graph-settings-panel-body .widgets .widget-container div div > input {
+        min-width: 0;
+    }
+
+    .graph-designer-graph-content .chosen-container {
+        width: 100% !important;
+    }
 }

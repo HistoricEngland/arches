@@ -1,0 +1,214 @@
+@media screen and (max-width: 768px) {
+    article.flexrow {
+        height: calc(100vh - 100px);
+    }
+
+    .search-toolbar {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .search-type-btn-panel {
+        padding-bottom: 0;
+    }
+
+    .search-type-btn,
+    .search-type-btn-popup,
+    .search-type-btn.relative.active,
+    .search-type-btn-popup.relative.active {
+        height: 20px;
+        padding: 0;
+    }
+
+    .popup-panel-row {
+        padding-left: 4px;
+    }
+
+    .search-type-btn .fa,
+    .search-type-btn-popup .fa {
+        display: none;
+    }
+
+    .popup-panel-row {
+        float: none;
+    }
+
+    .ep-notifs,
+    .ep-help {
+        width: 100%;
+    }
+
+    .workbench-card-wrapper {
+        height: 38vh;
+    }
+    
+    .workbench-card-sidepanel {
+        width: calc(100% - 74px);
+        height: 38vh;
+    }
+
+    .resource-component-abstract-container {
+        display: inline-flex;
+        width: 100vw;
+        height: calc(100vh - 100px);
+        &.is-summary {
+            height: calc(50vh - 100px);
+        }
+    }
+
+    .report-print-date {
+        white-space: nowrap;
+    }
+
+    .rp-no-data {
+        top: 0;
+    }
+
+    .search-result-details {
+        height: calc(50vh - 100px);
+    }
+
+    .sidepanel-draggable {
+        display: none;
+    }
+
+    #menu-control {
+        margin-left: 50px;
+    }
+
+    .resource-editor-container,
+    .graph-designer-panels-container,
+    .function-manager-container,
+    .map-manager-container {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .resource-editor-container .left-panel,
+    .left-panel.graph-designer {
+        flex: 0 0 30vh !important;
+        overflow-y: auto;
+    }
+
+    .resource-editor-container .left-panel .resource-editor-tree,
+    .map-manager-container .layer-list {
+        height: auto;
+    }
+
+    .resource-editor-container {
+        .main-panel {
+            flex: 0 0 calc(70vh - 100px) !important;
+            overflow-y: auto;
+            .card-component-wrapper-editor {
+                height: inherit;
+            }
+            .rr-splash {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    }
+
+    .create-resource-instance-card-component.rr-table-pop {
+        padding-left: 0;
+    }
+
+    .create-instance-header {
+        padding-left: 55px;
+    }
+  
+    .recent-edits-container,
+    .profile-summary-page,
+    .graph-designer-container {
+        height: calc(100vh - 100px);
+    }
+
+    .profile-list,
+    .profile-report {
+        padding: 20px;
+    }
+
+    .profile-report {
+        min-height: 0;
+    }
+
+    .graph-designer-container {
+        display: inline-block;
+        #page-content {
+            padding: 0 10px 240px;
+        }
+    }
+
+    .resource-grid-main-container {
+        height: 90px;
+    }
+
+    .resource-grid-tools-container {
+        top: 20px;
+        left: inherit;
+    }
+
+    .graph-find, .resource-grid-title {
+        font-size: 1.1em;
+    }
+
+    .graph-designer-container .graph-list-header .btn-group {
+        right: 10px;
+    }
+
+    .graph-designer-panels-container .settings-panel {
+        height: calc(70vh - 155px);
+    }
+
+    .graph-designer-panels-container .settings-panel .settings-panel-body {
+        overflow-x: hidden;
+    }
+
+    .graph-selector {
+        width: auto;
+    }
+
+    .left-column-crud-container {
+        width: 100%;
+        flex: 0 0 30vh;
+    }
+
+    .ep-form-toolbar .btn::before {
+        content: "";
+        margin: 0;
+        padding: 0;
+    }
+
+    .graph-settings-panel-body .widgets .widget-container div div > input {
+        min-width: 0;
+    }
+
+    .graph-designer-graph-content .chosen-container {
+        width: 100% !important;
+    }
+
+    .resource-toolbar {
+        height: 105px;
+    }
+
+    .find-widget {
+        width: 42vw;
+    }
+
+    .settings-panel-body {
+        .graph-designer {
+            height: calc(70vh - 205px);
+        }
+    }
+
+    .map-manager-container {
+        .panel-heading {
+            span {
+                font-size: 2.8vw;
+            }
+        }
+        .category-title {
+            padding: 9px 5px;
+        }
+    }
+}

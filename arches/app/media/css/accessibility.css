@@ -1,4 +1,4 @@
-html, body {
+/*html, body {
     overflow-y: hidden;
 }
 
@@ -309,6 +309,7 @@ a.tree-display-tool:hover,
 .resource-grid-main.mpm-manager .mpm-title {
     width: calc(100% - 55px);
 }
+
 div.search-facet-item:focus {
     box-shadow: inset 0 0 0 3px #000;
     outline: none;
@@ -569,13 +570,13 @@ div.search-facet-item:focus {
     left: auto;
     top: auto;
     margin-left: 55px;
-}
+}*/
 
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
 
-@media only screen and (min-width: 1025px) and (max-width: 1140px) {
+/*@media only screen and (min-width: 1025px) and (max-width: 1140px) {
     .search-toolbar .fa {
         display: none;
     }
@@ -583,9 +584,9 @@ div.search-facet-item:focus {
     .search-type-btn, .search-type-btn-popup {
         min-width: auto;
     }
-}
+}*/
 
-@media screen and (max-width: 1024px) {
+/*@media screen and (max-width: 1024px) {
     article.flexrow {
         flex-direction: column-reverse;
     }
@@ -896,4 +897,4 @@ div.search-facet-item:focus {
     .map-manager-container .category-title {
         padding: 9px 5px;
     }
-}
+}*/

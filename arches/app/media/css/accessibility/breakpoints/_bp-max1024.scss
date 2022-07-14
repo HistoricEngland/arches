@@ -1,0 +1,101 @@
+@media screen and (max-width: 1024px) {
+    article.flexrow {
+        flex-direction: column-reverse;
+    }
+
+    article .flex.search-map-container {
+        min-height: 0;
+    }
+
+    .search-results-panel {
+        max-width: inherit;
+        min-height: 0;
+    }
+
+    .search-control-container {
+        margin-top: 0;
+        flex: 1;
+    }
+
+    .tab-pane .tab-pane-content {
+        height: calc(50vh - 75px);
+        overflow-y: auto;
+    }
+
+    .card-form-preview-container:not(.map-manager-container .card-form-preview-container) {
+        height: calc(70vh - 155px);
+        overflow-y: auto;
+    }
+
+    .workbench-card-sidebar-tab {
+        height: 3em;
+        padding: 4px;
+    }
+
+    .top-right-nav div {
+        white-space: nowrap;
+    }
+
+    .search-toolbar {
+        width: 100%;
+    }
+
+    .facets-container,
+    .facets-search-container {
+        width: 50%;
+    }
+
+    .facets-search-container,
+    .list-group.search-facets,
+    .search-popup-panel {
+        height: calc(50vh - 75px);
+    }
+
+    .facets-search-container .rr-splash {
+        margin: 0;
+        padding: 5px;
+    }
+
+    .faceted-search-card-container {
+        padding: 2px;
+    }
+
+    .facet-body {
+        margin: 0 5px;
+        padding: 0;
+    }
+
+    .related-resources-content .rr-splash,
+    .search-result-details-splash .rr-splash {
+        padding: 20px;
+        margin: 20px;
+    }
+
+    .search-result-details-splash {
+        padding: 5px 0 0 0;
+    }
+
+    .rr-splash-description:last-child {
+        margin-bottom: 0;
+    }
+
+    .search-result-details {
+        height: 50vh;
+    }
+
+    .dl-horizontal {
+        dt {
+            float: none;
+            width: auto;
+            text-align: left;
+            padding-top: 10px;
+        }
+        dd {
+            margin-left: 0;
+        }
+    }
+
+    .rp-card-section-contents {
+        display: block;
+    }
+}

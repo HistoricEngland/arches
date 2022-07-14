@@ -1,0 +1,9 @@
+@media only screen and (min-width: 1025px) and (max-width: 1140px) {
+    .search-toolbar .fa {
+        display: none;
+    }
+
+    .search-type-btn, .search-type-btn-popup {
+        min-width: auto;
+    }
+}

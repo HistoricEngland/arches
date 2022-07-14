@@ -1,0 +1,27 @@
+a:hover,
+a:focus,
+.btn-file-upload-reset:hover,
+.btn-file-upload-reset:focus,
+.v5-splash-navbar .navbar-nav>li>a:hover,
+.btn-file-upload-reset:hover,
+.btn-file-upload-reset:focus,
+.workbench-card-sidebar-tab:hover,
+.workbench-card-sidebar-tab:focus {
+    text-decoration: underline;
+}
+
+.regular-link {
+    color: var(--link-regular);
+}
+
+.crud-card-main a {
+    color: var(--link-crud-card);
+}
+
+.search-listing-footer a:focus {
+    background: none;
+}
+
+.hover-feature-footer a {
+    color: var(--btn-feature);
+}

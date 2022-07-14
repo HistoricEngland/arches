@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load template_tags %}
 {% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
@@ -36,15 +37,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
 
-    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+    {% block css %}
+        <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
 
-    <link href="{% static 'css/unify.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-    <link href="{% static 'css/index.css' %}" rel="stylesheet">
-    {% if app_settings.ACCESSIBILITY_MODE %}
-    <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
-    {% endif %}
+        <link href="{% static 'css/unify.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+        <link href="{% static 'css/index.css' %}" rel="stylesheet">
+        {% if app_settings.ACCESSIBILITY_MODE %}
+        <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+            {% compress css %}
+                <link type="text/x-scss" href="{% static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
+            {% endcompress %}
+        {% endif %}
+    {% endblock css%}
 </head>
 
 <body>

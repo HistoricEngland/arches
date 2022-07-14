@@ -42,10 +42,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% block css %}
         {% compress css %}
         <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen">
+            {% if app_settings.ACCESSIBILITY_MODE %}
+                <link type="text/x-scss" href="{% static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
+            {% endif %}
     	{% endcompress %}
-        {% if app_settings.ACCESSIBILITY_MODE %}
-        <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
-        {% endif %}
         <link href="{% static 'css/package.css' %}" rel="stylesheet">
         <link href="{% static 'css/project.css' %}" rel="stylesheet">
     {% endblock css%}

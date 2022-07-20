@@ -1611,12 +1611,8 @@ class DomainDataType(BaseDomainDataType):
         return terms
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        domain_text = None
-        for tile in document["tiles"]:
-            for k, v in tile.data.items():
-                if v == nodevalue:
-                    node = models.Node.objects.get(nodeid=k)
-                    domain_text = self.get_option_text(node, v)
+        node = models.Node.objects.get(nodeid=nodeid)
+        domain_text = self.get_option_text(node, nodevalue)
 
         if domain_text not in document["strings"] and domain_text is not None:
             document["strings"].append({"string": domain_text, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
@@ -1709,13 +1705,10 @@ class DomainListDataType(BaseDomainDataType):
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
-        for tile in document["tiles"]:
-            for k, v in tile.data.items():
-                if v == nodevalue:
-                    node = models.Node.objects.get(nodeid=k)
-                    for value in nodevalue:
-                        text_value = self.get_option_text(node, value)
-                        domain_text_values.add(text_value)
+        node = models.Node.objects.get(nodeid=nodeid)
+        for value in nodevalue:
+            text_value = self.get_option_text(node, value)
+            domain_text_values.add(text_value)
 
         for value in domain_text_values:
             if value not in document["strings"]:

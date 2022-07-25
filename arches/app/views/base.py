@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+from django.utils.decorators import method_decorator
+from arches.app.utils.decorators import login_required
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
@@ -31,6 +32,8 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
+
+@method_decorator(login_required, name="dispatch")
 class BaseManagerView(TemplateView):
 
     template_name = ""

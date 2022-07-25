@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from arches.app.utils.decorators import login_required
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
@@ -128,6 +129,7 @@ class KibanaProxy(ProxyView):
         return JSONResponse(_("KibanaProxy failed"), status=500)
 
 
+@method_decorator(login_required, name="dispatch")
 class APIBase(View):
     def dispatch(self, request, *args, **kwargs):
         try:

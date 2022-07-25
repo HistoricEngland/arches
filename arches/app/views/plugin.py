@@ -27,7 +27,7 @@ from django.utils.decorators import method_decorator
 from arches.app.utils.decorators import login_required
 
 
-# @method_decorator(login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class PluginView(MapBaseManagerView):
     action = None
 

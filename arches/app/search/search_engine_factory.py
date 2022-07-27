@@ -25,7 +25,6 @@ from django.core.exceptions import ImproperlyConfigured
 class SearchEngineFactory(object):
     def create(
         self,
-        hosts=settings.ELASTICSEARCH_HOSTS,
         prefix=settings.ELASTICSEARCH_PREFIX,
         connection_options=settings.ELASTICSEARCH_CONNECTION_OPTIONS,
     ):
@@ -35,7 +34,7 @@ class SearchEngineFactory(object):
         modulename = (".").join(components[0 : len(components) - 1])
         # _temp = __import__(modulename, globals(), locals(), [classname], -1)
         _temp = __import__(modulename, globals(), locals(), [classname])  # in py3, level must be >= 0
-        return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
+        return getattr(_temp, classname)(prefix=prefix, **connection_options)
 
 
 SearchEngineInstance = SearchEngineFactory().create()

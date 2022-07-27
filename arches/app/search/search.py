@@ -38,7 +38,15 @@ class SearchEngine(object):
         serializer.dumps = serializer.serialize
         serializer.loads = JSONDeserializer().deserialize
         self.prefix = kwargs.pop("prefix", "").lower()
-        self.es = Elasticsearch(serializer=serializer, **kwargs)
+
+        self.es = Elasticsearch(
+            cloud_id=settings.ELASTIC_CLOUD_ID,
+            ca_certs=False,
+            verify_certs=False,
+            ssl_show_warn=False,
+            http_auth=(settings.ELASTIC_CLOUD_USER, settings.ELASTIC_CLOUD_PASSWORD),
+            serializer=serializer,
+        )
         self.logger = logging.getLogger(__name__)
         warnings.filterwarnings("ignore", category=ElasticsearchWarning)
 

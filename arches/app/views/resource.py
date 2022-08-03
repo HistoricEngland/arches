@@ -725,7 +725,7 @@ class ResourceReportView(MapBaseManagerView):
 
         if graph.iconclass:
             context["nav"]["icon"] = graph.iconclass
-        context["nav"]["title"] = graph.name
+        context["nav"]["title"] = f"{graph.name} Report"
         context["nav"]["res_edit"] = True
         context["nav"]["print"] = True
 

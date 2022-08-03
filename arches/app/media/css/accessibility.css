@@ -727,12 +727,15 @@ div.search-facet-item:focus {
     }
 
     .workbench-card-wrapper {
-        height: 38vh;
+        height: calc(70vh - 150px);
     }
     
     .workbench-card-sidepanel {
-        width: calc(100% - 74px);
-        height: 38vh;
+        height: calc(70vh - 150px);
+    }
+
+    .workbench-card-sidepanel .install-buttons {
+        margin-right: 75px;
     }
 
     .resource-component-abstract-container {
@@ -790,7 +793,8 @@ div.search-facet-item:focus {
     }
 
     .resource-editor-container .main-panel .card-component-wrapper-editor {
-        height: inherit;
+        height: calc(70vh - 150px);
+        padding-bottom: 0;
     }
 
     .resource-editor-container .main-panel .rr-splash {

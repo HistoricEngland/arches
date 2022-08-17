@@ -2233,10 +2233,11 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
+    margin-right: 75px;
 }
 
-.workbench-card-container.workbench-card-container-sidepanel-active {
-    margin-right: 400px;
+.workbench-card-container.workbench-card-container-sidepanel-active .mapboxgl-ctrl-top-right {
+    right: 400px;
 }
 
 .workbench-card-container-wrapper.workbench-card-container-sidepanel-active {
@@ -13087,7 +13088,7 @@ ul.select2-choices:after {
 }
 
 .card-component-wrapper-editor {
-    height: calc(100vh - 100px);
+    height: calc(100vh - 50px);
     padding-bottom: 50px;
     overflow-y: auto;
     background: #fafafa;

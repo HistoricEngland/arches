@@ -62,10 +62,9 @@ class SearchResultsExporter(object):
         self.set_precision = GeoUtils().set_precision
 
     def insert_subcard_below_parent_card(self, main_card_list, sub_card_list):
-        for sub_card in sub_card_list:
-            parent_obj = sub_card.nodegroup.parentnodegroup_id
-            for main_card in main_card_list:
-                if main_card.nodegroup_id == parent_obj:
+        for main_card in main_card_list:            
+            for sub_card in sub_card_list:
+                if main_card.nodegroup_id == sub_card.nodegroup.parentnodegroup_id:
                     index_number = main_card_list.index(main_card) + 1
                     main_card_list.insert(index_number, sub_card)
 

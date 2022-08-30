@@ -120,8 +120,8 @@ def prepare_search_index(create=False):
                 "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "resourceinstanceid": {"type": "keyword"},
                 "root_ontology_class": {"type": "keyword"},
-                "displayname": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
-                "displaydescription": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
+                "displayname": {"type": "keyword"},
+                "displaydescription": {"type": "keyword"},
                 "map_popup": {"type": "keyword"},
                 "provisional_resource": {"type": "keyword"},
                 "tiles": {

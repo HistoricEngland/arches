@@ -115,21 +115,13 @@ def prepare_search_index(create=False):
             "index.mapping.nested_objects.limit": 50000,
         },
         "mappings": {
-            "dynamic_templates": [
-                {
-                    "language_values": {
-                        "path_match": "tiles.data.*.*.value",
-                        "mapping": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                    }
-                }
-            ],
             "properties": {
                 "graph_id": {"type": "keyword"},
                 "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "resourceinstanceid": {"type": "keyword"},
                 "root_ontology_class": {"type": "keyword"},
-                "displayname": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
-                "displaydescription": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
+                "displayname": {"type": "keyword"},
+                "displaydescription": {"type": "keyword"},
                 "map_popup": {"type": "keyword"},
                 "provisional_resource": {"type": "keyword"},
                 "tiles": {
@@ -161,7 +153,6 @@ def prepare_search_index(create=False):
                             "fields": {"raw": {"type": "keyword"}, "folded": {"type": "text", "analyzer": "folding"}},
                         },
                         "nodegroup_id": {"type": "keyword"},
-                        "language": {"type": "text"},
                         "provisional": {"type": "boolean"},
                     },
                 },

@@ -106,7 +106,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 
-    <div class="set-variable-pixel-height">
+    <div class="set-variable-pixel-height graph-designer-panels-container">
 
         <!-- Left Panel -->
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
@@ -115,18 +115,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="graph-designer-tab-container">
                     <ul class="nav nav-tabs">
                         <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
-                            <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
+                            <a href="#" class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
                                 {% trans 'Graph' %}
                             </a>
                         </li>
                         <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
-                            <a class="graph-designer-tab ion-clipboard" aria-expanded="false">
+                            <a href="#" class="graph-designer-tab ion-clipboard" aria-expanded="false">
                                 {% trans 'Cards' %}
                             </a>
                         </li>
                         <!--ko if: graph.isresource() -->
                         <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
-                            <a class="graph-designer-tab ion-lock-combination" aria-expanded="false">
+                            <a href="#" class="graph-designer-tab ion-lock-combination" aria-expanded="false">
                                 {% trans 'Permissions' %}
                             </a>
                         </li>
@@ -207,7 +207,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             >
                 <!--Middle Panel -->
                 <!-- ko if: cardTree.selection -->
-                <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }" style="">
+                <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }">
                     <!-- ko if: typeof cardTree.selection()!=='string' -->
                         <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
                         <div data-bind="with: cardTree.selection()">
@@ -225,7 +225,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% trans "Report Configuration" %}
                     </div>
                     <div class="tab-content listing-container form-divider">
-                        <div class="node-config-item" style="">
+                        <div class="node-config-item">
                             <div class="control-label">
                                 {% trans "Template" %}
                             </div>

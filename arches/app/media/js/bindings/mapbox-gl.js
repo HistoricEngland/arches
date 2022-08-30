@@ -40,6 +40,12 @@ define([
                     map.addImage(marker.name, image);
                 });
             });
+            //-- #46072: add scale control to map
+            map.addControl(new mapboxgl.ScaleControl({
+                maxWidth: 200,
+                unit: 'metric'
+            }));
+            //----------------
         });
 
         // prevents drag events from bubbling

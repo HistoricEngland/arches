@@ -100,13 +100,17 @@
                             </div>
 
                             <div class="col-xs-12">
-                                <span class="node-semantic-description">
-                                    <div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div>
-                                    <div class="node-form ontology" data-bind="text: '(' + graphModel.getParentNode(node()).ontologyclass_friendlyname() + '; parent)'"></div>
-                                    <div class="node-form ontology" data-bind="text: node().parentproperty_friendlyname"></div>
-                                    <div class="node-form node-name" data-bind="text: node().name"></div>
-                                    <div class="node-form ontology" data-bind="text: '(' + node().ontologyclass_friendlyname()  + ')'"></div>
-                                </span>
+                                <div class="node-semantic-description">
+                                    <div class="col-xs-12">
+                                        <div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <div class="node-form ontology" data-bind="text: '(' + graphModel.getParentNode(node()).ontologyclass_friendlyname() + '; parent)'"></div>
+                                        <div class="node-form ontology" data-bind="text: node().parentproperty_friendlyname"></div>
+                                        <div class="node-form node-name" data-bind="text: node().name"></div>
+                                        <div class="node-form ontology" data-bind="text: '(' + node().ontologyclass_friendlyname()  + ')'"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -172,7 +176,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 
@@ -192,7 +196,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isrequired(), 'disabled': checkIfImmutable()}, click: toggleRequired"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().isrequired(), 'disabled': checkIfImmutable()}, click: toggleRequired" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 
@@ -213,7 +217,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 
@@ -237,7 +241,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector(), 'disabled': checkIfImmutable()}, click: toggleIsCollector"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector(), 'disabled': checkIfImmutable()}, click: toggleIsCollector" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 

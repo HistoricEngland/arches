@@ -115,14 +115,6 @@ def prepare_search_index(create=False):
             "index.mapping.nested_objects.limit": 50000,
         },
         "mappings": {
-            "dynamic_templates": [
-                {
-                    "language_values": {
-                        "path_match": "tiles.data.*.*.value",
-                        "mapping": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                    }
-                }
-            ],
             "properties": {
                 "graph_id": {"type": "keyword"},
                 "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},

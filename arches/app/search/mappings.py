@@ -153,7 +153,6 @@ def prepare_search_index(create=False):
                             "fields": {"raw": {"type": "keyword"}, "folded": {"type": "text", "analyzer": "folding"}},
                         },
                         "nodegroup_id": {"type": "keyword"},
-                        "language": {"type": "text"},
                         "provisional": {"type": "boolean"},
                     },
                 },

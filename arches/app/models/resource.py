@@ -48,9 +48,9 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_users_for_object,
     get_restricted_users,
     get_restricted_instances,
+    user_can_read_resource,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -76,9 +76,7 @@ class Resource(models.ResourceInstance):
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"][descriptor], context
-            )
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"][descriptor], context)
         else:
             return "undefined"
 
@@ -226,7 +224,7 @@ class Resource(models.ResourceInstance):
         start = time()
         for resource in resources_to_create:
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
-        
+
         try:
             resources[0].tiles[0].save_edit(
                 note=f"Bulk created: {len(tiles)} for {len(resources)} resources.",
@@ -557,8 +555,11 @@ class Resource(models.ResourceInstance):
             resourceinstance_graphid=resourceinstance_graphid,
         )
 
+        resource_relations["hits"]["hits"] = list(
+            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidto"]), resource_relations["hits"]["hits"])
+        )
 
-
+        resource_relations["hits"]["total"]["value"] = len(resource_relations["hits"]["hits"])
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
 

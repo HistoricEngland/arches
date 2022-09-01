@@ -559,6 +559,10 @@ class Resource(models.ResourceInstance):
             filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidto"]), resource_relations["hits"]["hits"])
         )
 
+        resource_relations["hits"]["hits"] = list(
+            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidfrom"]), resource_relations["hits"]["hits"])
+        )
+
         resource_relations["hits"]["total"]["value"] = len(resource_relations["hits"]["hits"])
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()

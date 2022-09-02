@@ -29,6 +29,8 @@ from arches.app.utils.permission_backend import user_can_delete_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_created_transaction
 from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import redirect
+from arches.app.models.system_settings import settings
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -57,6 +59,24 @@ def deprecated(func):
         return func(*args, **kwargs)
 
     return new_func
+
+
+def login_required(function):
+    @functools.wraps(function)
+    def wrapper(request, *args, **kwargs):
+        login_required = settings.LOGIN_REQUIRED if hasattr(settings, "LOGIN_REQUIRED") else False
+        if not login_required or (request.user.is_authenticated and request.user.username != "anonymous"):
+            return function(request, *args, **kwargs)
+        elif function.func.__func__.__qualname__.startswith("APIBase"):
+            raise PermissionDenied
+        else:
+            next = ""
+            url = request.get_full_path()
+            if url != "/":
+                next = f"?next={url}"
+            return redirect(f"/auth/{next}")
+
+    return wrapper
 
 
 def group_required(*group_names):

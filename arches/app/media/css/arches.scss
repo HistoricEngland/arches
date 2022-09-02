@@ -22,31 +22,34 @@
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
-#topskip {
-	position: absolute;
-	top: 0;
-	clip: rect(1px,1px,1px,1px);
-	width: 1px;
-	height: 1px;
-	margin: -1px;
-	overflow: hidden;
-	padding: 0;
-	background-color: #fae619;
-	color: #101010;
-	font-weight: bold;
-	opacity: .95;
-	text-align: center;
+#skip-link-holder a, #skip-link-holder a:link, #skip-link-holder a:visited {
+    color: #000;
+    background-color: #fae619;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 10px;
+    text-align: center;
+    outline: none !important;
+    max-height: 38px;
+    display: block;
+    width: 100%;
+    position: fixed;
+    top: -38px;
+    left: 0;
+    z-index: 10001;
 }
 
-#topskip:active, #topskip:focus {
-	clip: auto;
-	overflow: visible;
-	width: 100%;
-	height: auto;
-	padding: 10px;
-	z-index: 9999;
-	outline: none !important;
-	text-decoration: underline !important;
+#skip-target-holder {
+    position: absolute;
+    top: -38px;
+    left: 0;
+}
+
+#skip-link-holder a:focus, #skip-link-holder a:active {
+    text-decoration: underline !important;
+    left: 0;
+    top: 0;
+    z-index: 10000000;
 }
 
 img {
@@ -2230,10 +2233,11 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
+    margin-right: 75px;
 }
 
-.workbench-card-container.workbench-card-container-sidepanel-active {
-    margin-right: 400px;
+.workbench-card-container.workbench-card-container-sidepanel-active .mapboxgl-ctrl-top-right {
+    right: 400px;
 }
 
 .workbench-card-container-wrapper.workbench-card-container-sidepanel-active {
@@ -13084,7 +13088,7 @@ ul.select2-choices:after {
 }
 
 .card-component-wrapper-editor {
-    height: calc(100vh - 100px);
+    height: calc(100vh - 50px);
     padding-bottom: 50px;
     overflow-y: auto;
     background: #fafafa;

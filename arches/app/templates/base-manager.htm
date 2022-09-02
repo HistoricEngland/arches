@@ -41,7 +41,7 @@
                                         <!-- System Settings list item -->
                                         {% if request.user|has_group:"System Administrator" %}
                                         <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'config' %}')">
-                                            <a href="{% url 'config' %}">
+                                            <a href="#">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Manage System Settings" %}</strong>
@@ -114,7 +114,7 @@
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Application Administrator" %}
                                         <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">
-                                            <a href="{% url 'map_layer_manager' %}">
+                                            <a href="#">
                                                 <i class="fa fa-server"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Map Layer Manager" %}</strong>

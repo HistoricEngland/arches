@@ -69,7 +69,7 @@
                             </button>
                         </div>
                         <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
-                            <div class="rr-table-instance-label" style="padding-left: 10px;">
+                            <div class="rr-table-instance-label">
                             	<i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
                             </div>
                         </div>
@@ -244,9 +244,7 @@
                             </div>
                             <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;"
                                 data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                                <div class="rr-table-instance-label" style="padding-left: 10px;"
-                                    data-bind="text: $data.resourceName()">
-                                </div>
+                                <div class="rr-table-instance-label" data-bind="text: $data.resourceName()"></div>
                             </div>
                         </div>
                         <div class="rr-table-row-panel"

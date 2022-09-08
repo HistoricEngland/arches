@@ -23,8 +23,11 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.response import JSONResponse
 from arches.app.views.base import MapBaseManagerView
+from django.utils.decorators import method_decorator
+from arches.app.utils.decorators import login_required
 
 
+@method_decorator(login_required, name="dispatch")
 class PluginView(MapBaseManagerView):
     action = None
 

@@ -41,7 +41,7 @@
                                         <!-- System Settings list item -->
                                         {% if request.user|has_group:"System Administrator" %}
                                         <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'config' %}')">
-                                            <a href="{% url 'config' %}">
+                                            <a href="#">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Manage System Settings" %}</strong>
@@ -114,7 +114,7 @@
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Application Administrator" %}
                                         <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %} data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">
-                                            <a href="{% url 'map_layer_manager' %}">
+                                            <a href="#">
                                                 <i class="fa fa-server"></i>
                                                 <span class="menu-title">
                                                     <strong>{% trans "Map Layer Manager" %}</strong>
@@ -394,7 +394,7 @@
                                 <div class="ep-help-title">
                                     <span>{% trans 'Notifications' %}</span>
                                 </div>
-                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right">
+                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right"  aria-label="Close Notifications">
                                     <div data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
                                     <i class="fa fa-times-circle fa-lg"></i>
                                     </div>
@@ -414,7 +414,7 @@
                                 <div class="ep-edits-title">
                                     <span>{% trans 'My Edit History' %}</span>
                                 </div>
-                                <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
+                                <a href="#" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;" aria-label="Close Edits">
                                     <div data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
                                     <i class="fa fa-times-circle fa-lg"></i>
                                     </div>
@@ -434,7 +434,7 @@
                                 <div class="ep-help-title">
                                     <span>{% trans nav.help.title %}</span>
                                 </div>
-                                <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none" data-bind="click: function(){helpOpen(false)}">
+                                <a href="#" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none" data-bind="click: function(){helpOpen(false)}" aria-label="Close Help">
                                     <div data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
                                     <i class="fa fa-times-circle fa-lg"></i>
                                     </div>

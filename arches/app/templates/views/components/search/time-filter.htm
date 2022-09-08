@@ -51,7 +51,7 @@
         <div class="calendar picker">
             <h3 class="search-label">{% trans "From" %}</h3>
             <div id="search-from-c" class="hide-datepicker-time-option">
-                <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+                <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'" aria-label="Start date">
             </div>
         </div>
 
@@ -59,7 +59,7 @@
         <div class="calendar picker">
             <h3 class="search-label">{% trans "To" %}</h3>
             <div id="search-from-b" class="hide-datepicker-time-option">
-                <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+                <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'" aria-label="End date">
             </div>
         </div>
     </div>

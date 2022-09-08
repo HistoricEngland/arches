@@ -466,6 +466,7 @@ define([
                         accessToken: MapboxGl.accessToken,
                         mapboxgl: MapboxGl,
                         placeholder: arches.geocoderPlaceHolder,
+                        countries: "GB", // #46065 - force GB as a minimum
                         bbox: arches.hexBinBounds
                     }), 'top-right');
 

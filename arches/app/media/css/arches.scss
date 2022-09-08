@@ -4973,6 +4973,7 @@ ul .collapse li:last-of-type {
     width: 100%;
     height: calc(100vh - 50px);
     position: relative;
+    overflow-y:auto;
 }
 
 .flexrow {
@@ -8757,7 +8758,6 @@ a.mega-dropdown-toggle.disabled {
 .rr-table-row-initial {
     display: flex;
     flex-direction: row;
-    height: 36px;
 }
 
 .rr-table-row-panel {
@@ -8813,10 +8813,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-instance-label {
-    width: 430px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    padding: 0 10px 10px 10px;
 }
 
 .create-resource-instance-card-component {
@@ -8946,10 +8943,6 @@ a.mega-dropdown-toggle.disabled {
 .create-resource-instance-card-component.rr-table-pop .create-instance-panel {
     background: #fff;
     min-height: 60%;
-}
-
-.new-provisional-edit-card-container .rr-table-instance-label {
-    width: 475px;
 }
 
 .workbench-card-sidepanel .rr-table-instance-label {
@@ -11900,6 +11893,7 @@ div.search-facet-item.disabled {
 .search-facet-item-heading {
     font-weight: 400;
     font-size: 13px;
+    cursor: pointer;
 }
 
 .search-facet-item.header input {

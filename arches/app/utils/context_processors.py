@@ -53,6 +53,7 @@ def map_info(request):
             "zoom": default_zoom,
             "map_min_zoom": min_zoom,
             "map_max_zoom": max_zoom,
+            "map_search_auto_zoom" : "true" if settings.MAP_SEARCH_AUTO_ZOOM else "false", # needs to be set from the settings and to be added to the System Settings Graph so it can be changed by the sys admin
             "mapbox_api_key": settings.MAPBOX_API_KEY,
             "hex_bin_size": settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100,
             "mapbox_sprites": settings.MAPBOX_SPRITES,
@@ -78,5 +79,7 @@ def app_settings(request):
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
             "DEBUG": settings.DEBUG,
+            "DISABLE_EXPORT_FOR_ANONYMOUS_USER": settings.DISABLE_EXPORT_FOR_ANONYMOUS_USER,
+            "HIDE_RESOURCE_COPY_BUTTON": settings.HIDE_RESOURCE_COPY_BUTTON,
         }
     }

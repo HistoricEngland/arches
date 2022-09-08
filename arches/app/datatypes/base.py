@@ -263,14 +263,18 @@ class BaseDataType(object):
                                 "script": {
                                     "source": """
                                     int null_docs = 0;
-                                    for(tile in params._source.tiles){
-                                        if(tile.data.containsKey(params.node_id)){
-                                            def val = tile.data.get(params.node_id);
-                                            if (val == null || (val instanceof List && val.length==0)) {
-                                                null_docs++;
-                                                break;
+                                    try {
+                                        for(tile in params._source.tiles){
+                                            if(tile.data.containsKey(params.node_id)){
+                                                def val = tile.data.get(params.node_id);
+                                                if (val == null || (val instanceof List && val.length==0)) {
+                                                    null_docs++;
+                                                    break;
+                                                }
                                             }
                                         }
+                                    } catch (Exception e) {
+                                        //pass - there are instances where part of params._source.tiles is null. This is a temp workaround to #8638.
                                     }
                                     return null_docs;
                                 """,

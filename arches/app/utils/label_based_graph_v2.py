@@ -1,5 +1,6 @@
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
+from arches.app.utils.permission_backend import user_can_read_resource
 
 RESOURCE_ID_KEY = "@resource_id"
 NODE_ID_KEY = "@node_id"
@@ -203,6 +204,9 @@ class LabelBasedGraph(object):
                     resource_graph.pop(key, None)
 
             # adds metadata that was previously only accessible via API
+
+            permission = user.has_perms(["read_nodegroup"], "8d41e49e-a250-11e9-9eab-00224800b26d")  # Consultation
+
             return {
                 "displaydescription": resource.displaydescription(),
                 "displayname": resource.displayname(),
@@ -211,6 +215,7 @@ class LabelBasedGraph(object):
                 "map_popup": resource.map_popup(),
                 "resourceinstanceid": resource.resourceinstanceid,
                 "resource": resource_graph,
+                "user_can_view_consultations": permission,
             }
         else:  # pragma: no cover
             return root_label_based_node

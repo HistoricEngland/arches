@@ -168,7 +168,8 @@ define([
                 }
 
             });
-            searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags))).trigger('change');
+            searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags)));
+            searchbox.select2().trigger('change.select2');
         }
     };
 

@@ -222,6 +222,12 @@
                         </div>
                         {% endblock navbar %}
                     </div>
+                    {% if app_settings.DEBUG %}
+                    <div class="debug-notice">
+                        <div>{% trans 'DEBUG' %}</div>
+                        <div>{{ app_settings.VERSION }}</div>
+                    </div>
+                    {% endif %}
                 </nav>
                 {% endblock mainnav %}
 

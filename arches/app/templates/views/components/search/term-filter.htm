@@ -1,7 +1,11 @@
 {% load i18n %}
 
 <!-- Term Filter -->
-<div><form autocomplete="off">
-    <input class="select2 resource_search_widget arches-select2" name="" style="width:100%;" placeholder="{% trans "Find a resource..." %}" aria-label="{% trans "Find a resource..." %}" data-bind="termSearch: {terms: filter.terms, tags: filter.tags}"></form>
+<div>
+    <form autocomplete="off">
+        <!-- <input class="select2 resource_search_widget arches-select2" name="" style="width:100%;" placeholder="{% trans "Find a resource..." %}" aria-label="{% trans "Find a resource..." %}" data-bind="termSearch: {terms: filter.terms, tags: filter.tags}">-->
+        <select class="select2 resource_search_widget arches-select2" name="" style="width:100%;" placeholder="{% trans "Find a resource..." %}" aria-label="{% trans "Find a resource..." %}" data-bind="termSearch: {terms: filter.terms, tags: filter.tags}">
+            </select>
+    </form>
 </div>
 <!-- End Term Filter -->

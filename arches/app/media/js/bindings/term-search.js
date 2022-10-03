@@ -4,7 +4,7 @@ define([
     'knockout',
     'arches',
     'select2'
-], function($, _, ko, arches) {
+], function($, _, ko, arches, select2) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var allBindings = allBindingsAccessor();
@@ -25,7 +25,7 @@ define([
             });
 
             var searchbox = $(el).select2({
-                dropdownCssClass: 'resource_search_widget_dropdown',
+                //dropdownCssClass: 'resource_search_widget_dropdown',
                 multiple: true,
                 minimumInputLength: 2,
                 ajax: {
@@ -37,7 +37,7 @@ define([
                             page_limit: 30
                         };
                     },
-                    results: function(data, page) {
+                    processResults: function(data) {
                         var value = $(el).parent().find('.select2-input').val();
 
                         // this result is being hidden by a style in arches.css
@@ -57,6 +57,7 @@ define([
                         }, this);
                         //res = _.groupBy(results, 'type');
                         var res = [];
+                        /*
                         res.push({
                             inverted: ko.observable(false),
                             type: 'group',
@@ -68,6 +69,10 @@ define([
                             disabled: true
                         });
                         _.each(_.groupBy(results, 'type'), function(value, group){
+                            res = res.concat(value);
+                        });
+                        */
+                        _.each(results, function(value){
                             res = res.concat(value);
                         });
                         res.unshift({
@@ -87,7 +92,7 @@ define([
                 id: function(item) {
                     return item.type + item.value + item.context_label;
                 },
-                formatResult: function(result, container, query, escapeMarkup) {
+                templateResult: function(result, container, query, escapeMarkup) {
                     var markup = [];
                     var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                     if (result.type === 'group') {
@@ -117,7 +122,7 @@ define([
                     });
                     return formatedresult;
                 },
-                formatSelection: function(result, container) {
+                templateSelection: function(result, container) {
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
                     var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span>' + context;
                     if (result.inverted()) {
@@ -159,6 +164,7 @@ define([
                 //terms(terms);
 
             }).on('select2-loaded', function(e, el) {
+                /*
                 if (searchbox.groups.length > 0) {
                     if (searchbox.groups[0] === 'concepts'){
                         $('.term').hide();
@@ -166,6 +172,7 @@ define([
                         $('.concept').hide();
                     }
                 }
+                */
 
             });
             searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags)));

@@ -151,7 +151,7 @@
 <div class="create-resource-instance-card-component rr-table-pop"
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
-        <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false, attr:{'aria-label': 'Resource Instance Information for ' + ko.unwrap($data.resourceName)}" class="close-new-step" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+        <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false, attr:{'aria-label': 'Related Resource Instance Information for ' + ko.unwrap($data.resourceName)}" class="close-new-step" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
             <i class="fa fa-times-circle"></i>
         </div>
     </div>

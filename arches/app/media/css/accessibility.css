@@ -191,6 +191,10 @@ a:focus,
     background-color: #943725 !important;
 }
 
+.btn-danger:focus{
+    color: #FCFCFC !important;
+}
+
 .crud-card-main a {
     color: #17568c;
 }
@@ -729,7 +733,7 @@ div.search-facet-item:focus {
     .workbench-card-wrapper {
         height: calc(70vh - 150px);
     }
-    
+
     .workbench-card-sidepanel {
         height: calc(70vh - 150px);
     }
@@ -809,7 +813,7 @@ div.search-facet-item:focus {
     .create-instance-header {
         padding-left: 55px;
     }
-  
+
     .recent-edits-container,
     .profile-summary-page,
     .graph-designer-container {

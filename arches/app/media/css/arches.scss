@@ -801,7 +801,7 @@ input[type="checkbox"] {
 }
 
 .etl-manager-container {
-    display: flex; 
+    display: flex;
     flex-direction: column;
     background-color: #fff;
     width:100%;
@@ -859,14 +859,14 @@ input[type="checkbox"] {
 }
 
 h3.branch-xl-title {
-    margin-top: 15px; 
-    margin-bottom: 0px; 
+    margin-top: 15px;
+    margin-bottom: 0px;
     font-size: 19px;
     color: #454545;
 }
 
 h4.branch-xl-title {
-    margin-top: 0px; 
+    margin-top: 0px;
     margin-bottom: 0px;
     font-size: 16px;
     color: #454545;
@@ -1229,7 +1229,7 @@ div.wf-multi-tile-card-info div {
 }
 
 .resource-component-abstract-container footer {
-    background: #f8f8f8; 
+    background: #f8f8f8;
     display: flex;
     height: 50px;
     justify-content: space-between;
@@ -4973,6 +4973,7 @@ ul .collapse li:last-of-type {
     width: 100%;
     height: calc(100vh - 50px);
     position: relative;
+    overflow-y:auto;
 }
 
 .flexrow {
@@ -6547,7 +6548,7 @@ th.notif-type {
     .tabbed-workflow-step-container {
         margin-bottom: 108px;
     }
-    
+
     .dropzone {
         min-width: auto;
         width: auto;
@@ -6669,7 +6670,7 @@ th.notif-type {
             align-items: center;
             justify-content: center;
         }
-        
+
         i {
             font-size: 17px;
         }
@@ -6679,7 +6680,7 @@ th.notif-type {
         display: flex;
         flex-direction: row;
     }
-    
+
     .tabbed-workflow-title-bar .workflow-top-control {
         display: flex;
         flex: 1;
@@ -6696,8 +6697,8 @@ th.notif-type {
             justify-content: center;
             align-items: center;
         }
-    }        
-    
+    }
+
     .workflow-name-container {
         display: inherit;
         flex-direction: initial;
@@ -6716,13 +6717,13 @@ th.notif-type {
 
         h2 {
             margin-top: 10px;
-            font-weight: initial; 
+            font-weight: initial;
             font-size:17px
         }
     }
 
-    .ep-notifs-toggle, 
-    .ep-tools-search, 
+    .ep-notifs-toggle,
+    .ep-tools-search,
     .tabbed-workflow-step-information-box-container.seen,
     .workflow-nav-tab-container,
     .workflow-plugin .btn .verbose,
@@ -9646,7 +9647,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 #mainnav-container {
-    display: flex; 
+    display: flex;
     flex-direction: column;
     z-index: 3000;
 }
@@ -13651,25 +13652,25 @@ a.jstree-anchor.permissions-widget {
 }
 
 .iiif-gallery-content .panel-controls {
-    width: 230px; 
+    width: 230px;
     border-right: 1px solid #ddd;
 }
 
 .iiif-gallery-content .panel-controls .hide-gallery-control {
-    width: 230px; 
-    height: 50px; 
-    border-bottom: 1px solid #ddd; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    font-weight: 650; 
-    color: #5b9bd7; 
+    width: 230px;
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 650;
+    color: #5b9bd7;
     cursor: pointer;
 }
 
 .iiif-gallery-content .panel-controls .mode-selector {
-    width: 100%; 
-    height: 108px; 
+    width: 100%;
+    height: 108px;
     padding: 5px;
 }
 
@@ -13699,7 +13700,7 @@ a.jstree-anchor.permissions-widget {
 
 .iiif-gallery-content .panel-controls .panel-selector-buttons > div.selected {
     background-color: #add8e6;
-    border: 1px solid #5b9bd7; 
+    border: 1px solid #5b9bd7;
 }
 
 .iiif-gallery-content .panel-controls .panel-selector-buttons > div.hide {
@@ -13707,8 +13708,8 @@ a.jstree-anchor.permissions-widget {
 }
 
 .iiif-gallery-content .panel-controls .mode-selector-buttons > div > div {
-    background-color: #ddd; 
-    width: 40px; 
+    background-color: #ddd;
+    width: 40px;
     height: 20px;
 }
 
@@ -13870,9 +13871,9 @@ a.jstree-anchor.permissions-widget {
 }
 
 .iiif-leaflet .split-controls {
-    display: flex; 
-    position: absolute; 
-    z-index: 2500; 
+    display: flex;
+    position: absolute;
+    z-index: 2500;
     top: 9px;
 }
 
@@ -14000,13 +14001,13 @@ a.jstree-anchor.permissions-widget {
 }
 
 .iiif-leaflet .split-controls .button {
-    width: 38px; 
-    height: 38px; 
-    background-color: #fff; 
-    border: 2px solid #ddd; 
-    border-left: none; 
-    display: flex; 
-    justify-content: center; 
+    width: 38px;
+    height: 38px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-left: none;
+    display: flex;
+    justify-content: center;
     align-items: center;
     cursor: pointer;
     font-size: 27px;
@@ -15074,7 +15075,7 @@ a.jstree-anchor.permissions-widget {
     #container.mainnav-sm .brand-title {
         display: none;
     }
-    
+
     .profile-list,
     .profile-report {
         padding: 40px;
@@ -15296,10 +15297,10 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-job {
-    margin: 10px 15px 10px 10px; 
-    border: 1px solid #ddd; 
+    margin: 10px 15px 10px 10px;
+    border: 1px solid #ddd;
     border-radius: 2px;
-    display: block; 
+    display: block;
     background: #fff;
 }
 
@@ -15308,21 +15309,21 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-job-task-bar {
-    background: #eee; 
+    background: #eee;
     display: flex;
     justify-content: space-between;
-    height: 40px; 
+    height: 40px;
     border-top: 1px solid #ddd;
 }
 
 .etl-job-task-bar .task {
-    padding: 10px; 
+    padding: 10px;
 }
 
 .etl-job-task-bar .task a{
-    padding: 7px; 
+    padding: 7px;
     text-decoration: none;
-    color: steelblue; 
+    color: steelblue;
     cursor: pointer;
 }
 
@@ -15355,9 +15356,9 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-module-preview {
-    height: calc(100vh - 95px); 
-    width: calc(100vw - 450px); 
-    padding: 20px 25px; 
+    height: calc(100vh - 95px);
+    width: calc(100vw - 450px);
+    padding: 20px 25px;
     overflow: scroll;
     background: #fbfbfb;
 }
@@ -15381,13 +15382,13 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-loading-metadata-key {
-    font-size: 15px; 
+    font-size: 15px;
     padding-right: 3px;
     color: #777;
 }
 
 .etl-loading-metadata-value {
-    font-size: 15px; 
+    font-size: 15px;
     padding-right: 3px;
     color: rgb(4, 4, 45);
 }

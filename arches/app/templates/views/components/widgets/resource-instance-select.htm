@@ -54,17 +54,17 @@
                 <div class='rr-table-row'>
                     <div class="rr-table-row-initial">
                         <div class='rr-table-column icon-column'>
-                            <button data-bind="click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false" aria-label="Edit Resource Instance">
+                            <button data-bind="click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false, attr:{'aria-label': 'Edit Related Resource Instance ' + ko.unwrap($data.resourceName)}" >
                                 <i class="fa fa-pencil"></i>
                             </button>
                         </div>
                         <div class='rr-table-column icon-column'>
-                            <button data-bind="click: $parent.deleteRelationship, clickBubble: false" aria-label="Delete Resource Instance">
+                            <button data-bind="click: $parent.deleteRelationship, clickBubble: false, attr:{'aria-label': 'Remove Related Resource Instance ' + ko.unwrap($data.resourceName)}">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
                         <div class='rr-table-column icon-column'>
-                            <button data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false" aria-label="Resource Instance Information">
+                            <button data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false, attr:{'aria-label': 'Related Resource Instance Information for ' + ko.unwrap($data.resourceName)}" >
                                 <i class="fa fa-info-circle"></i>
                             </button>
                         </div>
@@ -151,7 +151,7 @@
 <div class="create-resource-instance-card-component rr-table-pop"
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
-        <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Resource Instance Information">
+        <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false, attr:{'aria-label': 'Related Resource Instance Information for ' + ko.unwrap($data.resourceName)}" class="close-new-step" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
             <i class="fa fa-times-circle"></i>
         </div>
     </div>
@@ -227,18 +227,18 @@
                         <div class="rr-table-row-initial">
                             <div class='rr-table-column icon-column'>
                                 <button
-                                    data-bind="click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false" aria-label="Edit Resource Instance">
+                                    data-bind="click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false, attr:{'aria-label': 'Edit Related Resource Instance ' + ko.unwrap($data.resourceName)}">
                                     <i class="fa fa-pencil"></i>
                                 </button>
                             </div>
                             <div class='rr-table-column icon-column'>
-                                <button data-bind="click: $parent.deleteRelationship, clickBubble: false"  aria-label="Delete Resource Instance">
+                                <button data-bind="click: $parent.deleteRelationship, clickBubble: false, attr:{'aria-label': 'Remove Related Resource Instance ' + ko.unwrap($data.resourceName)}">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
                             <div class='rr-table-column icon-column'>
                                 <button
-                                    data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false" aria-label="Resource Instance Information">
+                                    data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false, attr:{'aria-label': 'Related Resource Instance Information for ' + ko.unwrap($data.resourceName)}">
                                     <i class="fa fa-info-circle"></i>
                                 </button>
                             </div>

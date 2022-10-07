@@ -49,10 +49,10 @@
 								</div>
 							</div>
 							<div class="row" style="padding-top:10px; margin: -20px 0px 5px 0px;">
-								<div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
+								<div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" aria-labelledby="login-fail-header login-fail-message"  aria-live="assertive"  role="alert">
 									<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
-									<h2>{% trans "Login failed" %}</h2>
-									<span>{% trans "Invalid username and/or password." %}</span>
+									<h2 role="alert" id="login-fail-header">{% trans "Login failed" %}</h2>
+									<span role="alert" id="login-fail-message">{% trans "Invalid username and/or password." %}</span>
 								</div>
 							</div>
 						</fieldset>

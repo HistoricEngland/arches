@@ -236,9 +236,13 @@
                     <!-- ko if: alert() -->
                     <div data-bind="visible: alert().active" style="display: none;" class="relative">
                         <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
-                            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-                            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
-
+                            <div data-bind="attr: {'aria-label': alert().title}" aria-live = "assertive" role="alert">
+                                <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                            </div>
+                            <div data-bind="attr: {'aria-label': alert().text}" aria-live = "assertive" role="alert">
+                                <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+                            </div>
+                            
                             <div class="ep-form-alert-default-dismiss">
                                 <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
                             </div>

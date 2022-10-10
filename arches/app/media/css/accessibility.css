@@ -587,7 +587,7 @@ div.search-facet-item:focus {
 
 @media screen and (max-width: 1024px) {
     article.flexrow {
-        flex-direction: column-reverse;
+        flex-direction: column;
     }
 
     article .flex.search-map-container {

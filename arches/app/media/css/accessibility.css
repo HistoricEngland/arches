@@ -364,6 +364,7 @@ div.search-facet-item:focus {
 
 .card-form-preview-container {
     overflow-y: auto;
+    height: auto;
 }
 
 .ep-tools {

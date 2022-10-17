@@ -360,6 +360,7 @@ div.search-facet-item:focus {
 
 .card-form-preview-container {
     overflow-y: auto;
+    height: auto;
 }
 
 .ep-tools {
@@ -540,7 +541,7 @@ div.search-facet-item:focus {
 }
 
 .map-manager-container .left-column-crud-container {
-    flex: 0 0 37vw;
+    flex: none;
 }
 
 .map-manager-container .grid {
@@ -605,12 +606,10 @@ div.search-facet-item:focus {
     }
 
     .tab-pane .tab-pane-content {
-        height: calc(50vh - 75px);
         overflow-y: auto;
     }
 
     .card-form-preview-container:not(.map-manager-container .card-form-preview-container) {
-        height: calc(50vh - 75px);
         overflow-y: auto;
     }
 
@@ -683,12 +682,17 @@ div.search-facet-item:focus {
 
     .rp-card-section-contents {
         display: block;
+        overflow-wrap: anywhere;
     }
 }
 
 @media screen and (max-width: 768px) {
+    html, body {
+        overflow-y: auto;
+    }
+    
     article.flexrow {
-        height: calc(100vh - 100px);
+        height: 100%;
     }
 
     .search-toolbar {
@@ -706,6 +710,10 @@ div.search-facet-item:focus {
     .search-type-btn-popup.relative.active {
         height: 20px;
         padding: 0;
+    }
+
+    .search-control-container {
+        overflow-y: auto;
     }
 
     .popup-panel-row {
@@ -731,11 +739,17 @@ div.search-facet-item:focus {
     }
     
     .workbench-card-sidepanel {
-        height: calc(70vh - 150px);
+        height: 100%;
+        width: calc(100% - 75px);
     }
 
     .workbench-card-sidepanel .install-buttons {
         margin-right: 75px;
+    }
+
+    .workbench-card-sidepanel-header-container,
+    .workbench-card-sidepanel-body {
+        width: 100%;
     }
 
     .resource-component-abstract-container {
@@ -757,7 +771,7 @@ div.search-facet-item:focus {
     }
 
     .search-result-details {
-        height: calc(50vh - 100px);
+        height: auto;
     }
 
     .sidepanel-draggable {
@@ -771,25 +785,21 @@ div.search-facet-item:focus {
     .resource-editor-container,
     .graph-designer-panels-container,
     .function-manager-container,
-    .map-manager-container {
+    .map-manager-container,
+    .resource-editor-container .main-panel {
         flex-direction: column;
         overflow-y: auto;
     }
 
     .resource-editor-container .left-panel,
     .left-panel.graph-designer {
-        flex: 0 0 30vh !important;
+        flex: none !important;
         overflow-y: auto;
     }
 
     .resource-editor-container .left-panel .resource-editor-tree,
     .map-manager-container .layer-list {
         height: auto;
-    }
-
-    .resource-editor-container .main-panel {
-        flex: 0 0 calc(70vh - 100px) !important;
-        overflow-y: auto;
     }
 
     .resource-editor-container .main-panel .card-component-wrapper-editor {
@@ -800,6 +810,11 @@ div.search-facet-item:focus {
     .resource-editor-container .main-panel .rr-splash {
         margin: 20px;
         padding: 20px;
+    }
+
+    .resource-editor-tree,
+    .jstree-container-ul {
+        padding-bottom: 0;
     }
 
     .create-resource-instance-card-component.rr-table-pop {
@@ -813,7 +828,7 @@ div.search-facet-item:focus {
     .recent-edits-container,
     .profile-summary-page,
     .graph-designer-container {
-        height: calc(100vh - 100px);
+        height: auto;
     }
 
     .profile-list,
@@ -848,10 +863,7 @@ div.search-facet-item:focus {
 
     .graph-designer-container .graph-list-header .btn-group {
         right: 10px;
-    }
-
-    .graph-designer-panels-container .settings-panel {
-        height: calc(70vh - 155px);
+        top: -37px;
     }
 
     .graph-designer-panels-container .settings-panel .settings-panel-body {
@@ -864,7 +876,7 @@ div.search-facet-item:focus {
 
     .left-column-crud-container {
         width: 100%;
-        flex: 0 0 30vh;
+        flex: none;
     }
 
     .ep-form-toolbar .btn::before {
@@ -881,16 +893,8 @@ div.search-facet-item:focus {
         width: 100% !important;
     }
 
-    .resource-toolbar {
-        height: 105px;
-    }
-
     .find-widget {
         width: 42vw;
-    }
-
-    .settings-panel-body .graph-designer {
-        height: calc(70vh - 205px);
     }
 
     .map-manager-container .panel-heading span {
@@ -899,5 +903,49 @@ div.search-facet-item:focus {
 
     .map-manager-container .category-title {
         padding: 9px 5px;
+    }
+
+    .card-form-preview-container:not(.map-manager-container .card-form-preview-container),
+    .tab-pane .tab-pane-content,
+    .facets-search-container,
+    .list-group.search-facets,
+    .search-popup-panel {
+        height: inherit;
+    }
+
+    .search-container.saved-search-container.relative,
+    .search-container.time-search-container.relative {
+        overflow-y: auto !important;
+    }
+
+    .search-popup-panel {
+        max-width: inherit;
+        width: 100%;
+    }
+
+    .search-results-container {
+        padding: 10px 10px 20px 10px;
+    }
+
+    .content-panel,
+    .set-variable-pixel-height {
+        height: auto;
+    }
+
+    .fa-rotate-left:before,
+    .fa-undo:before,
+    .fa-check:before,
+    .fa-trash:before {
+        display: none;
+    }
+
+    .ep-menu-list {
+        height: auto;
+        padding-top: 20px;
+    }
+
+    .graph-settings-panel-body .icon-list {
+        height: auto;
+        overflow-y: auto;
     }
 }

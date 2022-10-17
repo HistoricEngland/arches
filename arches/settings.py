@@ -246,6 +246,15 @@ RESTRICT_MEDIA_ACCESS = False
 # value and is not signed in with a user account then the request will not be allowed.
 RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
+
+# By setting DISABLE_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
+# to export search results and is not signed in with a user account then the request
+# will not be allowed.
+DISABLE_EXPORT_FOR_ANONYMOUS_USER = False
+
+# Set to True to hide the Copy Resource button
+HIDE_RESOURCE_COPY_BUTTON = False
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = os.path.join(ROOT_DIR)
 
@@ -598,6 +607,7 @@ MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
+MAP_SEARCH_AUTO_ZOOM = True #True enable automatically fit search results bounds , False = disable
 
 # If True, users can make edits to graphs that are locked
 # (generally because they have resource intances saved against them)

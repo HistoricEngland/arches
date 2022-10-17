@@ -490,6 +490,8 @@ class MVT(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
+    action = None
+
     def get(self, request, graph_id=None):
         cards_querystring = request.GET.get("cards", None)
         exclusions_querystring = request.GET.get("exclude", None)
@@ -504,32 +506,33 @@ class Graphs(APIBase):
             exclusions = []
 
         perm = "read_nodegroup"
-        graph = cache.get(f"graph_{graph_id}")
         user = request.user
-
-        if graph is None:
+        if graph_id and not self.action:
             graph = Graph.objects.get(graphid=graph_id)
-        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+            graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
 
-        if get_cards:
-            datatypes = models.DDataType.objects.all()
-            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-            permitted_cards = []
-            for card in cards:
-                if user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(user, perm)
-                    permitted_cards.append(card)
-            cardwidgets = [
-                widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
-                for widget in widgets
-            ]
+            if get_cards:
+                datatypes = models.DDataType.objects.all()
+                cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+                permitted_cards = []
+                for card in cards:
+                    if user.has_perm(perm, card.nodegroup):
+                        card.filter_by_perm(user, perm)
+                        permitted_cards.append(card)
+                cardwidgets = [
+                    widget
+                    for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                    for widget in widgets
+                ]
 
-            permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+                permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
 
-            return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
-        else:
-            return JSONResponse({"graph": graph})
+                return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+            else:
+                return JSONResponse({"graph": graph})
+        elif self.action == "get_graph_models":
+            graphs = models.GraphModel.objects.all()
+            return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1229,13 +1232,16 @@ class ResourceReport(APIBase):
         if uncompacted_value == "true":
             compact = False
         perm = "read_nodegroup"
+        user = request.user
 
         resource = Resource.objects.get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
         if not template.preload_resource_data:
-            return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version)})
+            return JSONResponse(
+                {"template": template, "report_json": resource.to_json(compact=compact, version=version, user=user, perm=perm)}
+            )
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
@@ -1243,7 +1249,7 @@ class ResourceReport(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-            "report_json": resource.to_json(compact=compact, version=version),
+            "report_json": resource.to_json(compact=compact, version=version, user=user, perm=perm),
         }
 
         if "template" not in exclude:
@@ -1441,10 +1447,18 @@ class BulkDisambiguatedResourceInstance(APIBase):
         version = request.GET.get("v")
         hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
         compact = bool(request.GET.get("uncompacted", "false").lower() == "false")
+        perm = "read_nodegroup"
+        user = request.user
 
         return JSONResponse(
             {
-                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                resource.pk: resource.to_json(
+                    compact=compact,
+                    version=version,
+                    hide_hidden_nodes=hide_hidden_nodes,
+                    user=user,
+                    perm=perm,
+                )
                 for resource in Resource.objects.filter(pk__in=resource_ids)
             }
         )

@@ -22,6 +22,7 @@ import datetime
 import logging
 from io import StringIO
 from io import BytesIO
+import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
 from django.utils.translation import ugettext as _
@@ -61,10 +62,9 @@ class SearchResultsExporter(object):
         self.set_precision = GeoUtils().set_precision
 
     def insert_subcard_below_parent_card(self, main_card_list, sub_card_list):
-        for sub_card in sub_card_list:
-            parent_obj = sub_card.nodegroup.parentnodegroup_id
-            for main_card in main_card_list:
-                if main_card.nodegroup_id == parent_obj:
+        for main_card in main_card_list:            
+            for sub_card in sub_card_list:
+                if main_card.nodegroup_id == sub_card.nodegroup.parentnodegroup_id:
                     index_number = main_card_list.index(main_card) + 1
                     main_card_list.insert(index_number, sub_card)
 
@@ -341,7 +341,7 @@ class SearchResultsExporter(object):
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
         csvwriter.writeheader()
         for instance in instances:
-            csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
+            csvwriter.writerow({k: sanitize_csv_value(str(v)) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}
 
     def to_shp(self, instances, headers, name):
@@ -399,3 +399,7 @@ class SearchResultsExporter(object):
 
         feature_collection = {"type": "FeatureCollection", "features": features}
         return feature_collection
+
+
+def sanitize_csv_value(value):
+    return re.sub(r"^([@]|[=]|[+]|[-])", "'\g<1>", value)

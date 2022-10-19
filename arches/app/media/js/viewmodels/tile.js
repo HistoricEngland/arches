@@ -5,8 +5,8 @@ define([
     'knockout-mapping',
     'arches',
     'require',
-    'viewmodels/card',
-    'viewmodels/alert'
+    'viewmodels/alert',
+    'viewmodels/card'
 ], function($, _, ko, koMapping, arches, require, AlertViewModel) {
     /**
     * A viewmodel used for generic cards
@@ -73,7 +73,7 @@ define([
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
         this.transactionId = params.transactionId;
-        this.alert = config.alert || ko.observable(null);
+        this.alert = params.alert||ko.observable(null);
 
         _.extend(this, {
             filter: filter,
@@ -245,8 +245,7 @@ define([
                 });
             },
             deleteTile: function(onFail, onSuccess) {
-                self.alert(
-                    new AlertViewModel(
+                this.alert(new AlertViewModel(
                         'ep-alert-red',
                         'Are you sure you would like to delete this tile?',
                         'All data created for this tile will be deleted.',

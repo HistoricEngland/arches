@@ -328,6 +328,7 @@ div.search-facet-item:focus {
     font-size: 0.85em;
     border: 1px solid #d8d8d8;
     padding: 4px;
+    z-index: inherit;
 }
 
 .resource_search_widget_dropdown ul .select2-disabled div span span button,
@@ -572,6 +573,10 @@ div.search-facet-item:focus {
     margin-left: 55px;
 }
 
+.card-component-wrapper-editor {
+    height: auto;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -607,6 +612,7 @@ div.search-facet-item:focus {
 
     .tab-pane .tab-pane-content {
         overflow-y: auto;
+        height: calc(50vh - 75px);
     }
 
     .card-form-preview-container:not(.map-manager-container .card-form-preview-container) {
@@ -622,19 +628,20 @@ div.search-facet-item:focus {
         white-space: nowrap;
     }
 
-    .search-toolbar {
+    .search-toolbar,
+    .facets-container,
+    .facets-search-container {
         width: 100%;
     }
 
-    .facets-container,
-    .facets-search-container {
-        width: 50%;
+    .facets-container {
+        position: relative;
     }
 
     .facets-search-container,
     .list-group.search-facets,
     .search-popup-panel {
-        height: calc(50vh - 75px);
+        height: auto;
     }
 
     .facets-search-container .rr-splash {
@@ -651,6 +658,10 @@ div.search-facet-item:focus {
         padding: 0;
     }
 
+    .search-facet-item {
+        margin-bottom: 0;
+    }
+
     .related-resources-content .rr-splash,
     .search-result-details-splash .rr-splash {
         padding: 20px;
@@ -663,10 +674,6 @@ div.search-facet-item:focus {
 
     .rr-splash-description:last-child {
         margin-bottom: 0;
-    }
-
-    .search-result-details {
-        height: 50vh;
     }
 
     .dl-horizontal dt {
@@ -682,6 +689,10 @@ div.search-facet-item:focus {
 
     .rp-card-section-contents {
         display: block;
+        overflow-wrap: anywhere;
+    }
+
+    .card-summary-section {
         overflow-wrap: anywhere;
     }
 }
@@ -734,10 +745,6 @@ div.search-facet-item:focus {
         width: 100%;
     }
 
-    .workbench-card-wrapper {
-        height: calc(70vh - 150px);
-    }
-    
     .workbench-card-sidepanel {
         height: 100%;
         width: calc(100% - 75px);
@@ -771,7 +778,7 @@ div.search-facet-item:focus {
     }
 
     .search-result-details {
-        height: auto;
+        height: 100%;
     }
 
     .sidepanel-draggable {
@@ -803,7 +810,7 @@ div.search-facet-item:focus {
     }
 
     .resource-editor-container .main-panel .card-component-wrapper-editor {
-        height: calc(70vh - 150px);
+        height: auto;
         padding-bottom: 0;
     }
 
@@ -870,6 +877,10 @@ div.search-facet-item:focus {
         overflow-x: hidden;
     }
 
+    .graph-designer .card-component-panel {
+        overflow-y: auto;
+    }
+
     .graph-selector {
         width: auto;
     }
@@ -903,14 +914,6 @@ div.search-facet-item:focus {
 
     .map-manager-container .category-title {
         padding: 9px 5px;
-    }
-
-    .card-form-preview-container:not(.map-manager-container .card-form-preview-container),
-    .tab-pane .tab-pane-content,
-    .facets-search-container,
-    .list-group.search-facets,
-    .search-popup-panel {
-        height: inherit;
     }
 
     .search-container.saved-search-container.relative,
@@ -947,5 +950,9 @@ div.search-facet-item:focus {
     .graph-settings-panel-body .icon-list {
         height: auto;
         overflow-y: auto;
+    }
+
+    .tab-pane .tab-pane-content {
+        height: calc(100vh - 50px);
     }
 }

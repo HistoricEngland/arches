@@ -5,9 +5,8 @@ define([
     'knockout-mapping',
     'arches',
     'require',
-    'viewmodels/alert',
     'viewmodels/card'
-], function($, _, ko, koMapping, arches, require, AlertViewModel) {
+], function($, _, ko, koMapping, arches, require) {
     /**
     * A viewmodel used for generic cards
     *
@@ -73,7 +72,6 @@ define([
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
         this.transactionId = params.transactionId;
-        this.alert = params.alert||ko.observable(null);
 
         _.extend(this, {
             filter: filter,
@@ -245,32 +243,24 @@ define([
                 });
             },
             deleteTile: function(onFail, onSuccess) {
-                this.alert(new AlertViewModel(
-                        'ep-alert-red',
-                        'Are you sure you would like to delete this tile?',
-                        'All data created for this tile will be deleted.',
-                        function(){}, //does nothing when canceled
-                        function(onFail, onSuccess) {
-                            loading(true);
-                            $.ajax({
-                                type: "DELETE",
-                                url: arches.urls.tile,
-                                data: JSON.stringify(self.getData())
-                            }).done(function(response) {
-                                params.card.tiles.remove(self);
-                                selection(params.card);
-                                if (typeof onSuccess === 'function') {
-                                    onSuccess(response);
-                                }
-                            }).fail(function(response) {
-                                if (typeof onFail === 'function') {
-                                    onFail(response);
-                                }
-                            }).always(function(){
-                                loading(false);
-                            })
-                        })
-                );
+                loading(true);
+                $.ajax({
+                    type: "DELETE",
+                    url: arches.urls.tile,
+                    data: JSON.stringify(self.getData())
+                }).done(function(response) {
+                    params.card.tiles.remove(self);
+                    selection(params.card);
+                    if (typeof onSuccess === 'function') {
+                        onSuccess(response);
+                    }
+                }).fail(function(response) {
+                    if (typeof onFail === 'function') {
+                        onFail(response);
+                    }
+                }).always(function(){
+                    loading(false);
+                });
             }
         });
 

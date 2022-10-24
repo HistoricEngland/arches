@@ -209,39 +209,37 @@ define([
         };
 
         this.deleteTile = function() {
-            self.loading(true);
-            self.tile.deleteTile(function(response) {
-                self.loading(false);
-                params.pageVm.alert(
-                    new AlertViewModel(
-                        'ep-alert-red',
-                        response.responseJSON.title,
-                        response.responseJSON.message,
-                        null,
-                        function(){}
-                    )
+            params.pageVm.alert(            
+                new AlertViewModel(
+                    'ep-alert-red',
+                    'Are you sure you would like to delete this tile?',
+                    'All data created for this tile will be deleted.',
+                    function(){}, //does nothing when canceled
+                    function() {
+                        self.loading(true);
+                        self.tile.deleteTile(function(response) {
+                            self.loading(false);
+                            params.pageVm.alert(
+                                new AlertViewModel(
+                                    'ep-alert-red',
+                                    response.responseJSON.title,
+                                    response.responseJSON.message,
+                                    null,
+                                    function(){}
+                                )
+                            );
+                            if (params.form.onDeleteError) {
+                                params.form.onDeleteError(self.tile);
+                            }
+                        }, function() {
+                            self.loading(false);
+                            if (typeof self.onDeleteSuccess === 'function') self.onDeleteSuccess();
+                            if (params.form.onDeleteSuccess) {
+                                params.form.onDeleteSuccess(self.tile);
+                            }
+                        });
+                    })
                 );
-                if (params.form.onDeleteError) {
-                    params.form.onDeleteError(self.tile);
-                }
-            }, function() {
-                self.loading(false);
-                if (typeof self.onDeleteSuccess === 'function') self.onDeleteSuccess();
-                if (params.form.onDeleteSuccess) {
-                    params.form.onDeleteSuccess(self.tile);
-                }
-            });
-        };
-        
-        this.createParentAndChild = async (parenttile, childcard) => {
-            try{
-                const newSave = await self.card.saveParentTile(parenttile);
-                if(newSave){
-                    childcard.selected(true);
-                }
-            } catch (err){
-                console.log(err);
-            }
         };
 
         this.initialize();

@@ -62,7 +62,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         }
             //####################################
     </script>
-    
+
 </head>
 
 <body {% block body_attributes %}class="scroll-y-hidden"{% endblock %}>
@@ -73,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block javascript %}
 
-    {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
+{% if analytics_cookies or accept_all_cookies and app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
 
         <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

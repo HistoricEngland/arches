@@ -506,25 +506,34 @@ define([
                 );
             });
 
-            self.tilesToRemove().forEach(function(tile) {
-                tile.deleteTile(
-                    function(response) {
-                        self.alert(new AlertViewModel(
-                            'ep-alert-red', 
-                            response.responseJSON.title,
-                            response.responseJSON.message,
-                            null, 
-                            function(){ return; }
-                        ));
-                    },
-                    function() {
-                        self.tilesToRemove.remove(tile);
-                        if ( self.tilesToRemove().length === 0 ) {
-                            self.complete(true);
-                            self.loading(true);
-                            self.saving(false);
-                        }
-                    }
+            self.tilesToRemove().forEach(function(tile) {                
+                params.pageVm.alert(            
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        'Item Deletion.',
+                        'Are you sure you would like to delete this item?',
+                        function(){}, //does nothing when canceled
+                        function(tile) {
+                            tile.deleteTile(
+                                function(response) {
+                                    self.alert(new AlertViewModel(
+                                        'ep-alert-red', 
+                                        response.responseJSON.title,
+                                        response.responseJSON.message,
+                                        null, 
+                                        function(){ return; }
+                                    ));
+                                },
+                                function() {
+                                    self.tilesToRemove.remove(tile);
+                                    if ( self.tilesToRemove().length === 0 ) {
+                                        self.complete(true);
+                                        self.loading(true);
+                                        self.saving(false);
+                                    }
+                                }
+                            );
+                        })
                 );
             });
 

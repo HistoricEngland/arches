@@ -16,15 +16,24 @@ define([
         params.title() != undefined ? this.itemName(params.title()) : this.itemName('Items');
 
         this.remove = function(tile) {
-            tile.deleteTile( function(response) {
-                self.alert(new AlertViewModel(
-                    'ep-alert-red', 
-                    response.responseJSON.title,
-                    response.responseJSON.message,
-                    null, 
-                    function(){ return; }
-                ));
-            });
+            params.pageVm.alert(            
+                new AlertViewModel(
+                    'ep-alert-red',
+                    'Item Deletion.',
+                    'Are you sure you would like to delete this item?',
+                    function(){}, //does nothing when canceled
+                    function(tile) {
+                        tile.deleteTile( function(response) {
+                            self.alert(new AlertViewModel(
+                                'ep-alert-red', 
+                                response.responseJSON.title,
+                                response.responseJSON.message,
+                                null, 
+                                function(){ return; }
+                            ));
+                        });
+                    })
+            );
         };
 
         this.edit = function(tile) { self.tile(tile); };

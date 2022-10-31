@@ -752,6 +752,9 @@ div.search-facet-item:focus {
 
     .workbench-card-sidepanel .install-buttons {
         margin-right: 75px;
+        width: calc(100% - 76px);
+        padding: 10px;
+        z-index: 30;
     }
 
     .workbench-card-sidepanel-header-container,
@@ -954,5 +957,9 @@ div.search-facet-item:focus {
 
     .tab-pane .tab-pane-content {
         height: calc(100vh - 50px);
+    }
+
+    .time-wheel-wrap .chart {
+        margin-top: 15px;
     }
 }

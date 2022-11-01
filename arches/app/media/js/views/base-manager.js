@@ -64,7 +64,7 @@ define([
                 return window.location.pathname === "/search" || window.location.pathname === "/plugins/c8261a41-a409-4e45-b049-c925c28a57da";
             });
 
-            // Register binding of onEnterkey. e.g. <div data-bind="onEnterkey: someValue"> </div>
+            // Register binding of onEnterkey. e.g. <div data-bind="onEnterkey"> </div>
             ko.bindingHandlers.onEnterkey = {
                 init: function (element, valueAccessor) {
                     ko.utils.unwrapObservable(valueAccessor()); // Unwrap to get subscription.

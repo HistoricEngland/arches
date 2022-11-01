@@ -4973,6 +4973,7 @@ ul .collapse li:last-of-type {
     width: 100%;
     height: calc(100vh - 50px);
     position: relative;
+    overflow-y:auto;
 }
 
 .flexrow {

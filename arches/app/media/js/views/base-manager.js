@@ -73,7 +73,6 @@ define([
                         if (keyCode === 13) {   // Check if keypress is <enter>.
                             $(element).blur();
                             $(element).click();
-                            return true;    // Allow default action.
                         }
                         return true;    // Allow default action.
                     });

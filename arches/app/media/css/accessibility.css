@@ -191,6 +191,10 @@ a:focus,
     background-color: #943725 !important;
 }
 
+.btn-danger:focus{
+    color: #FCFCFC !important;
+}
+
 .crud-card-main a {
     color: #17568c;
 }

@@ -212,8 +212,8 @@ define([
             params.pageVm.alert(            
                 new AlertViewModel(
                     'ep-alert-red',
-                    'Are you sure you would like to delete this tile?',
-                    'All data created for this tile will be deleted.',
+                    'Item Deletion.',
+                    'Are you sure you would like to delete this item?',
                     function(){}, //does nothing when canceled
                     function() {
                         self.loading(true);

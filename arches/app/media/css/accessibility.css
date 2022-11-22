@@ -578,7 +578,8 @@ div.search-facet-item:focus {
 }
 
 .card-component-wrapper-editor {
-    height: auto;
+    height: calc(100vh - 100px);
+    padding-bottom: 0;
 }
 
 /******************************************************************/
@@ -817,7 +818,7 @@ div.search-facet-item:focus {
     }
 
     .resource-editor-container .main-panel .card-component-wrapper-editor {
-        height: auto;
+        height: calc(100vh - 50px);
         padding-bottom: 0;
     }
 

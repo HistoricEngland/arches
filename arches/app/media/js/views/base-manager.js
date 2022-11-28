@@ -64,6 +64,20 @@ define([
                 return window.location.pathname === "/search" || window.location.pathname === "/plugins/c8261a41-a409-4e45-b049-c925c28a57da";
             });
 
+            // Register binding of onEnterkeyClick. e.g. <div data-bind="onEnterkeyClick"> </div>
+            ko.bindingHandlers.onEnterkeyClick = {
+                init: function (element, valueAccessor) {
+                    ko.utils.unwrapObservable(valueAccessor()); // Unwrap to get subscription.
+                    $(element).keypress(function (event) {
+                        var keyCode = (event.which ? event.which : event.keyCode);
+                        if (keyCode === 13) {   // Check if keypress is <enter>.
+                            $(element).click();
+                        }
+                        return true;    // Allow default action.
+                    });
+                }
+            };
+
             PageView.prototype.constructor.call(this, options);
             return this;
         }

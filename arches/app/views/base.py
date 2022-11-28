@@ -31,6 +31,7 @@ from arches.app.utils.permission_backend import (
     get_resource_types_by_perm,
 )
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
+import json
 
 
 @method_decorator(login_required, name="dispatch")
@@ -90,7 +91,19 @@ class BaseManagerView(TemplateView):
         )
         context["app_name"] = settings.APP_NAME
         context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
+
+        cookie_key = "CookieControl"
+        if cookie_key in self.request.COOKIES:
+            cookie_control = json.loads(self.request.COOKIES[cookie_key])
+            optional_cookies = cookie_control["optionalCookies"]
+            context["analytics_cookies"] = self.get_optional_cookie_value_as_boolean(optional_cookies, "analytics")
+        else:
+            context["accept_all_cookies"] = True
+
         return context
+
+    def get_optional_cookie_value_as_boolean(self, cookie, key, value="accepted"):
+        return cookie[key] == value if key in cookie else False
 
 
 class MapBaseManagerView(BaseManagerView):

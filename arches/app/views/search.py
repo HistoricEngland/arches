@@ -351,13 +351,15 @@ def search_results(request, returnDsl=False):
     if for_export or pages:
         results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
+        if pages and pages.isnumeric():
+            pages = int(pages)
         if not pages:
             if total <= settings.SEARCH_EXPORT_LIMIT:
                 pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
             if total > settings.SEARCH_EXPORT_LIMIT:
                 pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
         if pages > 1:
-            for page in range(int(pages)):
+            for page in range(pages):
                 results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
                 results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:

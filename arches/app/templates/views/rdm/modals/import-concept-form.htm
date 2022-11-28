@@ -36,8 +36,8 @@
                             </div>
                             <div class="row hidden">
                                 <div class="col-md-12">
-                                    <div class="alert alert-warning">
-                                        <h4>{% trans "Error" %}</h4>
+                                    <div class="alert alert-warning" aria-labelledby="error-text-header error_text"  aria-live="assertive"  role="alert">
+                                        <h4 role="alert" id="error-text-header">{% trans "Error" %}</h4>
                                         <p id='error_text' style="max-height:300px; overflow-y:scroll;"></p>
                                     </div>
                                 </div>

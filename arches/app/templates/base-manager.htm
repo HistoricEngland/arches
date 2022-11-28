@@ -35,6 +35,16 @@
                                     
                                     <ul id="mainnav-menu" class="list-group">
 
+                                        <!-- Home. -->
+                                        <li>
+                                            <a href="/" data-bind="click:function () { navigate('/') }">
+                                                <i class="ti-home"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Home" %}</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
                                         <!-- Tools -->
                                         <li class="list-header">{% trans "Tools" %}</li>
 
@@ -216,6 +226,14 @@
                                             </li>
                                             {% endif %}
                                         {% endfor %}
+                                        <li>
+                                            <a href="#" data-bind="click: function() { CookieControl.open() }">
+                                                <i class="fa fa-check-circle"></i>
+                                                <span class="menu-title">
+                                                    Cookie Control
+                                                </span>
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -236,8 +254,12 @@
                     <!-- ko if: alert() -->
                     <div data-bind="visible: alert().active" style="display: none;" class="relative">
                         <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
-                            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-                            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+                            <div data-bind="attr: {'aria-label': alert().title}" aria-live = "assertive" role="alert">
+                                <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                            </div>
+                            <div data-bind="attr: {'aria-label': alert().text}" aria-live = "assertive" role="alert">
+                                <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+                            </div>
 
                             <div class="ep-form-alert-default-dismiss">
                                 <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
@@ -446,7 +468,7 @@
                                 <!-- content gets inserted into this div -->
                                 <div class="ep-help-content"></div>
                                 <hr>
-                                <h5>{% trans "for more documentation, visit" %} <a href="https://arches.readthedocs.io/" target="_blank">arches.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
+                                <p class="h5">{% trans "for more documentation, visit" %} <a href="https://arches.readthedocs.io/" target="_blank">arches.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></p>
                             </div>
                         </div>
                         

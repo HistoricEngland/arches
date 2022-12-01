@@ -220,6 +220,7 @@ urlpatterns = [
     url(r"^notifications$", NotificationView.as_view(), name="get_notifications"),
     url(r"^notifications/dismiss$", NotificationView.as_view(action="dismiss"), name="dismiss_notifications"),
     url(r"^notifications/get_types$", NotificationView.as_view(action="get_types"), name="get_notification_types"),
+    url(r"^notifications/update_types$", NotificationView.as_view(action="update_types"), name="update_notification_types"),
     url(r"^couchdb/(?P<path>.*)$", api.CouchdbProxy.as_view()),
     url(r"^%s/(?P<path>.*)$" % settings.KIBANA_CONFIG_BASEPATH, api.KibanaProxy.as_view()),
     url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),

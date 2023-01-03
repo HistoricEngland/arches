@@ -702,7 +702,7 @@ div.search-facet-item:focus {
     }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 915px) {
     html, body {
         overflow-y: auto;
     }
@@ -844,6 +844,13 @@ div.search-facet-item:focus {
     .profile-summary-page,
     .graph-designer-container {
         height: auto;
+    }
+
+    .profile-full-name, .profile-e-mail {
+        position: relative;
+        left: auto;
+        top: auto;
+        font-size: 1.5em;
     }
 
     .profile-list,

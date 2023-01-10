@@ -1070,6 +1070,8 @@ class MapLayer(models.Model):
     class Meta:
         managed = True
         db_table = "map_layers"
+        default_permissions = ()
+        permissions = (("no_access_to_maplayer", "No access to map layer"),)
 
 
 class GraphXMapping(models.Model):

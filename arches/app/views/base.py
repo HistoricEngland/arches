@@ -139,7 +139,7 @@ class MapBaseManagerView(BaseManagerView):
             map_layers = all_map_layers
         else:
             for m in all_map_layers:
-                if (m.addtomap is True) or (not self.request.user.has_perm("no_access_to_maplayer", m)):
+                if (m.addtomap is True and m.isoverlay is False) or (not self.request.user.has_perm("no_access_to_maplayer", m)):
                     map_layers.append(m)
 
         context["map_layers"] = map_layers

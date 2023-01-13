@@ -267,7 +267,7 @@ def export_results(request):
             exporter = SearchResultsExporter(search_request=request)
             export_files, export_info = exporter.export(format, report_link)
             wb = export_files[0]["outputfile"]
-            with NamedTemporaryFile() as tmp:
+            with NamedTemporaryFile(delete=bool(settings.DELETE_TEMP_EXCEL_EXPORT_FILE)) as tmp:
                 wb.save(tmp.name)
                 tmp.seek(0)
                 stream = tmp.read()

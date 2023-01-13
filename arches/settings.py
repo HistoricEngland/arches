@@ -135,6 +135,11 @@ ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 # ordered as seen in the resource cards or not.
 EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 
+# This is used to indicate whether temporary export files for Tile Excel Export should
+# be deleted or not
+
+DELETE_TEMP_EXCEL_EXPORT_FILE = True
+
 RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 
 PREFERRED_COORDINATE_SYSTEMS = (

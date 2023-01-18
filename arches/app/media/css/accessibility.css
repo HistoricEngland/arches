@@ -388,6 +388,7 @@ div.search-facet-item:focus {
 
 .top-btn-txt {
     font-size: 0.7em;
+    margin-left: 3px;
 }
 
 .resource-filter .resource-selector-button div .btn,
@@ -793,10 +794,6 @@ div.search-facet-item:focus {
         display: none;
     }
 
-    #menu-control {
-        margin-left: 50px;
-    }
-
     .resource-editor-container,
     .graph-designer-panels-container,
     .function-manager-container,
@@ -973,5 +970,36 @@ div.search-facet-item:focus {
 
     .time-wheel-wrap .chart {
         margin-top: 15px;
+    }
+
+    .ep-graph-title-icon {
+        display: none;
+    }
+
+    h1.page-header.text-overflow.ep-graph-title {
+        font-size: 1.1em;
+        white-space: normal;
+        padding: 5px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .top-right-nav span.top-btn-txt {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #menu-control {
+        margin-left: 50px;
+    }
+
+    h1.page-header.text-overflow.ep-graph-title {
+        padding-left: 5px!important;
+    }
+
+    .ep-notifs-toggle {
+        display: flex;
     }
 }

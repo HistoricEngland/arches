@@ -388,6 +388,7 @@ div.search-facet-item:focus {
 
 .top-btn-txt {
     font-size: 0.7em;
+    margin-left: 3px;
 }
 
 .resource-filter .resource-selector-button div .btn,
@@ -983,6 +984,10 @@ div.search-facet-item:focus {
         top: 50%;
         transform: translateY(-50%);
     }
+
+    .top-right-nav span.top-btn-txt {
+        display: none;
+    }
 }
 
 @media screen and (max-width: 768px) {
@@ -992,5 +997,9 @@ div.search-facet-item:focus {
 
     h1.page-header.text-overflow.ep-graph-title {
         padding-left: 5px!important;
+    }
+
+    .ep-notifs-toggle {
+        display: flex;
     }
 }

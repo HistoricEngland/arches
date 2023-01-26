@@ -28,7 +28,7 @@
                     <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
                         <div>
                             <!-- ko if: groupedGraphs -->
-                            <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
+                            <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, value: graphId"></select>
                             <!-- /ko -->
                             <script type="text/html" id="selectGraphTemplate">
                                 <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
@@ -50,7 +50,7 @@
             </div>
 
             <div class="col-xs-12 col-sm-2">
-                <div class="btn-group">
+                <div class="btn-group pull-right">
                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
                         {% trans "Add" %} <i class="ion-more"></i>
                     </button>

@@ -1046,8 +1046,18 @@ a#menu-toggle:focus {
     }
 
     .ep-form-toolbar .ep-form-toolbar-buttons {
-        text-align: center;
+        text-align: left;
+        left: 15px;
         right: 0;
+    }
+
+    .ep-form-toolbar .ep-form-toolbar-select,
+    .ep-form-toolbar .ep-form-toolbar-buttons {
+        min-height: 41px;
+    }
+
+    .ep-form-toolbar .graph-settings-crud span button {
+        margin-right: 10px;
     }
 }
 

@@ -591,6 +591,32 @@ a#menu-toggle:focus {
     height: 32px;
 }
 
+.ep-form-toolbar {
+    display: block;
+}
+
+.ep-form-toolbar .ep-form-toolbar-select,
+.ep-form-toolbar .ep-form-toolbar-buttons {
+    min-height: 54px;
+}
+
+.ep-form-toolbar .ep-form-toolbar-select {
+    padding-top: 4px;
+}
+
+.ep-form-toolbar .ep-form-toolbar-buttons {
+    text-align: right;
+    right: 10px;
+}
+
+.ep-form-toolbar .graph-settings-crud {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -1017,6 +1043,11 @@ a#menu-toggle:focus {
 
     .resource-tools a.resource-grid-title {
         padding: 3px 10px 6px 10px;
+    }
+
+    .ep-form-toolbar .ep-form-toolbar-buttons {
+        text-align: center;
+        right: 0;
     }
 }
 

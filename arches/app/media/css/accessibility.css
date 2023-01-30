@@ -1066,15 +1066,20 @@ a#menu-toggle:focus {
         margin-left: 50px;
     }
 
-    h1.page-header.text-overflow.ep-graph-title {
-        padding-left: 5px!important;
-    }
-
     .ep-notifs-toggle {
         display: flex;
     }
 
     .graph-designer-container .resource-toolbar .btn-group.pull-right {
         top: -30px;
+    }
+
+    #container.mainnav-lg .menu-expanded .brand-title {
+        top: -10px;
+        left: 15px;
+    }
+
+    h1.page-header.text-overflow.ep-graph-title.ep-graph-title-nopad {
+        padding-left: 5px!important;
     }
 }

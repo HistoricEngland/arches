@@ -20,7 +20,7 @@
                         <div id="mainnav-menu-wrap">
                             <div class="nano">
                                 <div class="nano-content" tabindex="0">
-                                    
+
                                     {% block navheader %}
                                     <div class="toggle-leftnav-container">
                                         <!--<a id="menu-toggle" href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()); }" onclick="if($('#container').hasClass('mainnav-sm')){$('#mainnav-container').removeClass('menu-expanded');}else{$('#mainnav-container').addClass('menu-expanded');}" onkeyup="if($('#container').hasClass('mainnav-sm')){$('#mainnav-container').removeClass('menu-expanded');}else{$('#mainnav-container').addClass('menu-expanded');}">-->
@@ -32,7 +32,7 @@
                                         </a>
                                     </div>
                                     {% endblock navheader %}
-                                    
+
                                     <ul id="mainnav-menu" class="list-group">
 
                                         <!-- Home. -->
@@ -278,7 +278,7 @@
                     <!-- /ko -->
 
                     <header>
-                        
+
                         {% block header %}
 
                         <div class="ep-toolbar">
@@ -336,7 +336,7 @@
 
                                     {% if show_language_swtich %}
                                     {% get_current_language as LANGUAGE_CODE %}
-                                        <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" 
+                                        <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;"
                                         data-bind='component: {
                                             name: "views/components/language-switcher",
                                             params: {
@@ -344,7 +344,7 @@
                                             }
                                         }'></div>
                                     {% endif %}
-                                    
+
                                     <!-- Notifications -->
                                     {% if nav.notifs %}
                                     <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
@@ -396,12 +396,19 @@
                                     {% endif %}
 
                                     {% if nav.help %}
-                                    <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
-                                        <div>
-                                        <i class="ion-help"></i>
-                                        <span class="top-btn-txt">{% trans "Help" %}</span>
-                                        </div>
-                                    </a>
+                                        {% if user_is_guest %}
+                                            <a href="https://rise.articulate.com/share/And6xdYdwDOxM_SMA9eHoLhfAZK4g5cO" class="ep-help-toggle ep-tools ep-tools-right">
+                                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+                                                <i class="ion-help"></i>
+                                                </div>
+                                            </a>
+                                        {% else %}
+                                            <a href="https://rise.articulate.com/share/1ynrLdvjIPVLpvbfJCBxIKUB_bOa1OJX#/" class="ep-help-toggle ep-tools ep-tools-right">
+                                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+                                                <i class="ion-help"></i>
+                                                </div>
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
 
                                 </div>
@@ -471,7 +478,7 @@
                                 <p class="h5">{% trans "for more documentation, visit" %} <a href="https://arches.readthedocs.io/" target="_blank">arches.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></p>
                             </div>
                         </div>
-                        
+
                         {% endblock header %}
 
                     </header>
@@ -483,7 +490,7 @@
                         {% block main_content %}
                         {% endblock main_content %}
                     </main>
-                   
+
                 </div>
 
                 {% block aside_container %}

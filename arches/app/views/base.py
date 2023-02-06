@@ -39,6 +39,14 @@ class BaseManagerView(TemplateView):
 
     template_name = ""
 
+    def is_user_only_in_guest_group(self, user):
+        groups_length = len(user.groups.all())
+        guest_filter = user.groups.filter(name='Guest').exists()
+        if groups_length == 1 and guest_filter == True:
+            return True
+        else:
+            return False
+
     def get_context_data(self, **kwargs):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
         context["system_settings_graphid"] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
@@ -89,6 +97,7 @@ class BaseManagerView(TemplateView):
             )
             > 0
         )
+        context["user_is_guest"] = self.is_user_only_in_guest_group(self.request.user)
         context["app_name"] = settings.APP_NAME
         context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
 

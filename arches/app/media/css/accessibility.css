@@ -491,7 +491,7 @@ div.search-facet-item:focus {
 
 .resource-component-abstract {
     overflow-y: auto;
-    height: calc(100vh - 100px);
+    overflow-x: hidden;
 }
 
 .resource-component-abstract-container.is-summary {
@@ -709,6 +709,7 @@ div.search-facet-item:focus {
     
     article.flexrow {
         height: 100%;
+        overflow-x: hidden;
     }
 
     .search-toolbar {
@@ -774,7 +775,7 @@ div.search-facet-item:focus {
     }
 
     .resource-component-abstract-container.is-summary {
-        height: calc(50vh - 100px);
+        height: 100%;
     }
 
     .report-print-date {

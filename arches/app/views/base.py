@@ -39,13 +39,13 @@ class BaseManagerView(TemplateView):
 
     template_name = ""
 
-    def is_user_only_in_guest_group(self, user):
+    def help_url_based_on_user(self, user):
         groups_length = len(user.groups.all())
         guest_filter = user.groups.filter(name='Guest').exists()
         if groups_length == 1 and guest_filter == True:
-            return True
+            return settings.BASIC_HELP_LINK
         else:
-            return False
+            return settings.ADVANCED_HELP_LINK
 
     def get_context_data(self, **kwargs):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
@@ -97,7 +97,7 @@ class BaseManagerView(TemplateView):
             )
             > 0
         )
-        context["user_is_guest"] = self.is_user_only_in_guest_group(self.request.user)
+        context["help_url"] = self.help_url_based_on_user(self.request.user)
         context["app_name"] = settings.APP_NAME
         context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
 

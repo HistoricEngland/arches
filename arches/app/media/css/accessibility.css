@@ -401,6 +401,10 @@ div.search-facet-item:focus {
     background: inherit;
 }
 
+.search-tools-container .row {
+    margin: 0;
+}
+
 .search-results-container {
     overflow-y: auto;
 }
@@ -1058,6 +1062,10 @@ a#menu-toggle:focus {
 
     .ep-form-toolbar .graph-settings-crud span button {
         margin-right: 10px;
+    }
+
+    .nav-btn-container {
+        min-width: 49px;
     }
 }
 

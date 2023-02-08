@@ -401,6 +401,10 @@ div.search-facet-item:focus {
     background: inherit;
 }
 
+.search-tools-container .row {
+    margin: 0;
+}
+
 .search-results-container {
     overflow-y: auto;
 }
@@ -874,7 +878,8 @@ a#menu-toggle:focus {
 
     .recent-edits-container,
     .profile-summary-page,
-    .graph-designer-container {
+    .graph-designer-container,
+    .resource-editor-container-main {
         height: auto;
     }
 
@@ -894,7 +899,8 @@ a#menu-toggle:focus {
         min-height: 0;
     }
 
-    .graph-designer-container {
+    .graph-designer-container,
+    .resource-editor-container-main {
         display: inline-block;
     }
 
@@ -913,6 +919,10 @@ a#menu-toggle:focus {
 
     .graph-find, .resource-grid-title {
         font-size: 1.1em;
+    }
+
+    .resource-grid-title {
+        padding: 0 20px 0 20px;
     }
 
     .graph-designer-container .graph-list-header .btn-group {
@@ -1059,6 +1069,10 @@ a#menu-toggle:focus {
 
     .ep-form-toolbar .graph-settings-crud span button {
         margin-right: 10px;
+    }
+
+    .nav-btn-container {
+        min-width: 49px;
     }
 }
 

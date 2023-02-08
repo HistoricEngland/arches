@@ -314,8 +314,7 @@
 
                                     <!-- Login -->
                                     {% if nav.login %}
-                                    
-                                    <div>
+                                    <div class="nav-btn-container">
                                         <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
                                             {% if user.username == 'anonymous' %}
                                             <span class="hidden-xs">{% trans "Login" %}</span>
@@ -340,7 +339,7 @@
 
                                     <!-- Notifications -->
                                     {% if nav.notifs %}
-                                    <div>
+                                    <div class="nav-btn-container">
                                         <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
                                             <div data-bind="visible: unreadNotifs()" id="circle"></div>
                                             <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
@@ -352,7 +351,7 @@
 
                                     <!-- Search Bar -->
                                     {% if nav.search %}
-                                    <div>
+                                    <div class="nav-btn-container">
                                         <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
                                             <i class="ion-search"></i>
                                             <span class="top-btn-txt">{% trans 'Search' %}</span>
@@ -362,7 +361,7 @@
 
                                     <!-- Prov edit history-->
                                     {% if user_is_reviewer == False and user_can_edit %}
-                                    <div>
+                                    <div class="nav-btn-container">
                                         <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
                                             <i class="ion-clock"></i>
                                             <span class="top-btn-txt">{% trans 'Recent Edits' %}</span>
@@ -371,7 +370,7 @@
                                     {% endif %}
 
                                     {% if nav.res_edit and user_can_edit %}
-                                    <div>
+                                    <div class="nav-btn-container">
                                         <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
                                             <i class="ion-edit"></i>
                                             <span class="top-btn-txt">{% trans 'Edit Resource' %}</span>
@@ -380,7 +379,7 @@
                                     {% endif %}
 
                                     {% if nav.print %}
-                                    <div>
+                                    <div class="nav-btn-container">
                                         <a href="#" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
                                             <i class="ion-printer"></i>
                                             <span class="top-btn-txt">{% trans 'Print' %}</span>
@@ -389,7 +388,7 @@
                                     {% endif %}
 
                                     {% if nav.help %}
-                                    <div>
+                                    <div class="nav-btn-container">
                                         <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
                                             <i class="ion-help"></i>
                                             <span class="top-btn-txt">{% trans "Help" %}</span>

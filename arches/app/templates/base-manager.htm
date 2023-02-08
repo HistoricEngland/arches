@@ -396,21 +396,12 @@
                                     {% endif %}
 
                                     {% if nav.help %}
-                                        {% if user_is_guest %}
-                                            <a href="https://rise.articulate.com/share/And6xdYdwDOxM_SMA9eHoLhfAZK4g5cO" class="ep-help-toggle ep-tools ep-tools-right" target="_blank" aria-label="Open external link to help guidance">
-                                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
-                                                <i class="ion-android-open"></i>
-                                                <span class="top-btn-txt">{% trans "Help" %}</span>
-                                                </div>
-                                            </a>
-                                        {% else %}
-                                            <a href="https://rise.articulate.com/share/1ynrLdvjIPVLpvbfJCBxIKUB_bOa1OJX#/" class="ep-help-toggle ep-tools ep-tools-right" target="_blank" aria-label="Open external link to help guidance">
-                                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
-                                                <i class="ion-android-open"></i>
-                                                <span class="top-btn-txt">{% trans "Help" %}</span>
-                                                </div>
-                                            </a>
-                                        {% endif %}
+                                        <a href={{ help_url }} class="ep-help-toggle ep-tools ep-tools-right" target="_blank" aria-label="Open external link to help guidance">
+                                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+                                            <i class="ion-android-open"></i>
+                                            <span class="top-btn-txt">{% trans "Help" %}</span>
+                                            </div>
+                                        </a>
                                     {% endif %}
 
                                 </div>

@@ -256,10 +256,10 @@ RESTRICT_MEDIA_ACCESS = False
 RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
 
-# By setting DISABLE_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
-# to export search results and is not signed in with a user account then the request
-# will not be allowed.
-DISABLE_EXPORT_FOR_ANONYMOUS_USER = False
+# Specify the user groups that are allowed to export results from the application
+# If the array is empty then export will be allowed for ALL users.
+
+ENABLE_EXPORT_FOR_SPECIFIC_GROUPS = []
 
 # Set to True to hide the Copy Resource button
 HIDE_RESOURCE_COPY_BUTTON = False

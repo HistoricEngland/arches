@@ -35,7 +35,10 @@ class SearchEngineFactory(object):
         modulename = (".").join(components[0 : len(components) - 1])
         # _temp = __import__(modulename, globals(), locals(), [classname], -1)
         _temp = __import__(modulename, globals(), locals(), [classname])  # in py3, level must be >= 0
-        return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
+        if "cloud_id" in connection_options.keys():
+            return getattr(_temp, classname)(prefix=prefix, **connection_options)
+        else:
+            return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
 
 
 SearchEngineInstance = SearchEngineFactory().create()

@@ -621,6 +621,16 @@ a#menu-toggle:focus {
     width: 100%;
 }
 
+#circle {
+    margin-left: -5px;
+    margin-top: -11px;
+}
+
+#circle-outline {
+    margin-left: -7px;
+    margin-top: -11px;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/

@@ -624,13 +624,11 @@ a#menu-toggle:focus {
 #circle {
     margin-left: -5px;
     margin-top: -11px;
-    display: block !important;
 }
 
 #circle-outline {
     margin-left: -7px;
     margin-top: -11px;
-    display: block !important;
 }
 
 /******************************************************************/

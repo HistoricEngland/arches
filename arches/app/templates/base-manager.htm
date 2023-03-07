@@ -314,16 +314,16 @@
 
                                     <!-- Login -->
                                     {% if nav.login %}
-                                    <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
-                                        <div>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
                                             {% if user.username == 'anonymous' %}
                                             <span class="hidden-xs">{% trans "Login" %}</span>
                                             {% else %}
                                             <i class="fa fa-sign-out"></i>
                                             <span class="top-btn-txt">{% trans "Logout" %}, {{ user.first_name|default:user.username }}</span>
                                             {% endif %}
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if show_language_swtich %}
@@ -339,61 +339,61 @@
                                     
                                     <!-- Notifications -->
                                     {% if nav.notifs %}
-                                    <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
-                                        <div>
+                                    <div class="nav-btn-container">
+                                        <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
                                             <div data-bind="visible: unreadNotifs()" id="circle"></div>
                                             <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
                                             <i class="fa fa-bell"></i>
                                             <span class="top-btn-txt hidden-xs">{% trans 'Alerts' %}</span>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     <!-- Search Bar -->
                                     {% if nav.search %}
-                                    <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                                        <div>
-                                        <i class="ion-search"></i>
-                                        <span class="top-btn-txt">{% trans 'Search' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                                            <i class="ion-search"></i>
+                                            <span class="top-btn-txt">{% trans 'Search' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     <!-- Prov edit history-->
                                     {% if user_is_reviewer == False and user_can_edit %}
-                                    <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
-                                        <div>
-                                        <i class="ion-clock"></i>
-                                        <span class="top-btn-txt">{% trans 'Recent Edits' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
+                                            <i class="ion-clock"></i>
+                                            <span class="top-btn-txt">{% trans 'Recent Edits' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if nav.res_edit and user_can_edit %}
-                                    <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
-                                        <div>
-                                        <i class="ion-edit"></i>
-                                        <span class="top-btn-txt">{% trans 'Edit Resource' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
+                                            <i class="ion-edit"></i>
+                                            <span class="top-btn-txt">{% trans 'Edit Resource' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if nav.print %}
-                                    <a href="#" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
-                                        <div>
-                                        <i class="ion-printer"></i>
-                                        <span class="top-btn-txt">{% trans 'Print' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="#" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+                                            <i class="ion-printer"></i>
+                                            <span class="top-btn-txt">{% trans 'Print' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if nav.help %}
-                                    <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
-                                        <div>
-                                        <i class="ion-help"></i>
-                                        <span class="top-btn-txt">{% trans "Help" %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
+                                            <i class="ion-help"></i>
+                                            <span class="top-btn-txt">{% trans "Help" %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                 </div>

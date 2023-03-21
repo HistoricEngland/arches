@@ -53,6 +53,7 @@ def sync(self, surveyid=None, userid=None, synclogid=None):
 def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
+    from arches.app.utils.email_contexts import return_email_context
 
     settings.update_from_db()
 
@@ -86,24 +87,22 @@ def export_search_results(self, userid, request_values, format, report_link):
     expiration_date = datetime.now() + timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
     formatted_expiration_date = expiration_date.strftime("%A, %d %B %Y")
 
+    context = return_email_context(
+        _(f"Hello,\nYour request to download a set of search results is now ready. You have until {formatted_expiration_date} to access this download, after which time it'll be deleted."),
+          exportid,
+          _("Download Now"),
+          _("Thank you"),
+          email,export_name,str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
+          _user
+          )
+
     return {
         "taskid": self.request.id,
         "msg": _(
             f"Your search '{export_name}' is ready for download. You have until {formatted_expiration_date} to access this file, after which we'll automatically remove it."
         ),
         "notiftype_name": "Search Export Download Ready",
-        "context": dict(
-            greeting=_(
-                f"Hello,\nYour request to download a set of search results is now ready. You have until {formatted_expiration_date} to access this download, after which time it'll be deleted."
-            ),
-            link=exportid,
-            button_text=_("Download Now"),
-            closing=_("Thank you"),
-            email=email,
-            name=export_name,
-            email_link=str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
-        ),
-    }
+        "context":context}
 
 
 @shared_task(bind=True)

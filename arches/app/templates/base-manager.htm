@@ -218,6 +218,40 @@
                                             </li>
                                             {% endif %}
                                         {% endfor %}
+
+                                        <!-- Privacy Policy -->
+                                        <li>
+                                            <a href="https://historicengland.org.uk/terms/privacy/"
+                                               target="_blank" class="" data-original-title="" title="">
+                                                  <i class="fa fa-shield"></i>
+                                                  <span class="menu-title">
+                                                    <strong>Privacy policy</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Terms & conditions-->
+                                        <li>
+                                            <a href="https://historicengland.org.uk/terms/"
+                                               target="_blank" class="" data-original-title="" title="">
+                                                  <i class="fa fa-file-text-o"></i>
+                                                  <span class="menu-title">
+                                                    <strong>Terms &amp; conditions</strong>
+                                                  </span>
+                                            </a>
+                                        </li>
+
+                                        <!-- Accessibility -->
+                                        <li>
+                                            <a href="https://historicengland.org.uk/access/"
+                                                  target="_blank" data-original-title="" title="" class="">
+                                                    <i class="fa fa-universal-access"></i>
+                                                    <span class="menu-title">
+                                                      <strong> Accessibility </strong>
+                                                    </span>
+                                            </a>
+                                        </li>
+
                                         <li>
                                             <a href="#" data-bind="click: function() { CookieControl.open() }">
                                                 <i class="fa fa-check-circle"></i>
@@ -314,16 +348,16 @@
 
                                     <!-- Login -->
                                     {% if nav.login %}
-                                    <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
-                                        <div>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
                                             {% if user.username == 'anonymous' %}
                                             <span class="hidden-xs">{% trans "Login" %}</span>
                                             {% else %}
                                             <i class="fa fa-sign-out"></i>
                                             <span class="top-btn-txt">{% trans "Logout" %}, {{ user.first_name|default:user.username }}</span>
                                             {% endif %}
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if show_language_swtich %}
@@ -339,52 +373,52 @@
 
                                     <!-- Notifications -->
                                     {% if nav.notifs %}
-                                    <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
-                                        <div>
+                                    <div class="nav-btn-container">
+                                        <a href="#" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
                                             <div data-bind="visible: unreadNotifs()" id="circle"></div>
                                             <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
                                             <i class="fa fa-bell"></i>
                                             <span class="top-btn-txt hidden-xs">{% trans 'Alerts' %}</span>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     <!-- Search Bar -->
                                     {% if nav.search %}
-                                    <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                                        <div>
-                                        <i class="ion-search"></i>
-                                        <span class="top-btn-txt">{% trans 'Search' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                                            <i class="ion-search"></i>
+                                            <span class="top-btn-txt">{% trans 'Search' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     <!-- Prov edit history-->
                                     {% if user_is_reviewer == False and user_can_edit %}
-                                    <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
-                                        <div>
-                                        <i class="ion-clock"></i>
-                                        <span class="top-btn-txt">{% trans 'Recent Edits' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
+                                            <i class="ion-clock"></i>
+                                            <span class="top-btn-txt">{% trans 'Recent Edits' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if nav.res_edit and user_can_edit %}
-                                    <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
-                                        <div>
-                                        <i class="ion-edit"></i>
-                                        <span class="top-btn-txt">{% trans 'Edit Resource' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
+                                            <i class="ion-edit"></i>
+                                            <span class="top-btn-txt">{% trans 'Edit Resource' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if nav.print %}
-                                    <a href="#" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
-                                        <div>
-                                        <i class="ion-printer"></i>
-                                        <span class="top-btn-txt">{% trans 'Print' %}</span>
-                                        </div>
-                                    </a>
+                                    <div class="nav-btn-container">
+                                        <a href="#" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+                                            <i class="ion-printer"></i>
+                                            <span class="top-btn-txt">{% trans 'Print' %}</span>
+                                        </a>
+                                    </div>
                                     {% endif %}
 
                                     {% if nav.help %}

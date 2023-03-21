@@ -33,20 +33,26 @@
                 </div>
             </div>
             <div class="search-tools-container">
-                <!-- Result Count and ordering Block -->
-                <div class="search-count-container">
-                    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
-                </div>
-                <div class="search-controls-container">
-                    <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
-                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
-                    <!--/ko-->
-                    <span style="width:125px">
-                        <div data-bind="component: {
-                            name: 'sort-results',
-                            params: sharedStateObject
-                        }"></div>
-                    </span>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <!-- Result Count and ordering Block -->
+                        <div class="search-count-container">
+                            <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="search-controls-container">
+                            <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
+                            <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
+                            <!--/ko-->
+                            <span style="width:125px">
+                                <div data-bind="component: {
+                                    name: 'sort-results',
+                                    params: sharedStateObject
+                                }"></div>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

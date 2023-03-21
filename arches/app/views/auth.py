@@ -143,12 +143,12 @@ class SignupView(View):
                     "Thanks for your interest in {settings.APP_NAME}. Click on link below \
                     to confirm your email address! Use your email address to login."
                 ),
-                closing_text=_(
+                _(
                     "This link expires in 24 hours.  If you can't get to it before then, \
                     don't worry, you can always try again with the same email address."
                 ),
-                email=None,
-                additional_context={"button_text": _("Signup for {settings.APP_NAME}"),
+                None,
+                {"button_text": _("Signup for {settings.APP_NAME}"),
                                     "link": confirmation_link}
             )
 

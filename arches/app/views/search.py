@@ -60,9 +60,7 @@ logger = logging.getLogger(__name__)
 @method_decorator(login_required, name="dispatch")
 class SearchView(MapBaseManagerView):
     def get(self, request):
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
@@ -76,9 +74,7 @@ class SearchView(MapBaseManagerView):
         card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
             widgets=widgets,
@@ -267,7 +263,7 @@ def export_results(request):
             exporter = SearchResultsExporter(search_request=request)
             export_files, export_info = exporter.export(format, report_link)
             wb = export_files[0]["outputfile"]
-            with NamedTemporaryFile() as tmp:
+            with NamedTemporaryFile(dir=settings.TILE_EXCEL_EXPORT_TEMP_DIRECTORY,delete=settings.TILE_EXCEL_EXPORT_TEMP_FILE_DELETE) as tmp:
                 wb.save(tmp.name)
                 tmp.seek(0)
                 stream = tmp.read()

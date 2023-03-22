@@ -388,6 +388,7 @@ div.search-facet-item:focus {
 
 .top-btn-txt {
     font-size: 0.7em;
+    margin-left: 3px;
 }
 
 .resource-filter .resource-selector-button div .btn,
@@ -398,6 +399,10 @@ div.search-facet-item:focus {
 .search-footer {
     position: relative;
     background: inherit;
+}
+
+.search-tools-container .row {
+    margin: 0;
 }
 
 .search-results-container {
@@ -491,7 +496,7 @@ div.search-facet-item:focus {
 
 .resource-component-abstract {
     overflow-y: auto;
-    height: calc(100vh - 100px);
+    overflow-x: hidden;
 }
 
 .resource-component-abstract-container.is-summary {
@@ -580,6 +585,50 @@ div.search-facet-item:focus {
 .card-component-wrapper-editor {
     height: calc(100vh - 100px);
     padding-bottom: 0;
+}
+
+a#menu-toggle:focus {
+    outline: none!important;
+}
+
+.graph-designer-container .find-widget select {
+    height: 32px;
+}
+
+.ep-form-toolbar {
+    display: block;
+}
+
+.ep-form-toolbar .ep-form-toolbar-select,
+.ep-form-toolbar .ep-form-toolbar-buttons {
+    min-height: 54px;
+}
+
+.ep-form-toolbar .ep-form-toolbar-select {
+    padding-top: 4px;
+}
+
+.ep-form-toolbar .ep-form-toolbar-buttons {
+    text-align: right;
+    right: 10px;
+}
+
+.ep-form-toolbar .graph-settings-crud {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+}
+
+#circle {
+    margin-left: -6px;
+    margin-top: -17px;
+}
+
+#circle-outline {
+    margin-left: -8px;
+    margin-top: -17px;
 }
 
 /******************************************************************/
@@ -702,13 +751,14 @@ div.search-facet-item:focus {
     }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 915px) {
     html, body {
         overflow-y: auto;
     }
     
     article.flexrow {
         height: 100%;
+        overflow-x: hidden;
     }
 
     .search-toolbar {
@@ -770,11 +820,11 @@ div.search-facet-item:focus {
     .resource-component-abstract-container {
         display: inline-flex;
         width: 100vw;
-        height: calc(100vh - 100px);
+        height: 100%;
     }
 
     .resource-component-abstract-container.is-summary {
-        height: calc(50vh - 100px);
+        height: 100%;
     }
 
     .report-print-date {
@@ -791,10 +841,6 @@ div.search-facet-item:focus {
 
     .sidepanel-draggable {
         display: none;
-    }
-
-    #menu-control {
-        margin-left: 50px;
     }
 
     .resource-editor-container,
@@ -842,8 +888,16 @@ div.search-facet-item:focus {
 
     .recent-edits-container,
     .profile-summary-page,
-    .graph-designer-container {
+    .graph-designer-container,
+    .resource-editor-container-main {
         height: auto;
+    }
+
+    .profile-full-name, .profile-e-mail {
+        position: relative;
+        left: auto;
+        top: auto;
+        font-size: 1.5em;
     }
 
     .profile-list,
@@ -855,7 +909,8 @@ div.search-facet-item:focus {
         min-height: 0;
     }
 
-    .graph-designer-container {
+    .graph-designer-container,
+    .resource-editor-container-main {
         display: inline-block;
     }
 
@@ -876,9 +931,26 @@ div.search-facet-item:focus {
         font-size: 1.1em;
     }
 
+    .resource-grid-title {
+        padding: 0 20px 0 20px;
+    }
+
     .graph-designer-container .graph-list-header .btn-group {
-        right: 10px;
-        top: -37px;
+        position: relative;
+        top: 13px;
+        right: 13px;
+    }
+
+    .graph-designer-container .edit-panel-search-bar {
+        display: inline-block;
+        position: relative;
+        top: 4px;
+        left: 0;
+    }
+
+    .graph-designer-container .resource-tools {
+        margin-left: 90px;
+        top: -42px;
     }
 
     .graph-designer-panels-container .settings-panel .settings-panel-body {
@@ -914,6 +986,7 @@ div.search-facet-item:focus {
 
     .find-widget {
         width: 42vw;
+        left: 88px;
     }
 
     .map-manager-container .panel-heading span {
@@ -966,5 +1039,72 @@ div.search-facet-item:focus {
 
     .time-wheel-wrap .chart {
         margin-top: 15px;
+    }
+
+    .ep-graph-title-icon {
+        display: none;
+    }
+
+    h1.page-header.text-overflow.ep-graph-title {
+        font-size: 1.1em;
+        white-space: normal;
+        padding: 5px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .top-right-nav span.top-btn-txt {
+        display: none;
+    }
+
+    #mainnav-container.menu-expanded .toggle-leftnav-container {
+        width: 220px;
+    }
+
+    .resource-tools a.resource-grid-title {
+        padding: 3px 10px 6px 10px;
+    }
+
+    .ep-form-toolbar .ep-form-toolbar-buttons {
+        text-align: left;
+        left: 15px;
+        right: 0;
+    }
+
+    .ep-form-toolbar .ep-form-toolbar-select,
+    .ep-form-toolbar .ep-form-toolbar-buttons {
+        min-height: 41px;
+    }
+
+    .ep-form-toolbar .graph-settings-crud span button {
+        margin-right: 10px;
+    }
+
+    .nav-btn-container {
+        min-width: 49px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #menu-control {
+        margin-left: 50px;
+    }
+
+    .ep-notifs-toggle {
+        display: flex;
+    }
+
+    .graph-designer-container .resource-toolbar .btn-group.pull-right {
+        top: -30px;
+    }
+
+    #container.mainnav-lg .menu-expanded .brand-title {
+        top: -10px;
+        left: 15px;
+    }
+
+    h1.page-header.text-overflow.ep-graph-title.ep-graph-title-nopad {
+        padding-left: 5px!important;
     }
 }

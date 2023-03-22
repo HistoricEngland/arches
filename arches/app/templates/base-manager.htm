@@ -218,10 +218,10 @@
                                             </li>
                                             {% endif %}
                                         {% endfor %}
-                                                                                
+
                                         <!-- Privacy Policy -->
                                         <li>
-                                            <a href="https://historicengland.org.uk/terms/privacy/" 
+                                            <a href="https://historicengland.org.uk/terms/privacy/"
                                                target="_blank" class="" data-original-title="" title="">
                                                   <i class="fa fa-shield"></i>
                                                   <span class="menu-title">
@@ -232,7 +232,7 @@
 
                                         <!--Terms & conditions-->
                                         <li>
-                                            <a href="https://historicengland.org.uk/terms/" 
+                                            <a href="https://historicengland.org.uk/terms/"
                                                target="_blank" class="" data-original-title="" title="">
                                                   <i class="fa fa-file-text-o"></i>
                                                   <span class="menu-title">
@@ -243,8 +243,8 @@
 
                                         <!-- Accessibility -->
                                         <li>
-                                            <a href="https://historicengland.org.uk/access/" 
-                                                  target="_blank" data-original-title="" title="" class="">                                                                                                  
+                                            <a href="https://historicengland.org.uk/access/"
+                                                  target="_blank" data-original-title="" title="" class="">
                                                     <i class="fa fa-universal-access"></i>
                                                     <span class="menu-title">
                                                       <strong> Accessibility </strong>
@@ -422,12 +422,12 @@
                                     {% endif %}
 
                                     {% if nav.help %}
-                                    <div class="nav-btn-container">
-                                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
-                                            <i class="ion-help"></i>
+                                        <a href={{ help_url }} class="ep-help-toggle ep-tools ep-tools-right" target="_blank" aria-label="Open external link to help guidance">
+                                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+                                            <i class="ion-android-open"></i>
                                             <span class="top-btn-txt">{% trans "Help" %}</span>
+                                            </div>
                                         </a>
-                                    </div>
                                     {% endif %}
 
                                 </div>

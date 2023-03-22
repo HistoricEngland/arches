@@ -743,6 +743,13 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
 
+# --- Default URLs for use in the application help
+
+BASIC_HELP_LINK = "#"
+
+ADVANCED_HELP_LINK = "#"
+
+
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################

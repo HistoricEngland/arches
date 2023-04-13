@@ -248,7 +248,7 @@ RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
 
 # Specify the user groups that are allowed to export results from the application
-# If the array is empty then export will be allowed for ALL users.
+# If the list is empty then export will be allowed for ALL users.
 
 ENABLE_EXPORT_FOR_SPECIFIC_GROUPS = []
 

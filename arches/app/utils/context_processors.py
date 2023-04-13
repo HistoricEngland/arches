@@ -22,6 +22,7 @@ from arches.app.models.models import GroupMapSettings
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.views.search import allow_user_to_export_results
 
 
 def livereload(request):
@@ -79,7 +80,7 @@ def app_settings(request):
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
             "DEBUG": settings.DEBUG,
-            "DISABLE_EXPORT_FOR_ANONYMOUS_USER": settings.DISABLE_EXPORT_FOR_ANONYMOUS_USER,
+            "ALLOW_RESULTS_EXPORT": allow_user_to_export_results(request.user),
             "HIDE_RESOURCE_COPY_BUTTON": settings.HIDE_RESOURCE_COPY_BUTTON,
         }
     }

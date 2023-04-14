@@ -19,10 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
+from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
@@ -134,6 +137,8 @@ class UserManagerView(BaseManagerView):
 
     def post(self, request):
 
+        from arches.app.utils.message_contexts import return_message_context
+
         if self.action == "get_user_names":
             data = {}
             if self.request.user.is_authenticated and user_is_resource_reviewer(request.user):
@@ -173,12 +178,30 @@ class UserManagerView(BaseManagerView):
                 user = form.save()
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else None
+
+                    user = ""
+
+                    if request.user.first_name != "":
+                        user = request.user.first_name
+                    else:
+                        user = request.user.username
+
                     message = (
                         f"Your {settings.APP_NAME} profile was just changed.  If this was unexpected, please contact your "
                         f"{settings.APP_NAME} administrator{f' at {admin_info}.' if (admin_info and not str.isspace(admin_info)) else '.'}"
                     )
                     message = _(message)
-                    user.email_user(_("Your " + settings.APP_NAME + " Profile Has Changed"), message)
+
+                    email_context = return_message_context(message,"",None,{"username":user})
+
+                    html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+                    text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+                    # create the email, and attach the HTML version as well.
+                    msg = EmailMultiAlternatives(_("Your " + settings.APP_NAME + " Profile Has Changed!"), text_content, admin_info, [form.cleaned_data["email"]])
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+
                 except:
                     logger.error("Error sending email", exc_info=True)
                 request.user = user

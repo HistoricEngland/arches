@@ -98,7 +98,7 @@ def export_search_results(self, userid, request_values, format, report_link):
         _(f"Hello,\nYour request to download a set of search results is now ready. You have until {formatted_expiration_date} to access this download, after which time it'll be deleted."),
         _("Thank you"),
         email,
-        {"link":exportid,"button_next":_("Download Now"),"name":export_name,"email_link":str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),"username":user},
+        {"link":exportid,"button_text":_("Download Now"),"name":export_name,"email_link":str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),"username":user},
     )
 
     return {

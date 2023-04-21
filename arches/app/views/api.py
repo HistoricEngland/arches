@@ -61,6 +61,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils import translation
+from arches.app.utils.request_caching import cache_per_user_view
 
 
 from arches.celery import app
@@ -893,6 +894,7 @@ class SearchExport(View):
 
 
 class SearchComponentData(APIBase):
+    @cache_per_user_view(prefix="search_component_data")
     def get(self, request, componentname):
         search_filter_factory = SearchFilterFactory(request)
         search_filter = search_filter_factory.get_filter(componentname)

@@ -51,11 +51,13 @@ from io import StringIO
 from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
 from arches.app.models.system_settings import settings
+from arches.app.utils.request_caching import caching_per_user, cache_per_user_view, cache_per_user_request
 
 logger = logging.getLogger(__name__)
 
 
 class SearchView(MapBaseManagerView):
+    @cache_per_user_view(prefix="search_view_get")
     def get(self, request):
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
@@ -111,10 +113,13 @@ class SearchView(MapBaseManagerView):
         }
         context["celery_running"] = task_management.check_if_celery_available()
         context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()
+        
+        
+        #caching_per_user(request, rendered, prefix="search_view_get")
 
         return render(request, "views/search.htm", context)
 
-
+@cache_per_user_request(prefix="home_page_search")
 def home_page(request):
     return render(
         request,
@@ -124,8 +129,9 @@ def home_page(request):
         },
     )
 
-
+@cache_per_user_request(prefix="search_terms")
 def search_terms(request):
+
     lang = request.GET.get("lang", request.LANGUAGE_CODE)
     se = SearchEngineFactory().create()
     searchString = request.GET.get("q", "")
@@ -196,10 +202,12 @@ def search_terms(request):
                         }
                     )
                     i = i + 1
+                    
+    #    caching_per_user(request, ret, prefix="search_terms")
 
     return JSONResponse(ret)
 
-
+@cache_per_user_request(prefix="search_get_resource_model_label")
 def get_resource_model_label(result):
     if len(result["nodegroupid"]["buckets"]) > 0:
         for nodegroup in result["nodegroupid"]["buckets"]:
@@ -395,6 +403,7 @@ def search_results(request, returnDsl=False):
         ret["timestamp"] = datetime.now()
         ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
         ret["userid"] = request.user.id
+                
         return JSONResponse(ret)
 
     else:
@@ -433,7 +442,6 @@ def get_provisional_type(request):
 
 def get_permitted_nodegroups(user):
     return [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")]
-
 
 def buffer(request):
     spatial_filter = JSONDeserializer().deserialize(
@@ -479,13 +487,13 @@ def _get_child_concepts(conceptid):
         ret.add(row[0])
     return list(ret)
 
-
+@cache_per_user_request(prefix="time_wheel_config")
 def time_wheel_config(request):
+    #config = caching_per_user(request, prefix="time_wheel_config")
+    #if not config:    
     time_wheel = TimeWheel()
-    key = "time_wheel_config_{0}".format(request.user.username)
-    config = cache.get(key)
-    if config is None:
-        config = time_wheel.time_wheel_config(request.user)
+    config = time_wheel.time_wheel_config(request.user)
+    #caching_per_user(request, config, prefix="time_wheel_config")
     return JSONResponse(config, indent=4)
 
 

@@ -742,6 +742,10 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
+# Extra contexts for email
+
+EXTRA_EMAIL_CONTEXT = {}
+
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

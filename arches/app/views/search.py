@@ -60,6 +60,7 @@ logger = logging.getLogger(__name__)
 
 @method_decorator(login_required, name="dispatch")
 class SearchView(MapBaseManagerView):
+    @cache_per_user_view(prefix="search_view_get")
     def get(self, request):
         map_markers = models.MapMarker.objects.all()
         resource_graphs = (

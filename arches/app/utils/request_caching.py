@@ -1,5 +1,7 @@
 from django.core.cache import cache as core_cache
-import pickle
+import logging
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_TTL = 120
 CACHE_KEY_MAX_LENGTH = 250
@@ -13,7 +15,6 @@ def cache_key(request):
     Returns:
         str: valid cache key
     """
-    print(f"request: {request}")
     if request.user.is_anonymous:
         user = 'anonymous'
     else:
@@ -44,7 +45,11 @@ def get_cache_package(request, prefix, supported_verbs):
     if request.method in supported_verbs and len(CACHE_KEY) <= CACHE_KEY_MAX_LENGTH:
         can_cache = True
     if can_cache:
-        response = core_cache.get(CACHE_KEY, None)
+        try:
+            response = core_cache.get(CACHE_KEY, None)
+        except Exception as e:
+            logger.exception(e)
+            response = None
     else:
         response = None
         
@@ -66,7 +71,10 @@ def cache_per_user_view(ttl=DEFAULT_TTL, prefix=None, supported_verbs=['GET']):
             if not response:
                 response = function(instance, request, *args, **kwargs)
                 if can_cache:
-                    core_cache.set(CACHE_KEY, response, ttl)
+                    try:
+                        core_cache.set(CACHE_KEY, response, ttl)
+                    except Exception as e:
+                        logger.exception(e)
             return response
         return apply_cache
     return decorator
@@ -100,7 +108,10 @@ def cache_per_user_get_context(ttl=DEFAULT_TTL, prefix=None, supported_verbs=['G
             if not response:
                 response = function(instance, *args, **kwargs)
                 if can_cache:
-                    core_cache.set(CACHE_KEY, response, ttl)
+                    try:
+                        core_cache.set(CACHE_KEY, response, ttl)
+                    except Exception as e:
+                        logger.exception(e)
             return response
         return apply_cache
     return decorator

@@ -34,6 +34,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.request_caching import cache_per_user_request, cache_per_user_view
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, MaxAgg, Aggregation
 from arches.app.search.search_export import SearchResultsExporter
@@ -474,13 +475,10 @@ def _get_child_concepts(conceptid):
         ret.add(row[0])
     return list(ret)
 
-
+@cache_per_user_request(prefix="time_wheel_config")
 def time_wheel_config(request):
-    time_wheel = TimeWheel()
-    key = "time_wheel_config_{0}".format(request.user.username)
-    config = cache.get(key)
-    if config is None:
-        config = time_wheel.time_wheel_config(request.user)
+    time_wheel = TimeWheel()    
+    config = time_wheel.time_wheel_config(request.user)
     return JSONResponse(config, indent=4)
 
 

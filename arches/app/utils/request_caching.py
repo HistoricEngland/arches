@@ -16,14 +16,13 @@ def cache_key(request):
         str: valid cache key
     """
     if request.user.is_anonymous:
-        user = 'anonymous'
+        user = 'anon'
     else:
         user = request.user.id
     q = getattr(request, request.method)
     q.lists()
     urlencode = q.urlencode(safe='()')
-
-    CACHE_KEY = 'req_cache_%s_%s_%s' % (request.path, user, urlencode)
+    CACHE_KEY = f"req_{request.path}_{user}_{urlencode}"
     return CACHE_KEY
 
 def get_cache_package(request, prefix, supported_verbs):
@@ -79,7 +78,7 @@ def cache_per_user_view(ttl=DEFAULT_TTL, prefix=None, supported_verbs=['GET']):
         return apply_cache
     return decorator
 
-def cache_per_user_request(ttl=DEFAULT_TTL, prefix=None, supported_verbs=['GET']):
+def cache_per_user_request(ttl=DEFAULT_TTL, prefix=None, supported_verbs=['GET'], kwarg_match=[]):
     """Used as a decorator to cache the response of a view function where a request object is passed in as the first argument.
     
     The function should have the parameters (request, *args, **kwargs).
@@ -88,9 +87,13 @@ def cache_per_user_request(ttl=DEFAULT_TTL, prefix=None, supported_verbs=['GET']
         ttl (_type_, optional): Duration to maintain cache in seconds. Defaults to DEFAULT_TTL.
         prefix (_type_, optional): Key Prefix if needed. Defaults to None.
         supported_verbs (list, optional): Request verbs to support. Defaults to ['GET'].
+        kwarg_match (list, optional): List of kwargs to use as part of the cache key. Defaults to [] which will ignore kwarg values.
     """
     def decorator(function):
         def apply_cache(request, *args, **kwargs):
+            for kwarg in kwarg_match:
+                prefix = f"{prefix}_{kwarg}={str(kwargs[kwarg])}"
+            
             CACHE_KEY, can_cache, response = get_cache_package(request, prefix, supported_verbs)
             if not response:
                 response = function(request, *args, **kwargs)

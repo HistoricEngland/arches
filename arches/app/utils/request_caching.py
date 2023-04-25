@@ -91,13 +91,12 @@ def cache_per_user_request(ttl=DEFAULT_TTL, prefix=None, supported_verbs=['GET']
     """
     def decorator(function):
         def apply_cache(request, *args, **kwargs):
-            if prefix:
-                k_prefix = prefix
-            else:
+            k_prefix = prefix
+            if len(kwarg_match)>0:
                 k_prefix = "k"
-            for k, v in kwargs.items():
-                if k in kwarg_match:    
-                    k_prefix = f"{prefix}_{k}={str(v)}"   
+                for k, v in kwargs.items():
+                    if k in kwarg_match:    
+                        k_prefix = f"{prefix}_{k}={str(v)}"   
                      
             CACHE_KEY, can_cache, response = get_cache_package(request, k_prefix, supported_verbs)
             if not response:

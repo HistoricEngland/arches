@@ -306,7 +306,7 @@ def get_dsl_from_search_string(request):
     dsl = search_results(request, returnDsl=True).dsl
     return JSONResponse(dsl)
 
-
+@cache_per_user_request(prefix="search_results", kwarg_match=["returnDsl"])
 def search_results(request, returnDsl=False):
     for_export = request.GET.get("export")
     pages = request.GET.get("pages", None)

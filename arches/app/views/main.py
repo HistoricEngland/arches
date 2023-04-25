@@ -22,8 +22,9 @@ from arches import __version__
 from arches.app.models.system_settings import settings
 from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponse
+from arches.app.utils.request_caching import cache_per_user_request
 
-
+@cache_per_user_request(ttl=600, prefix="index")
 def index(request):
     return render(
         request,

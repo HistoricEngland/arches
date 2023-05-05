@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             VOLATILE
             PARALLEL UNSAFE
             COST 100
-            
+
         AS $BODY$
         DECLARE
             resourceinstancefrom_id uuid;
@@ -22,18 +22,18 @@ class Migration(migrations.Migration):
         BEGIN
             --https://dbfiddle.uk/?rdbms=postgres_12&fiddle=21e25754f355a492dfd7b4a134182d2e
 
-            SELECT resourceinstanceid INTO resourceinstancefrom_id FROM tiles WHERE tileid = tile_id; 
-            SELECT graphid INTO from_graphid FROM resource_instances WHERE resourceinstanceid = resourceinstancefrom_id; 
+            SELECT resourceinstanceid INTO resourceinstancefrom_id FROM tiles WHERE tileid = tile_id;
+            SELECT graphid INTO from_graphid FROM resource_instances WHERE resourceinstanceid = resourceinstancefrom_id;
 
             DELETE FROM resource_x_resource WHERE tileid = tile_id;
 
             WITH updated_tiles as (
                 UPDATE tiles t
                 SET tiledata = ret.result
-                FROM nodes n, 
+                FROM nodes n,
                     (SELECT res.tileid, (res.tiledata || jsonb_object_agg(res.nodeid, res.result)) result
-                        FROM 
-                        nodes n, 
+                        FROM
+                        nodes n,
                             (SELECT t.tileid, n.nodeid, t.tiledata, jsonb_agg(jsonb_set(tile_data, array['resourceXresourceId'::text], ('"' || uuid_generate_v4()|| '"')::jsonb, true)) result
                                 FROM tiles t LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid, jsonb_array_elements(t.tiledata->n.nodeid::text) tile_data
                                 WHERE t.tiledata->>n.nodeid::text IS NOT null
@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 FROM relationships r
             )
             , relationships3 AS (
-                SELECT fr.nodeid, fr.relationship, fr.to_graphid, 
+                SELECT fr.nodeid, fr.relationship, fr.to_graphid,
                 (
                     SELECT graphs->>'ontologyProperty'
                     FROM jsonb_array_elements(fr.config->'graphs') AS graphs

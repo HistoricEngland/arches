@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8689_card_violation_message'),
+        ('models', '8770_bulk_index_queue_insert'),
     ]
 
     operations = [

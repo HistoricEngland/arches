@@ -216,6 +216,9 @@ def allow_user_to_export_results(user_object):
 
 
 def export_results(request):
+
+    app_name = settings.APP_NAME
+
     if (allow_user_to_export_results(request.user) == False):
         message = _("You do not have permission to download exports.").format(
             **locals()

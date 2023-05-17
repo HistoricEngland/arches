@@ -7,7 +7,7 @@
             toggleTab('basemap');
         }, css: {
             'active': activeTab() === 'basemap'
-        }">
+        }" aria-label="{% trans 'Click to open basemap filter' %}">
             <i class="fa fa-globe"></i>
             <span data-bind="text: $root.translations.basemap" class="map-sidebar-text"></span>
         </div>
@@ -15,7 +15,7 @@
             toggleTab('overlays');
         }, css: {
             'active': activeTab() === 'overlays'
-        }">
+        }" aria-label="{% trans 'Click to open overlays filter' %}">
             <i class="fa fa-list"></i>
             <span data-bind="text: $root.translations.overlays" class="map-sidebar-text"></span>
         </div>
@@ -23,7 +23,7 @@
             toggleTab('legend');
         }, css: {
             'active': activeTab() === 'legend'
-        }">
+        }" aria-label="{% trans 'Click to open legend filter' %}">
             <i class="fa fa-list-alt"></i>
             <span data-bind="text: $root.translations.legend" class="map-sidebar-text"></span>
         </div>
@@ -83,7 +83,7 @@
                                 <div class="overlay-opacity-control">
                                     <i class="fa fa-adjust"></i>
                                     <div class="overlay-opacity-slider">
-                                        <input type="range" min="0" max="100" step="1" data-bind="value: opacity, valueUpdate: 'input'">
+                                        <input type="range" min="0" max="100" step="1" data-bind="value: opacity, valueUpdate: 'input'" aria-label="{% trans 'Slider to change the opacity of the overlay' %}">
                                     </div>
                                 </div>
                             </div>

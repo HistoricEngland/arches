@@ -558,16 +558,17 @@ class Resource(models.ResourceInstance):
             resourceinstance_graphid=resourceinstance_graphid,
         )
 
-        resource_relations["hits"]["hits"] = list(
-            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidto"]), resource_relations["hits"]["hits"])
+
+        resource_relations["relations"] = list(
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), resource_relations["relations"])
         )
 
-        resource_relations["hits"]["hits"] = list(
-            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidfrom"]), resource_relations["hits"]["hits"])
+        resource_relations["relations"] = list(
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom), resource_relations["relations"])
         )
 
-        resource_relations["hits"]["total"]["value"] = len(resource_relations["hits"]["hits"])
-        ret["total"] = resource_relations["hits"]["total"]
+        resource_relations["total"] = len(resource_relations["relations"])
+        ret["total"] = resource_relations["total"]
 
         instanceids = set()
 

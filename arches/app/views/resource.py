@@ -738,7 +738,7 @@ class RelatedResourcesView(BaseManagerView):
     )
 
     def paginate_related_resources(self, related_resources, page, request):
-        total = related_resources["total"]["value"]
+        total = related_resources["total"]
         paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
         page = paginator.page(page)
 

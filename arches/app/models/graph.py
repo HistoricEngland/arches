@@ -188,7 +188,11 @@ class Graph(models.GraphModel):
             node.isrequired = nodeobj.get("isrequired", False)
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
-            self.create_node_alias(node)
+            node.hascustomalias = nodeobj.get("hascustomalias", False)
+            if node.hascustomalias or nodeobj.get("alias", False) is not False:
+                node.alias = nodeobj.get("alias", "")
+            else:
+                self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -204,7 +208,7 @@ class Graph(models.GraphModel):
 
         node.graph = self
 
-        if self.ontology is None:
+        if self.ontology_id is None:
             node.ontologyclass = None
         if node.pk is None:
             node.pk = uuid.uuid1()
@@ -244,7 +248,6 @@ class Graph(models.GraphModel):
         return edge
 
     def add_card_contraint(self, constraint, card):
-        unique_to_all = constraint.get("uniquetoallinstances", False)
         constraint_model = models.ConstraintModel()
         constraint_model.constraintid = constraint.get("constraintid", None)
         constraint_model.uniquetoallinstances = constraint.get("uniquetoallinstances", False)
@@ -281,7 +284,8 @@ class Graph(models.GraphModel):
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
             card.config = cardobj.get("config", None)
             constraints = cardobj.get("constraints", "")
-            for constraint in constraints:
+            constraints_with_nodes = [c for c in constraints if len(c["nodes"])]
+            for constraint in constraints_with_nodes:
                 self.add_card_contraint(constraint, card)
 
         card.graph = self
@@ -373,7 +377,17 @@ class Graph(models.GraphModel):
                 node = self.nodes[nodeid]
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
-                node.save()
+                try:
+                    node.save()
+                except IntegrityError as err:
+                    if "unique_alias_graph" in str(err):
+                        message = _('Duplicate node alias: "{0}". All aliases must be unique in a resource model.'.format(node.alias))
+                        raise GraphValidationError(message)
+                    else:
+                        logger.error(err)
+                        message = _('Fail to save node "{0}".'.format(node.name))
+                        raise GraphValidationError(message)
+
             else:
                 for node in self.nodes.values():
                     self.update_es_node_mapping(node, datatype_factory, se)
@@ -522,7 +536,11 @@ class Graph(models.GraphModel):
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
 
+            aliases = [n.alias for n in self.nodes.values()]
+
             for node in branch_copy.nodes.values():
+                if node.alias and node.alias in aliases:
+                    node.alias = self.make_name_unique(node.alias, aliases, "_n")
                 self.add_node(node)
             for card in branch_copy.get_cards():
                 self.add_card(card)
@@ -735,8 +753,17 @@ class Graph(models.GraphModel):
         for edge_id, edge in copy_of_self.edges.items():
             edge.pk = uuid.uuid1()
             edge.graph = copy_of_self
+            copied_domainnode = edge.domainnode
+            copied_rangenode = edge.rangenode
+            # edge.domainnode_id and rangenode_id refer to orignial nodeid - not new id.
+            # edge.domainnode and edge.rangenode point to the new copied nodes
+            # We have to update those identifiers here
             edge.domainnode_id = edge.domainnode.pk
             edge.rangenode_id = edge.rangenode.pk
+            # in Django 3, this breaks the reference to the domainnode and rangenode
+            # so we have to repair them here
+            edge.domainnode = copied_domainnode
+            edge.rangenode = copied_rangenode
 
         copy_of_self.edges = {edge.pk: edge for edge_id, edge in copy_of_self.edges.items()}
 
@@ -1387,12 +1414,15 @@ class Graph(models.GraphModel):
         """
         Assigns a unique, slugified version of a node's name as that node's alias.
         """
-
         with connection.cursor() as cursor:
-            cursor.callproc("__arches_slugify", [node.name])
-            row = cursor.fetchone()
-            aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
-            node.alias = self.make_name_unique(row[0], aliases, "_n")
+            if node.hascustomalias:
+                cursor.callproc("__arches_slugify", [node.alias])
+                node.alias = cursor.fetchone()[0]
+            else:
+                cursor.callproc("__arches_slugify", [node.name])
+                row = cursor.fetchone()
+                aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
+                node.alias = self.make_name_unique(row[0], aliases, "_n")
         return node.alias
 
     def validate(self):

@@ -393,7 +393,9 @@ class ResourcePermissionDataView(View):
 
     def make_instance_private(self, resourceinstanceid, graphid=None):
         resource = Resource(resourceinstanceid)
-        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(resource_instance.graph_id)
+        resource.createdtime = resource_instance.createdtime
         resource.add_permission_to_all("no_access_to_resourceinstance")
         instance_creator = get_instance_creator(resource)
         user = User.objects.get(pk=instance_creator["creatorid"])
@@ -405,7 +407,9 @@ class ResourcePermissionDataView(View):
 
     def make_instance_public(self, resourceinstanceid, graphid=None):
         resource = Resource(resourceinstanceid)
-        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(resource_instance.graph_id)
+        resource.createdtime = resource_instance.createdtime
         resource.remove_resource_instance_permissions()
         return self.get_instance_permissions(resource)
 
@@ -437,7 +441,7 @@ class ResourcePermissionDataView(View):
                                 for perm in identity["selectedPermissions"]:
                                     assign_perm(perm["codename"], identityModel, resource_instance)
 
-                resource = Resource(str(resource_instance.resourceinstanceid))
+                resource = Resource.objects.get(pk=str(resource_instance.resourceinstanceid))
                 resource.graph_id = resource_instance.graph_id
                 resource.index()
 
@@ -734,7 +738,7 @@ class RelatedResourcesView(BaseManagerView):
     )
 
     def paginate_related_resources(self, related_resources, page, request):
-        total = related_resources["total"]["value"]
+        total = related_resources["total"]
         paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
         page = paginator.page(page)
 

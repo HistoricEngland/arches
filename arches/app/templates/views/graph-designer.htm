@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 
@@ -238,7 +238,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
 
                         <div class='report-preview' data-bind='component: {
-                            name: "resource-report-abstract",
+                            name: reportLookup[report.get("template_id")()].componentname,
                             params: {
                                 report: report,
                                 configForm: true,
@@ -278,7 +278,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- /ko -->
                     <!-- ko if: cardTree.selection()==='root' -->
                         <div class='resource-report editor-report' data-bind='component: {
-                            name: "resource-report-abstract",
+                            name: reportLookup[report.get("template_id")()].componentname,
                             params: {
                                 report: report
                             }

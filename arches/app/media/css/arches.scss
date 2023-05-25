@@ -2426,7 +2426,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel div .new-provisional-edit-card-container {
-    padding-left: 5px;
+    padding-left: 10px;
 }
 
 .workbench-card-sidepanel .new-provisional-edit-card-container {
@@ -3145,6 +3145,12 @@ a.select2-search-choice-close {
     margin-bottom: 8px;
     margin-right: 0px;
 }
+
+.iiif-canvas-filter {
+    height: 28px;
+    margin: 0px 5px;
+}
+
 
 .key {
     margin-top: 98px;
@@ -4328,7 +4334,7 @@ div.dropdown-menu.open {
 
 .loading-mask {
     position: fixed;
-    background-color: grey;
+    background-color: #fafafa;
     top: 0;
     bottom: 0;
     left: 0;
@@ -4371,7 +4377,7 @@ div.dropdown-menu.open {
 
 .workflow-step-loading-mask {
     position: absolute;
-    top: 94px;
+    top: 95px;
     bottom: 58px;
     opacity: 1;
 }
@@ -7719,6 +7725,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     position: absolute;
     top: 6px;
     right: 10px;
+    font-size: 14px;
+}
+
+.iiif-clear-search.clear-node-search {
+    position: absolute;
+    top: 4px;
+    right: 2px;
     font-size: 14px;
 }
 
@@ -13672,6 +13685,7 @@ a.jstree-anchor.permissions-widget {
     width: 100%;
     height: 108px;
     padding: 5px;
+    background: #fafbfb;
 }
 
 .iiif-gallery-content .panel-controls .mode-selector-buttons {
@@ -14020,6 +14034,7 @@ a.jstree-anchor.permissions-widget {
     display: inline-block;
     white-space: nowrap;
     vertical-align: top;
+    background: #fafbfb;
 }
 .iiif-gallery-sequence-canvases {
     height: 108px;

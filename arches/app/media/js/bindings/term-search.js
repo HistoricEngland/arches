@@ -31,6 +31,7 @@ define([
                 ajax: {
                     url: arches.urls.search_terms,
                     dataType: 'json',
+                    quietMillis: 1000,
                     data: function(term, page) {
                         return {
                             q: term, // search term

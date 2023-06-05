@@ -206,12 +206,21 @@ def get_resource_model_label(result):
         return ""
 
 
+def allow_user_to_export_results(user_object):
+    user_groups_list = user_object.groups.all().values_list('name',flat=True)
+    export_groups = settings.ENABLE_EXPORT_FOR_SPECIFIC_GROUPS
+    if (len(export_groups) > 0) and (bool(set(user_groups_list).intersection(export_groups))) == False:
+        return False
+    else:
+        return True
+
+
 def export_results(request):
 
     app_name = settings.APP_NAME
 
-    if (settings.DISABLE_EXPORT_FOR_ANONYMOUS_USER is True) and (request.user.username == "anonymous"):
-        message = _("Anonymous users are unable to download exports.  Please sign in with your {app_name} username and password.").format(
+    if (allow_user_to_export_results(request.user) == False):
+        message = _("You do not have permission to download exports.").format(
             **locals()
         )
 

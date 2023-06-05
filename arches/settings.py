@@ -257,10 +257,10 @@ RESTRICT_MEDIA_ACCESS = False
 RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
 
-# By setting DISABLE_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
-# to export search results and is not signed in with a user account then the request
-# will not be allowed.
-DISABLE_EXPORT_FOR_ANONYMOUS_USER = False
+# Specify the user groups that are allowed to export results from the application
+# If the list is empty then export will be allowed for ALL users.
+
+ENABLE_EXPORT_FOR_SPECIFIC_GROUPS = []
 
 # Set to True to hide the Copy Resource button
 HIDE_RESOURCE_COPY_BUTTON = False
@@ -531,6 +531,10 @@ UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 
 OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
+
+# Dictionary containing any additional context items for customising email templates
+EXTRA_EMAIL_CONTEXT = {}
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -742,6 +746,18 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
+
+# Extra contexts for email
+
+EXTRA_EMAIL_CONTEXT = {}
+
+
+# --- Default URLs for use in the application help
+
+BASIC_HELP_LINK = "#"
+
+ADVANCED_HELP_LINK = "#"
+
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

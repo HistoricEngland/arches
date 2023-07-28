@@ -160,6 +160,7 @@ define([
         },
 
         isFromLessThanTo: function(fromDate, toDate) {
+            /*
             if(!this.isBCE(fromDate) && !this.isBCE(toDate)) {
                 return fromDate < toDate;
             }else if(this.isBCE(fromDate) && !this.isBCE(toDate)) {
@@ -170,10 +171,57 @@ define([
                 return fromDate > toDate;
             }
             return true;
-        },
+            */
 
+            let fromYMD = this.createNumericYMD(fromDate);
+            let toYMD = this.createNumericYMD(toDate);
+            return this.isFromYMDLessEqualThanToYMD(fromYMD, toYMD);
+        },
+        
+        /*
         isBCE: function(date) {
             return (date.charAt(0) === '-');
+        },
+        */
+
+        createNumericYMD: function(dateString, toEnd = false){
+            /**************************************
+            Transforms a full or partial string date formatted as YYYY-MM-DD to an int array that can be used
+            for applying numerical comparison/operations
+            
+            @param {String} dateString: [-]yyyy..y[ -mm [-dd] ]. Requires a minimum of a year, months and days are optional
+            @param {bool} toEnd: whether to round date to the end of the year/month if mm and/or dd missing
+
+            @returns array<int> [ (-)yyyy..y, m, d] e.g. [2000,11,1], [-1000000,1,1]
+            ***************************************/
+            let ymd = dateString.split('-');
+            if (dateString.charAt(0) == "-"){
+              ymd.shift();
+              ymd[0] = parseInt("-" + ymd[0]);
+            }  
+            ymd[1] = parseInt(ymd[1]) || (toEnd==true ? 12 : 1);
+            ymd[2] = parseInt(ymd[2]) || (toEnd==true ? (new Date(ymd[0], ymd[1], 0)).getDate() : 1);
+            return ymd;
+        },
+          
+        isFromYMDLessEqualThanToYMD: function(fromYMD, toYMD){
+            /**************************************
+            Checks that the fromYMD is less or equal to toYMD.
+            
+            @param {Array<int>} fromYMD : a date array created by createNumericYMD(). This represents the fromDate.
+            @param {Array<int>} toYMD   : a date array created by createNumericYMD(). This represents the toDate.
+
+            @returns bool - true if fromYMD is less or equal to toYMD; otherwise false.
+            ***************************************/ 
+
+            if (fromYMD[0] < toYMD[0]) return true;
+            if (fromYMD[1] < toYMD[1]) return true;
+            if (fromYMD[2] < toYMD[2]) return true;
+
+            if (fromYMD.join() == toYMD.join()) return true;
+
+            return false;
+              
         },
 
         clear: function() {

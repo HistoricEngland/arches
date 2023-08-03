@@ -158,23 +158,40 @@ function($, _, ko, moment, BaseFilter, arches) {
                 }
             },
 
-            isFromLessThanTo: function(fromDate, toDate) {
-                if(!this.isBCE(fromDate) && !this.isBCE(toDate)) {
-                    return fromDate < toDate;
-                }else if(this.isBCE(fromDate) && !this.isBCE(toDate)) {
-                    return true;
-                }else if(!this.isBCE(fromDate) && this.isBCE(toDate)) {
-                    return false;
-                }else if(this.isBCE(fromDate) && this.isBCE(toDate)) {
-                    return fromDate > toDate;
-                }
+            isFromLessThanTo: function(fromDate, toDate) {  
+                let fromYMD = this.createNumericYMD(fromDate);
+                let toYMD = this.createNumericYMD(toDate);
+                return this.isFromYMDLessEqualThanToYMD(fromYMD, toYMD);
+            },
+                
+            createNumericYMD: function(dateString, toEnd = false){
+
+                let ymd = dateString.split('-');
+                if (dateString.charAt(0) == "-"){
+                  ymd.shift();
+                  ymd[0] = parseInt("-" + ymd[0]);
+                }  
+                ymd[1] = parseInt(ymd[1]) || (toEnd==true ? 12 : 1);
+                ymd[2] = parseInt(ymd[2]) || (toEnd==true ? (new Date(ymd[0], ymd[1], 0)).getDate() : 1);
+                return ymd;
+            },
+              
+            isFromYMDLessEqualThanToYMD: function(fromYMD, toYMD){
+   
+                if (fromYMD[0] > toYMD[0]) return false;
+                if (fromYMD[1] > toYMD[1]) return false;
+                if (fromYMD[2] > toYMD[2]) return false;
+        
                 return true;
+                  
             },
-
-            isBCE: function(date) {
-                return (date.charAt(0) === '-');
+            //TODO: use this in this.filter.fromDate/toDate.subscribe to validate date string and return error message. apply after accessibility added in 7.5
+            //      so that error message can be read by screen reader etc.
+            validateDateString: function(dateString){
+                let dateRegex = /^-?\d{1,8}(-\d{1,2}(-\d{1,2})?)?$/;
+                return dateRegex.test(dateString);
             },
-
+            
             clear: function() {
                 this.filter.fromDate(null);
                 this.filter.toDate(null);

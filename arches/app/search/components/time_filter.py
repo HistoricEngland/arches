@@ -30,6 +30,12 @@ class TimeFilter(BaseSearchFilter):
             # now = str(datetime.utcnow())
             start_date = ExtendedDateFormat(temporal_filter["fromDate"])
             end_date = ExtendedDateFormat(temporal_filter["toDate"])
+
+            if start_date.is_valid() is False:
+                raise Exception("Invalid time filter start date: " + temporal_filter["fromDate"])
+            if end_date.is_valid() is False:
+                raise Exception("Invalid time filter end date: " + temporal_filter["toDate"])
+
             date_nodeid = (
                 str(temporal_filter["dateNodeId"]) if "dateNodeId" in temporal_filter and temporal_filter["dateNodeId"] != "" else None
             )

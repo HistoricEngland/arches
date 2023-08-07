@@ -188,6 +188,9 @@ function($, _, ko, moment, BaseFilter, arches) {
             createNumericYMD: function(dateString, isToDate = false){
 
                 let ymd = dateString.split('-');
+                if(ymd.length == 0){
+                    ymd[0] = dateString;
+                }
                 if (dateString.charAt(0) == "y" || dateString.charAt(0) == "Y") ymd.shift();
                 if (dateString.charAt(0) == "-"){
                   ymd.shift();

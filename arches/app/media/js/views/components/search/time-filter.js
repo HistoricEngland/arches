@@ -24,15 +24,27 @@ function($, _, ko, moment, BaseFilter, arches) {
                     inverted: ko.observable(false)
                 };
                 this.filter.fromDate.subscribe(function (fromDate) {
-                    var toDate = this.filter.toDate();
-                    if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
-                        this.filter.toDate(fromDate);
+                    const parsedfromDate = this.parseGreaterThan4DigitYear(fromDate);
+                    if (parsedfromDate !== fromDate) {
+                        this.filter.fromDate(parsedfromDate);
+                    }
+                    else {
+                        var toDate = this.filter.toDate();
+                        if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
+                            this.filter.toDate(fromDate);
+                        }
                     }
                 }, this);
                 this.filter.toDate.subscribe(function (toDate) {
-                    var fromDate = this.filter.fromDate();
-                    if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
-                        this.filter.fromDate(toDate);
+                    const parsedToDate = this.parseGreaterThan4DigitYear(toDate, true);
+                    if (parsedToDate !== toDate) {
+                        this.filter.toDate(parsedToDate);
+                    }
+                    else {
+                        var fromDate = this.filter.fromDate();
+                        if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
+                            this.filter.fromDate(toDate);
+                        }
                     }
                 }, this);
                 this.dateRangeType = ko.observable('custom');
@@ -160,19 +172,29 @@ function($, _, ko, moment, BaseFilter, arches) {
 
             isFromLessThanTo: function(fromDate, toDate) {  
                 let fromYMD = this.createNumericYMD(fromDate);
-                let toYMD = this.createNumericYMD(toDate);
+                let toYMD = this.createNumericYMD(toDate, true);
                 return this.isFromYMDLessEqualThanToYMD(fromYMD, toYMD);
             },
+
+            parseGreaterThan4DigitYear: function(dateString, isToDate = false){
+                if (dateString === undefined || dateString === null || dateString === "") return dateString;
+                let ymd = this.createNumericYMD(dateString, isToDate);
+                let ymdYear = ymd[0];
+                if (ymdYear < -9999 || ymdYear > 9999) return ymdYear.toString();
                 
-            createNumericYMD: function(dateString, toEnd = false){
+                return dateString;
+            },
+                
+            createNumericYMD: function(dateString, isToDate = false){
 
                 let ymd = dateString.split('-');
+                if (dateString.charAt(0) == "y" || dateString.charAt(0) == "Y") ymd.shift();
                 if (dateString.charAt(0) == "-"){
                   ymd.shift();
                   ymd[0] = parseInt("-" + ymd[0]);
                 }  
-                ymd[1] = parseInt(ymd[1]) || (toEnd==true ? 12 : 1);
-                ymd[2] = parseInt(ymd[2]) || (toEnd==true ? (new Date(ymd[0], ymd[1], 0)).getDate() : 1);
+                ymd[1] = parseInt(ymd[1]) || (isToDate==true ? 12 : 1);
+                ymd[2] = parseInt(ymd[2]) || (isToDate==true ? (new Date(ymd[0], ymd[1], 0)).getDate() : 1);
                 return ymd;
             },
               

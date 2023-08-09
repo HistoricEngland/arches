@@ -5,10 +5,11 @@ define([
     'knockout-mapping',
     'arches',
     'viewmodels/alert',
+    'viewmodels/alert-json',
     'search-components',
     'views/base-manager',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView) {
+], function($, _, ko, koMapping, arches, AlertViewModel, JsonErrorAlertViewModel, SearchComponents, BaseManagerView) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -164,7 +165,14 @@ define([
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
+                        
+                        try {
+                            this.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        }
+                        catch(err) {
+                            this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
+                        }
+                        
                     }
                 },
                 complete: function(request, status) {

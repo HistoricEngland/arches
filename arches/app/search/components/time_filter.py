@@ -6,6 +6,7 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Term, Terms, Range
 from arches.app.search.components.base import BaseSearchFilter
 from django.db.models import Q
+from django.utils.translation import ugettext as _
 
 details = {
     "searchcomponentid": "",
@@ -31,10 +32,10 @@ class TimeFilter(BaseSearchFilter):
             start_date = ExtendedDateFormat(temporal_filter["fromDate"])
             end_date = ExtendedDateFormat(temporal_filter["toDate"])
 
-            if start_date.is_valid() is False:
-                raise Exception("Invalid time filter From Date: " + temporal_filter["fromDate"])
-            if end_date.is_valid() is False:
-                raise Exception("Invalid time filter To Date: " + temporal_filter["toDate"])
+            if start_date.is_valid() is False and temporal_filter["fromDate"] is not None:
+                raise ValueError(_("Invalid time filter From Date: ") + temporal_filter["fromDate"])
+            if end_date.is_valid() is False and temporal_filter["toDate"] is not None:
+                raise ValueError(_("Invalid time filter To Date: ") + temporal_filter["toDate"])
 
             date_nodeid = (
                 str(temporal_filter["dateNodeId"]) if "dateNodeId" in temporal_filter and temporal_filter["dateNodeId"] != "" else None

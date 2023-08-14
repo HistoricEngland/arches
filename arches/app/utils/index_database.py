@@ -251,7 +251,7 @@ def _index_resource_batch(resourceids):
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
-    return index_resources_using_singleprocessing(resources, batch_size, quiet=True, se=_se)
+    return index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=False, title="Indexing Resource Batch")
 
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):

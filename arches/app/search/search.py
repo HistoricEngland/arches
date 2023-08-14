@@ -41,6 +41,8 @@ class SearchEngine(object):
         self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
         warnings.filterwarnings("ignore", category=ElasticsearchWarning)
+        if "cloud_id" in settings.ELASTICSEARCH_CONNECTION_OPTIONS:
+            serializer.utf_encode = True
 
     def _add_prefix(self, *args, **kwargs):
         if args:

@@ -19,7 +19,7 @@ from django.core.files import File
 
 
 class UnableToSerializeError(Exception):
-    """ Error for not implemented classes """
+    """Error for not implemented classes"""
 
     def __init__(self, value):
         self.value = value
@@ -30,7 +30,7 @@ class UnableToSerializeError(Exception):
 
 
 class UnableToSerializeMethodTypesError(Exception):
-    """ Error for not implemented classes """
+    """Error for not implemented classes"""
 
     def __init__(self, value):
         self.value = value
@@ -41,6 +41,10 @@ class UnableToSerializeMethodTypesError(Exception):
 
 
 class JSONSerializer(object):
+    def __init__(self, **options):
+        self._options = options
+        self.utf_encode = False
+
     def serializeToPython(self, obj, **options):
         self.options = options.copy()
 
@@ -61,10 +65,12 @@ class JSONSerializer(object):
         sort_keys = options.pop("sort_keys", True)
         options.pop("fields", None)
         options.pop("exclude", None)
-        return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
+        result = json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
+
+        return result.encode("utf-8") if self.utf_encode else result
 
     def handle_object(self, object, fields=None, exclude=None):
-        """ Called to handle everything, looks for the correct handling """
+        """Called to handle everything, looks for the correct handling"""
         # print type(object)
         # print object
         # print inspect.isclass(object)
@@ -133,7 +139,7 @@ class JSONSerializer(object):
             try:
                 # print key + ': ' + str(type(value))
                 obj[str(key)] = self.handle_object(value)
-            except (UnableToSerializeMethodTypesError):
+            except UnableToSerializeMethodTypesError:
                 pass
 
         return obj
@@ -236,7 +242,7 @@ class JSONDeserializer(object):
         return ret
 
     def handle_object(self, object, fields=None, exclude=None):
-        """ Called to handle everything, looks for the correct handling """
+        """Called to handle everything, looks for the correct handling"""
         if isinstance(object, dict):
             if "pk" in object and "model" in object and "fields" in object:
                 # assume that this is a serialized django model

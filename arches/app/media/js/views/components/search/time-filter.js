@@ -24,15 +24,27 @@ function($, _, ko, moment, BaseFilter, arches) {
                     inverted: ko.observable(false)
                 };
                 this.filter.fromDate.subscribe(function (fromDate) {
-                    var toDate = this.filter.toDate();
-                    if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
-                        this.filter.toDate(fromDate);
+                    const parsedfromDate = this.parseGreaterThan4DigitYear(fromDate);
+                    if (parsedfromDate !== fromDate) {
+                        this.filter.fromDate(parsedfromDate);
+                    }
+                    else {
+                        var toDate = this.filter.toDate();
+                        if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
+                            this.filter.toDate(fromDate);
+                        }
                     }
                 }, this);
                 this.filter.toDate.subscribe(function (toDate) {
-                    var fromDate = this.filter.fromDate();
-                    if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
-                        this.filter.fromDate(toDate);
+                    const parsedToDate = this.parseGreaterThan4DigitYear(toDate, true);
+                    if (parsedToDate !== toDate) {
+                        this.filter.toDate(parsedToDate);
+                    }
+                    else {
+                        var fromDate = this.filter.fromDate();
+                        if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
+                            this.filter.fromDate(toDate);
+                        }
                     }
                 }, this);
                 this.dateRangeType = ko.observable('custom');
@@ -158,23 +170,53 @@ function($, _, ko, moment, BaseFilter, arches) {
                 }
             },
 
-            isFromLessThanTo: function(fromDate, toDate) {
-                if(!this.isBCE(fromDate) && !this.isBCE(toDate)) {
-                    return fromDate < toDate;
-                }else if(this.isBCE(fromDate) && !this.isBCE(toDate)) {
-                    return true;
-                }else if(!this.isBCE(fromDate) && this.isBCE(toDate)) {
-                    return false;
-                }else if(this.isBCE(fromDate) && this.isBCE(toDate)) {
-                    return fromDate > toDate;
+            isFromLessThanTo: function(fromDate, toDate) {  
+                let fromYMD = this.createNumericYMD(fromDate);
+                let toYMD = this.createNumericYMD(toDate, true);
+                return this.isFromYMDLessEqualThanToYMD(fromYMD, toYMD);
+            },
+
+            parseGreaterThan4DigitYear: function(dateString, isToDate = false){
+                if (dateString === undefined || dateString === null || dateString === "") return dateString;
+                let ymd = this.createNumericYMD(dateString, isToDate);
+                let ymdYear = ymd[0];
+                if (ymdYear < -9999 || ymdYear > 9999) return ymdYear.toString();
+                
+                return dateString;
+            },
+                
+            createNumericYMD: function(dateString, isToDate = false){
+
+                let ymd = dateString.split('-');
+                if(ymd.length == 0){
+                    ymd[0] = dateString;
                 }
+                if (dateString.charAt(0) == "y" || dateString.charAt(0) == "Y") ymd.shift();
+                if (dateString.charAt(0) == "-"){
+                  ymd.shift();
+                  ymd[0] = parseInt("-" + ymd[0]);
+                }  
+                ymd[1] = parseInt(ymd[1]) || (isToDate==true ? 12 : 1);
+                ymd[2] = parseInt(ymd[2]) || (isToDate==true ? (new Date(ymd[0], ymd[1], 0)).getDate() : 1);
+                return ymd;
+            },
+              
+            isFromYMDLessEqualThanToYMD: function(fromYMD, toYMD){
+   
+                if (fromYMD[0] > toYMD[0]) return false;
+                if (fromYMD[1] > toYMD[1]) return false;
+                if (fromYMD[2] > toYMD[2]) return false;
+        
                 return true;
+                  
             },
-
-            isBCE: function(date) {
-                return (date.charAt(0) === '-');
+            //TODO: use this in this.filter.fromDate/toDate.subscribe to validate date string and return error message. apply after accessibility added in 7.5
+            //      so that error message can be read by screen reader etc.
+            validateDateString: function(dateString){
+                let dateRegex = /^-?\d{1,8}(-\d{1,2}(-\d{1,2})?)?$/;
+                return dateRegex.test(dateString);
             },
-
+            
             clear: function() {
                 this.filter.fromDate(null);
                 this.filter.toDate(null);

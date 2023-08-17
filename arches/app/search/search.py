@@ -130,6 +130,7 @@ class SearchEngine(object):
         id = kwargs.pop("id", None)
 
         if id:
+            kwargs.pop("query", None)
             kwargs = {  # removes bad kwargs for get methods
                 "index": kwargs.get("index"),
                 "source_includes": kwargs.get("source_includes"),
@@ -140,10 +141,9 @@ class SearchEngine(object):
                 if len(id) == 1:
                     id = id[0]
             if isinstance(id, list):
-                kwargs["query"] = {"ids": id}
+                kwargs["ids"] = id
                 return self.es.mget(**kwargs).body
             else:
-                kwargs.pop("query", None)  # remove query param
                 kwargs["id"] = id
                 return self.es.get(**kwargs).body
 

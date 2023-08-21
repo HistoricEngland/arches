@@ -44,9 +44,19 @@ class Command(BaseCommand):
             help="A graphid of the Resource Model you would like to remove all instances from.",
         )
 
+
+        parser.add_argument(
+            "--dont_index",
+            action="store_false",
+            dest="dont_index"
+        )
+
     def handle(self, *args, **options):
         if options["operation"] == "remove_resources":
             self.remove_resources(force=options["yes"], graphid=options["graph"])
+        if options["operation"] == "obfuscate_node_values":
+            self.obfuscate_node_values(index=options["dont_index"], force=options["yes"])
+            
 
     def remove_resources(self, load_id="", graphid=None, force=False):
         """
@@ -71,3 +81,190 @@ class Command(BaseCommand):
             graph.delete_instances(verbose=True)
 
         return
+    
+
+    NODES_TO_CHANGE = [
+        {"nodeid": "6da2f03b-7e55-11ea-8fe5-f875a44e0e11", "value_type": "title_id", "one_per_resource": True},
+        {"nodeid": "2caeb5e7-7b44-11ea-a919-f875a44e0e11", "value_type": "first_name", "one_per_resource": True},
+        {"nodeid": "96a3942a-7e53-11ea-8b5a-f875a44e0e11", "value_type": "last_name", "one_per_resource": True},
+        {"nodeid": "5f8ded26-7ef9-11ea-8e29-f875a44e0e11", "value_type": "full_name", "one_per_resource": True},
+        {"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "email", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #contact point EMAIL
+        {"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "full_address", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "e6d433a2-7f77-4eb7-96f2-57ebe0ac251e"}, #contact point MAIL
+        {"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "phone_number", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "75e6cfad-7418-4ed3-841b-3c083d7df30b"}, #contact point TELEPHONE
+        {"nodeid": "2beefb56-4084-11eb-bcc5-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #contact name correspondance
+        {"nodeid": "c06e676e-95ef-11ea-a32a-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic author
+        {"nodeid": "c06e6768-95ef-11ea-bf92-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic editor
+        {"nodeid": "c06e6773-95ef-11ea-8e2e-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic contributor
+    ]
+
+
+    def obfuscate_node_values(self, subject_nodes=NODES_TO_CHANGE, index=True, force=False):
+        """
+        Runs the resource_remover command found in data_management.resources
+
+        Args:
+            graphid (str): the graphid of the resource model to be obfuscated
+            nodeid list[str]: the nodeid of the node in tiles to obfuscate
+            value_type (str): the type of value to be used for obfuscation. Options are "first_name", "last_name", "full_name", "email", "empty"
+            index (bool): if True, the resource will be indexed after obfuscation. Defaults to True.
+
+        """
+        from arches.app.models.tile import Tile
+        if not force:
+            if not utils.get_yn_input(f"Nodes will be obfuscated with a random value. continue? "):
+                return
+
+        # get nodeids from subject_nodes
+        nodeids = [subject_node["nodeid"] for subject_node in subject_nodes]
+        print(f"Obfuscating {len(nodeids)} nodes")
+        #nodes = models.Node.objects.filter(nodeid__in=nodeids).select_related("nodegroup")
+                        
+        #get all nodegroups from related nodes
+        nodegroups = models.NodeGroup.objects.filter(node__nodeid__in=nodeids).distinct()
+        print(f"Obfuscating {len(nodegroups)} nodegroups")
+
+        #print distinct nodegroups ids
+        for nodegroup in nodegroups:
+            print(f"...nodegroup {nodegroup.nodegroupid}")   
+
+
+        #return
+        cache = {}
+        log = []
+        tiles = Tile.objects.filter(nodegroup__in=nodegroups).select_related("resourceinstance")
+        bulk_save_tiles = []
+        for tile in tiles:
+            if tile.resourceinstance.resourceinstanceid not in cache.keys():
+                cache[tile.resourceinstance.resourceinstanceid] = self.generate_random_data_dict()
+            for subject_node in subject_nodes:
+                if subject_node["one_per_resource"]:
+                    new_value = cache[tile.resourceinstance.resourceinstanceid][subject_node["value_type"]]
+                else:
+                    new_value = self.generate_random_data_dict()[subject_node["value_type"]]
+                
+                nodeid = subject_node["nodeid"]
+                if nodeid in tile.data.keys():
+                    if tile.data[nodeid] != "" and tile.data[nodeid] is not None: #then we need to edit the node value
+                        if "where_nodeid" in subject_node.keys(): #if the node has a where clause we need to check that the where clause is true to edit the node value
+                            if tile.data[subject_node["where_nodeid"]] == subject_node["where_value"]:
+                                #log.append(f"rid {tile.resourceinstance.resourceinstanceid}... tileid {tile.tileid}... node {nodeid} ... {tile.data[nodeid]} >>>>>>> {new_value} (as where_value {subject_node['where_value']} is true)")
+                                tile.data[nodeid] = new_value
+                        else:
+                            #log.append(f"rid {tile.resourceinstance.resourceinstanceid}... tileid {tile.tileid}... node {nodeid} ... {tile.data[nodeid]} >>>>>>> {new_value}")
+                            tile.data[nodeid] = new_value
+            
+            #tile.save(index=index) #<<<<<<<<<<<<<<<<<<<<<<<<< saves - should really use bulk_update
+            bulk_save_tiles.append(tile)
+        
+        #saved_count = Tile.objects.bulk_update(bulk_save_tiles, ["data"], batch_size=1000)
+
+        #log.sort()
+        #print("\n".join(log))      
+        #print(f"tiles saved: {saved_count}")  
+        return
+
+    def generate_random_data_dict(self):
+        """
+        Generates a random user dict
+
+        Returns:
+            dict: a dict with keys: first_name, last_name, full_name, email
+        """
+        import random
+
+        
+        title = random.choice([{
+            "id": "3cf16a39-594d-470c-9e9a-78139e9af77a",
+            "text": "Mr"
+        },
+        {
+            "id": "67cf2d2d-de1c-4a59-8d27-941610d45256",
+            "text": "Mrs"
+        },
+        {
+            "id": "d030a719-5bc5-4fb8-a4df-96fb9781ad58",
+            "text": "Ms"
+        },
+        {
+            "id": "3101fcda-3119-4014-94ab-4fb4d7ef38db",
+            "text": "Miss"
+        }
+        ])
+        title_text = title["text"]
+        title_id = title["id"]
+        if title_text == "Mr":
+            first_name = random.choice(self.MALE_FIRST_NAMES)
+        else:
+            first_name = random.choice(self.FEMALE_FIRST_NAMES)
+
+        last_name = random.choice(self.LAST_NAMES)
+        full_name = title_text + " " + first_name + " " + last_name
+        email = first_name + "." + last_name + "@example.com"
+        building_number = random.randint(1, 1000)
+        street = random.choice(self.STREETS)
+        city = random.choice(self.CITIES)
+        state = random.choice(self.STATES)
+        full_address = str(building_number) + " " + street + ", " + city + ", " + state
+        file_name = self.create_random_file_path()
+        url = self.create_random_url()
+        return {
+            "title": title_text,
+            "title_id": title_id,
+            "first_name": first_name,
+            "last_name": last_name,
+            "full_name": full_name,
+            "email": email,
+            "full_address": full_address,
+            "building_number": building_number,
+            "street": street,
+            "city": city,
+            "state": state,
+            "author_name": last_name + ", " + first_name[0],
+            "phone_number": "01234 567890",
+            "file_name": file_name,
+            "url": url,
+            "empty": ""
+        }
+
+    def load_txt_file_into_list(self, file_path):
+        """
+        Loads a text file into a list of strings
+
+        Args:
+            file_path (str): the path to the file to be loaded
+
+        Returns:
+            list: a list of strings
+        """
+        value_list = []
+        with open(file_path, "r") as f:
+            value_list = f.read().splitlines()
+        return value_list
+    
+    def create_random_file_path(self):
+        import random
+        drive = random.choice(["C", "D", "E", "F"])
+        folder = random.choice(["\\folder1", "\\folder2", "\\folder3", "\\folder4"])
+        file_name = random.choice(["\\file1", "\\file2", "\\file3", "\\file4"])
+        file_extension = random.choice([".txt", ".doc", ".docx", ".pdf"])
+        return drive + ":" + folder + file_name + file_extension
+    
+    def create_random_url(self):
+        import random
+        host = random.choice(["http://www.example.com", "https://www.example.com", "http://www.example.org", "https://www.example.org"])
+        path = random.choice(["/path1", "/path2", "/path3", "/path4"])
+        extension = random.choice([".txt", ".doc", ".docx", ".pdf", ""])
+        url = host + path + extension
+        return url
+
+    import os
+    #THIS_FILES_PATH = os.path.dirname(os.path.realpath(__file__))
+    THE_DIRECTORY_OF_THIS_FILE = os.path.dirname(os.path.realpath(__file__))
+    MALE_FIRST_NAMES = load_txt_file_into_list(None, os.path.join(THE_DIRECTORY_OF_THIS_FILE,"random","male_first.txt"))
+    FEMALE_FIRST_NAMES = load_txt_file_into_list(None, os.path.join(THE_DIRECTORY_OF_THIS_FILE,"random","female_first.txt"))
+    LAST_NAMES = load_txt_file_into_list(None, os.path.join(THE_DIRECTORY_OF_THIS_FILE,"random","last.txt"))
+    CITIES = load_txt_file_into_list(None, os.path.join(THE_DIRECTORY_OF_THIS_FILE,"random","cities.txt"))
+    STREETS = load_txt_file_into_list(None, os.path.join(THE_DIRECTORY_OF_THIS_FILE,"random","street.txt"))
+    STATES = load_txt_file_into_list(None, os.path.join(THE_DIRECTORY_OF_THIS_FILE,"random","states.txt"))
+
+    

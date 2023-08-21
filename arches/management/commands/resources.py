@@ -243,11 +243,11 @@ class Command(BaseCommand):
     
     def create_random_file_path(self):
         import random
-        drive = random.choice(["C", "D", "E", "F"])
+        drive = random.choice(["C:", "D:", "E:", "F:", "\\\\server1\\share", "\\\\server2\\share2"])
         folder = random.choice(["\\folder1", "\\folder2", "\\folder3", "\\folder4"])
         file_name = random.choice(["\\file1", "\\file2", "\\file3", "\\file4"])
         file_extension = random.choice([".txt", ".doc", ".docx", ".pdf"])
-        return drive + ":" + folder + file_name + file_extension
+        return drive + folder + file_name + file_extension
     
     def create_random_url(self):
         import random

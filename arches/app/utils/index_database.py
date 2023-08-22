@@ -247,7 +247,6 @@ def index_resources_by_type(
 
 
 def _index_resource_batch(resourceids):
-    from arches.app.search.search_engine_factory import SearchEngineInstance as _se
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)

@@ -17,10 +17,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from arches.management.commands import utils
+import uuid
 from arches.app.models import models
 from arches.app.models.graph import Graph
+from arches.app.models.resource import Resource
 from django.core.management.base import BaseCommand, CommandError
 import arches.app.utils.data_management.resources.remover as resource_remover
+from arches.app.utils.index_database import index_resources_using_singleprocessing as index_resources_using_singleprocessing
 
 
 class Command(BaseCommand):
@@ -84,17 +87,25 @@ class Command(BaseCommand):
     
 
     NODES_TO_CHANGE = [
-        {"nodeid": "6da2f03b-7e55-11ea-8fe5-f875a44e0e11", "value_type": "title_id", "one_per_resource": True},
-        {"nodeid": "2caeb5e7-7b44-11ea-a919-f875a44e0e11", "value_type": "first_name", "one_per_resource": True},
-        {"nodeid": "96a3942a-7e53-11ea-8b5a-f875a44e0e11", "value_type": "last_name", "one_per_resource": True},
-        {"nodeid": "5f8ded26-7ef9-11ea-8e29-f875a44e0e11", "value_type": "full_name", "one_per_resource": True},
-        {"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "email", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #contact point EMAIL
-        {"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "full_address", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "e6d433a2-7f77-4eb7-96f2-57ebe0ac251e"}, #contact point MAIL
-        {"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "phone_number", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "75e6cfad-7418-4ed3-841b-3c083d7df30b"}, #contact point TELEPHONE
-        {"nodeid": "2beefb56-4084-11eb-bcc5-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #contact name correspondance
+        #####person 
+        #{"nodeid": "6da2f03b-7e55-11ea-8fe5-f875a44e0e11", "value_type": "title_id", "one_per_resource": True}, #title
+        #{"nodeid": "2caeb5e7-7b44-11ea-a919-f875a44e0e11", "value_type": "first_name", "one_per_resource": True}, #Forenames
+        #{"nodeid": "96a3942a-7e53-11ea-8b5a-f875a44e0e11", "value_type": "last_name", "one_per_resource": True}, #Surname
+        #{"nodeid": "5f8ded26-7ef9-11ea-8e29-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #Full name
+        #{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "email", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #contact point where type is EMAIL
+        #{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "full_address", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "e6d433a2-7f77-4eb7-96f2-57ebe0ac251e"}, #contact point where type is MAIL
+        #{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "phone_number", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "75e6cfad-7418-4ed3-841b-3c083d7df30b"}, #contact point where type is TELEPHONE
+        #{"nodeid": "2beefb56-4084-11eb-bcc5-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #contact name correspondance
+        #####bibliographic author, editor, contributor
         {"nodeid": "c06e676e-95ef-11ea-a32a-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic author
         {"nodeid": "c06e6768-95ef-11ea-bf92-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic editor
         {"nodeid": "c06e6773-95ef-11ea-8e2e-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic contributor
+        #####digital objects??
+        {"nodeid": "c5c43d8c-eecc-11eb-8a55-a87eeabdefba", "value_type": "file_name", "one_per_resource": False, "where_nodeid": "c5c43d92-eecc-11eb-a6bc-a87eeabdefba", "where_value": "f4a51198-389e-40f2-acc6-41c99ba75d2b"}, #digital object cross source where type is FILEPATH
+        {"nodeid": "c5c43d91-eecc-11eb-bb4c-a87eeabdefba", "value_type": "url", "one_per_resource": False, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #digital object where type is URL
+        ######delete using remove_resources command
+
+
     ]
 
 
@@ -127,12 +138,11 @@ class Command(BaseCommand):
         for nodegroup in nodegroups:
             print(f"...nodegroup {nodegroup.nodegroupid}")   
 
-
-        #return
         cache = {}
-        log = []
+        #log = []
         tiles = Tile.objects.filter(nodegroup__in=nodegroups).select_related("resourceinstance")
-        bulk_save_tiles = []
+        print(f"Obfuscating {len(tiles)} tiles...")
+        transaction_id = uuid.uuid4()
         for tile in tiles:
             if tile.resourceinstance.resourceinstanceid not in cache.keys():
                 cache[tile.resourceinstance.resourceinstanceid] = self.generate_random_data_dict()
@@ -153,14 +163,22 @@ class Command(BaseCommand):
                             #log.append(f"rid {tile.resourceinstance.resourceinstanceid}... tileid {tile.tileid}... node {nodeid} ... {tile.data[nodeid]} >>>>>>> {new_value}")
                             tile.data[nodeid] = new_value
             
-            #tile.save(index=index) #<<<<<<<<<<<<<<<<<<<<<<<<< saves - should really use bulk_update
-            bulk_save_tiles.append(tile)
+            tile.save(index=False,transaction_id=transaction_id) #<<<<<<<<<<<<<<<<<<<<<<<<< saves - should really use bulk_update
+            #bulk_save_tiles.append(tile)
         
         #saved_count = Tile.objects.bulk_update(bulk_save_tiles, ["data"], batch_size=1000)
+
+        #index affected resources
+        rids = cache.keys()
+        if index:
+            print(f"Indexing {len(rids)} resources")
+            resources = Resource.objects.filter(resourceinstanceid__in=rids)
+            index_resources_using_singleprocessing(resources,title="Indexing obfucated resources")
 
         #log.sort()
         #print("\n".join(log))      
         #print(f"tiles saved: {saved_count}")  
+        print(f"Obfuscation complete")
         return
 
     def generate_random_data_dict(self):
@@ -249,13 +267,16 @@ class Command(BaseCommand):
         file_extension = random.choice([".txt", ".doc", ".docx", ".pdf"])
         return drive + folder + file_name + file_extension
     
-    def create_random_url(self):
+    def create_random_url(self, isfile=False):
         import random
-        host = random.choice(["http://www.example.com", "https://www.example.com", "http://www.example.org", "https://www.example.org"])
+        host = random.choice(["https://www.example.org"])
         path = random.choice(["/path1", "/path2", "/path3", "/path4"])
-        extension = random.choice([".txt", ".doc", ".docx", ".pdf", ""])
+        extension = random.choice(["/file.txt", "/file.doc", "/file.docx", "/file.pdf"]) if isfile else ""
         url = host + path + extension
         return url
+    
+    def create_example_url(self):
+        return "https://www.example.com/path/to/file.txt"
 
     import os
     #THIS_FILES_PATH = os.path.dirname(os.path.realpath(__file__))

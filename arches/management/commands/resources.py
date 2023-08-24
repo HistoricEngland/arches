@@ -23,7 +23,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from django.core.management.base import BaseCommand, CommandError
 import arches.app.utils.data_management.resources.remover as resource_remover
-from arches.app.utils.index_database import index_resources_using_singleprocessing as index_resources_using_singleprocessing
+from arches.app.utils.index_database import index_resources_using_multiprocessing as index_resources_using_multiprocessing
 
 
 class Command(BaseCommand):
@@ -88,24 +88,43 @@ class Command(BaseCommand):
 
     NODES_TO_CHANGE = [
         #####person 
-        #{"nodeid": "6da2f03b-7e55-11ea-8fe5-f875a44e0e11", "value_type": "title_id", "one_per_resource": True}, #title
-        #{"nodeid": "2caeb5e7-7b44-11ea-a919-f875a44e0e11", "value_type": "first_name", "one_per_resource": True}, #Forenames
-        #{"nodeid": "96a3942a-7e53-11ea-8b5a-f875a44e0e11", "value_type": "last_name", "one_per_resource": True}, #Surname
-        #{"nodeid": "5f8ded26-7ef9-11ea-8e29-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #Full name
-        #{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "email", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #contact point where type is EMAIL
-        #{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "full_address", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "e6d433a2-7f77-4eb7-96f2-57ebe0ac251e"}, #contact point where type is MAIL
-        #{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "phone_number", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "75e6cfad-7418-4ed3-841b-3c083d7df30b"}, #contact point where type is TELEPHONE
-        #{"nodeid": "2beefb56-4084-11eb-bcc5-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #contact name correspondance
+        ##{"nodeid": "6da2f03b-7e55-11ea-8fe5-f875a44e0e11", "value_type": "title_id", "one_per_resource": True}, #title
+        ##{"nodeid": "2caeb5e7-7b44-11ea-a919-f875a44e0e11", "value_type": "first_name", "one_per_resource": True}, #Forenames
+        ##{"nodeid": "96a3942a-7e53-11ea-8b5a-f875a44e0e11", "value_type": "last_name", "one_per_resource": True}, #Surname
+        ##{"nodeid": "5f8ded26-7ef9-11ea-8e29-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #Full name
+        ##{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "email", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", , "where_op":"equals", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #contact point where type is EMAIL
+        ##{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "full_address", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_op":"equals", "where_value": "e6d433a2-7f77-4eb7-96f2-57ebe0ac251e"}, #contact point where type is MAIL
+        ##{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "phone_number", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_op":"equals", "where_value": "75e6cfad-7418-4ed3-841b-3c083d7df30b"}, #contact point where type is TELEPHONE
+        ##{"nodeid": "2beefb56-4084-11eb-bcc5-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #contact name correspondance
         #####bibliographic author, editor, contributor
-        {"nodeid": "c06e676e-95ef-11ea-a32a-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic author
-        {"nodeid": "c06e6768-95ef-11ea-bf92-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic editor
-        {"nodeid": "c06e6773-95ef-11ea-8e2e-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic contributor
+        ##{"nodeid": "c06e676e-95ef-11ea-a32a-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic author
+        ##{"nodeid": "c06e6768-95ef-11ea-bf92-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic editor
+        ##{"nodeid": "c06e6773-95ef-11ea-8e2e-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic contributor
         #####digital objects??
-        {"nodeid": "c5c43d8c-eecc-11eb-8a55-a87eeabdefba", "value_type": "file_name", "one_per_resource": False, "where_nodeid": "c5c43d92-eecc-11eb-a6bc-a87eeabdefba", "where_value": "f4a51198-389e-40f2-acc6-41c99ba75d2b"}, #digital object cross source where type is FILEPATH
-        {"nodeid": "c5c43d91-eecc-11eb-bb4c-a87eeabdefba", "value_type": "url", "one_per_resource": False, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #digital object where type is URL
+        ##{"nodeid": "c5c43d8c-eecc-11eb-8a55-a87eeabdefba", "value_type": "file_name_pdf", "one_per_resource": False, "where_nodeid": "c5c43d8c-eecc-11eb-8a55-a87eeabdefba", "where_op":"contains", "where_value": "S:\\Exegesis"}, #digital object cross source where type is FILEPATH
+        ##{"nodeid": "c747550a-eeca-11eb-9d91-a87eeabdefba", "value_type": "file_name_pdf", "one_per_resource": False, "where_nodeid": "c747550a-eeca-11eb-9d91-a87eeabdefba", "where_op":"contains", "where_value": "S:\\Exegesis"}, #digital object cross source where type is FILEPATH
+        
+        #monument
+        #spatial meta data compilaer name
+        #{"nodeid": "87d3c3fb-f44f-11eb-a313-a87eeabdefba", "value_type": "full_name", "one_per_resource": False}, #Full name
+        #activity spatial meta data compilaer name
+        #{"nodeid": "a5416b5c-f121-11eb-be96-a87eeabdefba", "value_type": "full_name", "one_per_resource": False}, #Full name
+
+        ##{"nodeid": "c5c43d91-eecc-11eb-bb4c-a87eeabdefba", "value_type": "url", "one_per_resource": False, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_op":"equals", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #digital object where type is URL
         ######delete using remove_resources command
 
+        #"" FINDER NAME ARTEFACT
+        ##{"nodeid": "40924a71-b536-11ea-88c3-f875a44e0e11", "value_type": "full_name", "one_per_resource": False},
 
+        # Updater Name - activity and monument
+        ##{"nodeid": "65229156-efc8-11eb-b16e-a87eeabdefba", "value_type": "full_name", "one_per_resource": False},
+        ##{"nodeid": "6c219cbd-ee13-11eb-9e97-a87eeabdefba", "value_type": "full_name", "one_per_resource": False},
+        ##{"nodeid": "87d3d7d4-f44f-11eb-ad91-a87eeabdefba", "value_type": "full_name", "one_per_resource": False},
+        ##{"nodeid": "a541923e-f121-11eb-8237-a87eeabdefba", "value_type": "full_name", "one_per_resource": False},
+
+        #Creator name - activity and monument
+        ##{"nodeid": "65227d34-efc8-11eb-a018-a87eeabdefba", "value_type": "full_name", "one_per_resource": False},
+        ##{"nodeid": "6c219c5c-ee13-11eb-ab86-a87eeabdefba", "value_type": "full_name", "one_per_resource": False},
     ]
 
 
@@ -139,45 +158,53 @@ class Command(BaseCommand):
             print(f"...nodegroup {nodegroup.nodegroupid}")   
 
         cache = {}
-        #log = []
         tiles = Tile.objects.filter(nodegroup__in=nodegroups).select_related("resourceinstance")
         print(f"Obfuscating {len(tiles)} tiles...")
         transaction_id = uuid.uuid4()
+        import pyprind, sys
+        bar = pyprind.ProgBar(len(tiles), bar_char="█", stream=sys.stdout) if len(tiles) > 1 else None
         for tile in tiles:
-            if tile.resourceinstance.resourceinstanceid not in cache.keys():
-                cache[tile.resourceinstance.resourceinstanceid] = self.generate_random_data_dict()
-            for subject_node in subject_nodes:
-                if subject_node["one_per_resource"]:
-                    new_value = cache[tile.resourceinstance.resourceinstanceid][subject_node["value_type"]]
-                else:
-                    new_value = self.generate_random_data_dict()[subject_node["value_type"]]
-                
+            tile_dirty = False
+            for subject_node in subject_nodes:             
                 nodeid = subject_node["nodeid"]
                 if nodeid in tile.data.keys():
                     if tile.data[nodeid] != "" and tile.data[nodeid] is not None: #then we need to edit the node value
-                        if "where_nodeid" in subject_node.keys(): #if the node has a where clause we need to check that the where clause is true to edit the node value
-                            if tile.data[subject_node["where_nodeid"]] == subject_node["where_value"]:
-                                #log.append(f"rid {tile.resourceinstance.resourceinstanceid}... tileid {tile.tileid}... node {nodeid} ... {tile.data[nodeid]} >>>>>>> {new_value} (as where_value {subject_node['where_value']} is true)")
-                                tile.data[nodeid] = new_value
-                        else:
-                            #log.append(f"rid {tile.resourceinstance.resourceinstanceid}... tileid {tile.tileid}... node {nodeid} ... {tile.data[nodeid]} >>>>>>> {new_value}")
-                            tile.data[nodeid] = new_value
-            
-            tile.save(index=False,transaction_id=transaction_id) #<<<<<<<<<<<<<<<<<<<<<<<<< saves - should really use bulk_update
-            #bulk_save_tiles.append(tile)
-        
-        #saved_count = Tile.objects.bulk_update(bulk_save_tiles, ["data"], batch_size=1000)
+                        
+                        if tile.resourceinstance.resourceinstanceid not in cache.keys():
+                            cache[tile.resourceinstance.resourceinstanceid] = self.generate_random_data_dict()
 
-        #index affected resources
+                        if subject_node["one_per_resource"]:
+                            new_value = cache[tile.resourceinstance.resourceinstanceid][subject_node["value_type"]]
+                        else:
+                            new_value = self.generate_random_data_dict()[subject_node["value_type"]]
+                        
+                        if "where_nodeid" in subject_node.keys(): #if the node has a where clause we need to check that the where clause is true to edit the node value
+                            if tile.data[subject_node["where_nodeid"]] is not None:
+                                if subject_node["where_op"] == "contains":
+                                    if subject_node["where_value"] in tile.data[subject_node["where_nodeid"]]:
+                                        tile.data[nodeid] = new_value
+                                        tile_dirty = True
+                                elif subject_node["where_op"] == "equals":
+                                    if tile.data[subject_node["where_nodeid"]] == subject_node["where_value"]:
+                                        tile.data[nodeid] = new_value
+                                        tile_dirty = True
+                                else:
+                                    raise Exception(f"where_op {subject_node['where_op']} not recognised")
+                        else:
+                            tile.data[nodeid] = new_value
+                            tile_dirty = True
+            
+            if tile_dirty:
+                tile.save(index=False,transaction_id=transaction_id)
+            bar.update()
+
+        
         rids = cache.keys()
         if index:
             print(f"Indexing {len(rids)} resources")
-            resources = Resource.objects.filter(resourceinstanceid__in=rids)
-            index_resources_using_singleprocessing(resources,title="Indexing obfucated resources")
+            index_resources_using_multiprocessing(rids,batch_size=250)
 
-        #log.sort()
-        #print("\n".join(log))      
-        #print(f"tiles saved: {saved_count}")  
+
         print(f"Obfuscation complete")
         return
 
@@ -224,6 +251,10 @@ class Command(BaseCommand):
         state = random.choice(self.STATES)
         full_address = str(building_number) + " " + street + ", " + city + ", " + state
         file_name = self.create_random_file_path()
+        file_name_pdf = self.create_random_file_path(extension=".pdf")
+        file_name_docx = self.create_random_file_path(extension=".docx")
+        file_name_doc = self.create_random_file_path(extension=".doc")
+        file_name_txt = self.create_random_file_path(extension=".txt")
         url = self.create_random_url()
         return {
             "title": title_text,
@@ -240,6 +271,10 @@ class Command(BaseCommand):
             "author_name": last_name + ", " + first_name[0],
             "phone_number": "01234 567890",
             "file_name": file_name,
+            "file_name_pdf": file_name_pdf,
+            "file_name_docx": file_name_docx,
+            "file_name_doc": file_name_doc,
+            "file_name_txt": file_name_txt,
             "url": url,
             "empty": ""
         }
@@ -259,12 +294,12 @@ class Command(BaseCommand):
             value_list = f.read().splitlines()
         return value_list
     
-    def create_random_file_path(self):
+    def create_random_file_path(self, extension=None):
         import random
         drive = random.choice(["C:", "D:", "E:", "F:", "\\\\server1\\share", "\\\\server2\\share2"])
-        folder = random.choice(["\\folder1", "\\folder2", "\\folder3", "\\folder4"])
+        folder = random.choice(["\\aher\\1", "\\aher\\2", "\\aher\\3", "\\aher\\4"])
         file_name = random.choice(["\\file1", "\\file2", "\\file3", "\\file4"])
-        file_extension = random.choice([".txt", ".doc", ".docx", ".pdf"])
+        file_extension = random.choice([".txt", ".doc", ".docx", ".pdf"]) if extension is None else extension
         return drive + folder + file_name + file_extension
     
     def create_random_url(self, isfile=False):

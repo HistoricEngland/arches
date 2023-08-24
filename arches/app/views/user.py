@@ -179,12 +179,10 @@ class UserManagerView(BaseManagerView):
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else None
 
-                    user_name = ""
-
-                    if request.user.first_name != "":
-                        user_name = request.user.first_name
-                    else:
-                        user_name = request.user.username
+                    email_username = user.username
+                    # Use firstname for email if we have it.
+                    if user.first_name != "" and user.first_name is not None:
+                        email_username = user.first_name
 
                     message = (
                         f"Your {settings.APP_NAME} profile was just changed.  If this was unexpected, please contact your "
@@ -192,7 +190,7 @@ class UserManagerView(BaseManagerView):
                     )
                     message = _(message)
 
-                    email_context = return_message_context(message,"",None,{"username":user_name})
+                    email_context = return_message_context(message,"",None,{"username":email_username})
 
                     html_content = render_to_string("email/general_notification.htm", email_context)  # ...
                     text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.

@@ -86,6 +86,21 @@ class Command(BaseCommand):
         return
     
 
+    NODES_TO_CHANGE_TEMPLATE = [
+        {
+            "nodeid": "<nodeid of values to obfuscate>", # uuid
+            "value_type": "<key name of random value to use>", # see the generate_random_data_dict function for options
+            "one_per_resource": False , # if True, only one random value dict will be generated per resourceinstanceid. If False, a new random value dict will be generated for each node value to be obfuscated.
+            "where_nodeid": "", # nodeid on the same tile to check before updating the target value (e.g. check the contact point is an email before updating the node using the email value)
+            "where_op":"equals", # or "contains". The node value will only be updated if the where_nodeid value matches the where_value using the where_op operator
+            "where_value": "" # the value to check against the where_nodeid value
+         }
+
+        """
+         Update "nodeid" with a random value of "value_type" where the "where_nodeid" value is (as given by the where_op) equal to, or contains the value of, the where_value
+        """
+    ]
+
     NODES_TO_CHANGE = [
         #####person 
         ##{"nodeid": "6da2f03b-7e55-11ea-8fe5-f875a44e0e11", "value_type": "title_id", "one_per_resource": True}, #title
@@ -213,7 +228,30 @@ class Command(BaseCommand):
         Generates a random user dict
 
         Returns:
-            dict: a dict with keys: first_name, last_name, full_name, email
+            dict: a dict of random user data with the following structure:
+
+            {
+                "title": "Mr",
+                "title_id": "3cf16a39-594d-470c-9e9a-78139e9af77a", # valueid of the concept fo the given title (this is used for node value if concept)
+                "first_name": "John",
+                "last_name": "Smith",
+                "full_name": "Mr John Smith",
+                "email": "john.smith@example.com
+                "full_address": "1 Main Street, Anytown, Anystate",
+                "building_number": 1,
+                "street": "Main Street",
+                "city": "Anytown",
+                "state": "Anystate",
+                "author_name": "Smith, J",
+                "phone_number": "01234 567890",
+                "file_name": "C:\\aher\\1\\file1.txt",
+                "file_name_pdf": "C:\\aher\\1\\file1.pdf",
+                "file_name_docx": "C:\\aher\\1\\file1.docx",
+                "file_name_doc": "C:\\aher\\1\\file1.doc",
+                "file_name_txt": "C:\\aher\\1\\file1.txt",
+                "url": "https://www.example.com/path/to/file.txt",
+                "empty": ""
+            }
         """
         import random
 
@@ -256,6 +294,8 @@ class Command(BaseCommand):
         file_name_doc = self.create_random_file_path(extension=".doc")
         file_name_txt = self.create_random_file_path(extension=".txt")
         url = self.create_random_url()
+        
+        
         return {
             "title": title_text,
             "title_id": title_id,

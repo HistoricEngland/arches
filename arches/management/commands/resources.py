@@ -236,6 +236,7 @@ class Command(BaseCommand):
                 "first_name": "John",
                 "last_name": "Smith",
                 "full_name": "Mr John Smith",
+                "initials": "J.S",
                 "email": "john.smith@example.com
                 "full_address": "1 Main Street, Anytown, Anystate",
                 "building_number": 1,
@@ -282,6 +283,7 @@ class Command(BaseCommand):
 
         last_name = random.choice(self.LAST_NAMES)
         full_name = title_text + " " + first_name + " " + last_name
+        initials = f"{first_name[0]}.{last_name[0]}"
         email = first_name + "." + last_name + "@example.com"
         building_number = random.randint(1, 1000)
         street = random.choice(self.STREETS)
@@ -302,6 +304,7 @@ class Command(BaseCommand):
             "first_name": first_name,
             "last_name": last_name,
             "full_name": full_name,
+            "initials": initials,
             "email": email,
             "full_address": full_address,
             "building_number": building_number,

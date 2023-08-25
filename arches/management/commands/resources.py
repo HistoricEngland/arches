@@ -95,10 +95,6 @@ class Command(BaseCommand):
             "where_op":"equals", # or "contains". The node value will only be updated if the where_nodeid value matches the where_value using the where_op operator
             "where_value": "" # the value to check against the where_nodeid value
          }
-
-        """
-         Update "nodeid" with a random value of "value_type" where the "where_nodeid" value is (as given by the where_op) equal to, or contains the value of, the where_value
-        """
     ]
 
     NODES_TO_CHANGE = [
@@ -107,14 +103,17 @@ class Command(BaseCommand):
         ##{"nodeid": "2caeb5e7-7b44-11ea-a919-f875a44e0e11", "value_type": "first_name", "one_per_resource": True}, #Forenames
         ##{"nodeid": "96a3942a-7e53-11ea-8b5a-f875a44e0e11", "value_type": "last_name", "one_per_resource": True}, #Surname
         ##{"nodeid": "5f8ded26-7ef9-11ea-8e29-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #Full name
+        {"nodeid": "a663840a-7e56-11ea-9e90-f875a44e0e11", "value_type": "initials", "one_per_resource": True}, #Initials
         ##{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "email", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", , "where_op":"equals", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #contact point where type is EMAIL
         ##{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "full_address", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_op":"equals", "where_value": "e6d433a2-7f77-4eb7-96f2-57ebe0ac251e"}, #contact point where type is MAIL
         ##{"nodeid": "2547c133-9505-11ea-8e49-f875a44e0e11", "value_type": "phone_number", "one_per_resource": True, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_op":"equals", "where_value": "75e6cfad-7418-4ed3-841b-3c083d7df30b"}, #contact point where type is TELEPHONE
         ##{"nodeid": "2beefb56-4084-11eb-bcc5-f875a44e0e11", "value_type": "full_name", "one_per_resource": True}, #contact name correspondance
+        
         #####bibliographic author, editor, contributor
         ##{"nodeid": "c06e676e-95ef-11ea-a32a-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic author
         ##{"nodeid": "c06e6768-95ef-11ea-bf92-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic editor
         ##{"nodeid": "c06e6773-95ef-11ea-8e2e-f875a44e0e11", "value_type": "author_name", "one_per_resource": False}, #bibliographic contributor
+        
         #####digital objects??
         ##{"nodeid": "c5c43d8c-eecc-11eb-8a55-a87eeabdefba", "value_type": "file_name_pdf", "one_per_resource": False, "where_nodeid": "c5c43d8c-eecc-11eb-8a55-a87eeabdefba", "where_op":"contains", "where_value": "S:\\Exegesis"}, #digital object cross source where type is FILEPATH
         ##{"nodeid": "c747550a-eeca-11eb-9d91-a87eeabdefba", "value_type": "file_name_pdf", "one_per_resource": False, "where_nodeid": "c747550a-eeca-11eb-9d91-a87eeabdefba", "where_op":"contains", "where_value": "S:\\Exegesis"}, #digital object cross source where type is FILEPATH
@@ -128,7 +127,7 @@ class Command(BaseCommand):
         ##{"nodeid": "c5c43d91-eecc-11eb-bb4c-a87eeabdefba", "value_type": "url", "one_per_resource": False, "where_nodeid": "2547c132-9505-11ea-b22f-f875a44e0e11", "where_op":"equals", "where_value": "0f466b8b-a347-439f-9b61-bee9811ccbf0"}, #digital object where type is URL
         ######delete using remove_resources command
 
-        #"" FINDER NAME ARTEFACT
+        #FINDER NAME ARTEFACT
         ##{"nodeid": "40924a71-b536-11ea-88c3-f875a44e0e11", "value_type": "full_name", "one_per_resource": False},
 
         # Updater Name - activity and monument
@@ -283,7 +282,14 @@ class Command(BaseCommand):
 
         last_name = random.choice(self.LAST_NAMES)
         full_name = title_text + " " + first_name + " " + last_name
-        initials = f"{first_name[0]}.{last_name[0]}"
+        
+        #create a string of random name initials that has either one or two initials, each seperated by a full stop
+        captial_letters = [chr(x) for x in range(ord("A"), ord("Z") + 1)]
+        
+        initials = ""
+        for i in range(random.randint(1, 2)):
+            initials += random.choice(captial_letters) + "."
+
         email = first_name + "." + last_name + "@example.com"
         building_number = random.randint(1, 1000)
         street = random.choice(self.STREETS)

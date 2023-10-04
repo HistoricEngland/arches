@@ -158,7 +158,6 @@ class APIBase(View):
 
 class Sync(APIBase):
     def get(self, request, surveyid=None):
-
         can_sync = userCanAccessMobileSurvey(request, surveyid)
         if can_sync:
             synclog = models.MobileSyncLog(logid=None, survey_id=surveyid, userid=request.user.id)
@@ -184,7 +183,6 @@ class CheckSyncStatus(APIBase):
 
 class Surveys(APIBase):
     def get(self, request, surveyid=None):
-
         auth_header = request.META.get("HTTP_AUTHORIZATION", None)
         logger.info("Requesting projects for user: {0}".format(request.user.username))
         try:
@@ -537,7 +535,6 @@ class Graphs(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
-
     # context = [{
     #     "@context": {
     #         "id": "@id",
@@ -1747,3 +1744,19 @@ class TransformEdtfForTile(APIBase):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse({"data": result})
+
+
+class GetEnvVars(View):
+    def get(self, request):
+        env_vars = {}
+        for key, value in os.environ.items():
+            env_vars[key] = value
+        return JSONResponse(env_vars)
+
+
+class GetSettings(View):
+    def get(self, request):
+        settings_dict = {}
+        for key, value in sorted(vars(settings).items()):
+            settings_dict[key] = value
+        return JSONResponse(settings_dict)

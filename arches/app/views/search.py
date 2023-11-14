@@ -272,12 +272,20 @@ def export_results(request):
             exporter = SearchResultsExporter(search_request=request)
             export_files, export_info = exporter.export(format, report_link)
             wb = export_files[0]["outputfile"]
-            with NamedTemporaryFile(dir=settings.TILE_EXCEL_EXPORT_TEMP_DIRECTORY,delete=settings.TILE_EXCEL_EXPORT_TEMP_FILE_DELETE) as tmp:
-                wb.save(tmp.name)
-                tmp.seek(0)
-                stream = tmp.read()
-                export_files[0]["outputfile"] = tmp
-                return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+            try:
+                import tempfile
+                with NamedTemporaryFile(delete=False) as tmp:
+                    wb.save(tmp.name)
+                    tmp.seek(0)
+                    logger.warning(tempfile.gettempdir())
+                    stream = tmp.read()
+                    export_files[0]["outputfile"] = tmp
+                    return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+            except Exception as err:
+                logger.exception(err)
+                return JSONErrorResponse(message=err)
+            finally:
+                os.unlink(tmp.name)
         else:
             exporter = SearchResultsExporter(search_request=request)
             export_files, export_info = exporter.export(format, report_link)

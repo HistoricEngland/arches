@@ -275,9 +275,9 @@ def export_results(request):
             try:
                 import tempfile
                 with NamedTemporaryFile(delete=False) as tmp:
+                    logger.warning(tempfile.gettempdir())
                     wb.save(tmp.name)
                     tmp.seek(0)
-                    logger.warning(tempfile.gettempdir())
                     stream = tmp.read()
                     export_files[0]["outputfile"] = tmp
                     return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")

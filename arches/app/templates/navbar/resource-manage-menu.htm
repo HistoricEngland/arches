@@ -3,7 +3,7 @@
 
 <!-- Menu -->
 <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
-    <div class="panel ep-menu-panel relative" style="">
+    <div class="panel ep-menu-panel relative">
 
         <!-- Menu List -->
         <div class="panel-body">
@@ -13,7 +13,7 @@
                 <!-- Menu Item -->
                 <!-- TODO: Reenable once #8352 is resolved -->
                 <!-- <li id="settings-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
-                    <a href="" target="" class="" data-bind="click: copyResource">
+                    <a href="" target="" data-bind="click: copyResource">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Copy Resource" %} </div>
                             <span class="text-muted menu-item-subtitle">{% trans "Make a copy and start editing" %}</span>
@@ -25,7 +25,7 @@
                 <!-- Menu Item -->
                 {% if user_can_delete_resource %}
                 <li id="card-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
-                    <a href="" target="" class="" data-bind="click: deleteResource">
+                    <a href="" target="" data-bind="click: deleteResource">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Resource" %} </div>
                             <span class="text-muted menu-item-subtitle">{% trans "Permanently delete this resource" %}</span>

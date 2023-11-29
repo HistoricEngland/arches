@@ -41,7 +41,7 @@
                             </div>
 
                             <div class="col-xs-12">
-                                <input type="text" placeholder="{% trans 'Enter node name here...' %}"class="form-control" style="" placeholder="{% trans 'node name' %}" data-bind="value:node().name, valueUpdate: 'keyup'">
+                                <input type="text" placeholder="{% trans 'Enter node name here...' %}"class="form-control" placeholder="{% trans 'node name' %}" data-bind="value:node().name, valueUpdate: 'keyup'">
                             </div>
                         </div>
                     </div>
@@ -87,7 +87,7 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans 'Choose a class'%}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans 'Choose a class'%}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>

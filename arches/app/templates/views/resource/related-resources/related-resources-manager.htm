@@ -67,9 +67,9 @@
         <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}, style: {height: resourceEditorContext === true ? '55px' : '40px'}">
 
             <div class="editor-elements">
-                <div class="">
-                    <h2 class="">{% trans "Related Resources" %}</h2>
-                    <h3 class="">{% trans "Select resources and relate it to this one" %}</h3>
+                <div>
+                    <h2>{% trans "Related Resources" %}</h2>
+                    <h3>{% trans "Select resources and relate it to this one" %}</h3>
                     <div style="min-width: 300px;">
                         <input style="display:inline-block;" data-bind="
                             select2Query: {
@@ -126,7 +126,7 @@
                                     <!--ko if: self.graphIsSemantic -->
                                     <!--ko if: self.currentResource().resourceinstanceid === relationship.resourceinstanceidfrom() -->
                                     <div class="row">
-                                        <label class="col-sm-12" style="font-weight: bold;"><span class=""
+                                        <label class="col-sm-12" style="font-weight: bold;"><span 
                                             data-bind="text: self.currentResource().displayname"></span>{% trans "'s relationship to" %} <span                                   data-bind="text: resource.displayname"></span></label>
                                     </div>
                                     <div class="row">
@@ -144,7 +144,7 @@
                                     </div>
                                     <div class="row" style="margin-top: 20px;">
                                         <label class="col-sm-12" style="font-weight: bold;"><span
-                                                data-bind="text: resource.displayname"></span>{% trans "'s relationship to " %} <span class=""                            data-bind="text: self.currentResource().displayname"></span></label>
+                                                data-bind="text: resource.displayname"></span>{% trans "'s relationship to " %} <span data-bind="text: self.currentResource().displayname"></span></label>
                                     </div>
                                     <div class="row">
                                         <span class="col-sm-4" style="padding-right: 5px; text-align: right;"

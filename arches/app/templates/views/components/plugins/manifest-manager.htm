@@ -78,7 +78,7 @@
                 beforeMove: self.beforeMove,
                 afterMove: function(){console.log('hi')}
             }">  
-            <div class="iiif-manifest-metadata-panel" style="">
+            <div class="iiif-manifest-metadata-panel">
                 <div class="manifest-metadata-panel-drag"><i class="fa fa-ellipsis-v"></i></div>
                 <div style="display: flex; flex-direction: column; width: 100%;">
                 <div style="padding: 3px;">
@@ -132,8 +132,8 @@
     </div>
 
     <div class="iiif-canvas-links-panel">
-        <a class="" data-bind="click: addAllCanvases"> {% trans 'Select All' %}</a>
-        <a class="" data-bind="click: clearCanvasSelection, css: {disabled: canvasesForDeletion().length === 0}"> {% trans 'Clear All' %}</a>
+        <a data-bind="click: addAllCanvases"> {% trans 'Select All' %}</a>
+        <a data-bind="click: clearCanvasSelection, css: {disabled: canvasesForDeletion().length === 0}"> {% trans 'Clear All' %}</a>
 
         <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
             <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>

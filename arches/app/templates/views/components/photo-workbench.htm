@@ -67,7 +67,7 @@
             <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
                 <div class="file-select-window">
                    <div class="bord-top pad-ver file-select">
-                       <div class="" style="padding: 5px">
+                       <div style="padding: 5px">
                            <h2>{% trans 'Upload Photographs' %}</h2>
                            <h4>{% trans 'Drag & Drop your photos onto this panel to upload' %}</h4>
                        </div>
@@ -111,7 +111,7 @@
         <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
             <div class="file-select-window">
                <div class="bord-top pad-ver file-select">
-                   <div class="" style="padding: 5px">
+                   <div style="padding: 5px">
                        <h2>{% trans 'Upload Photographs' %}</h2>
                        <h4>{% trans 'Drag & Drop your photos onto this panel' %}</h4>
                    </div>
@@ -276,14 +276,14 @@
 
                     <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                         <div class="relative">
-                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () {
                                 card.model.get('helpactive')(false);
                             }"></a>
                         </div>
                         <div id="add-basemap-wizard-help-content">
                             <div>
                                 <div class="panel-heading">
-                                    <h3 class="panel-title help-panel-title" style="">
+                                    <h3 class="panel-title help-panel-title">
                                         <span data-bind="html: card.model.get('helptitle')"></span>
                                     </h3>
                                 </div>

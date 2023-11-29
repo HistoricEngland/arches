@@ -84,7 +84,7 @@
                 <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
                 <!-- Tertiary Panel For Card Help Text-->
-                <div class="" style="display: none;" data-bind="visible: model.helpenabled">
+                <div style="display: none;" data-bind="visible: model.helpenabled">
                     <div class="tertiary-panel-content">
 
                         <!-- Help CRUD -->
@@ -121,7 +121,7 @@
                     <!--ko if: model.constraints().length > 0 -->
                     <div class="constraint-selection" data-bind="foreach: {data: model.constraints(), as: 'constraintvm'}">
                         <div class="dropdown">
-                            <input class="" style="display:inline-block;"
+                            <input style="display:inline-block;"
                             data-bind="select2Query: {
                                 select2Config: getSelect2ConstraintConfig('{% trans "Select Nodes" %}')
                             }">

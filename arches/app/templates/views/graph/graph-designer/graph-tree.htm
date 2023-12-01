@@ -23,7 +23,7 @@
     <div class="left-panel-overflow graph-designer-node-tree">
         <!-- <div data-bind="sortable: $data"> -->
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-            <div class="" data-bind="template: {
+            <div data-bind="template: {
                 name: 'graph-tree',
                 foreach: graphTree.graphModel.tree,
                 as: 'node'
@@ -44,7 +44,7 @@
             <i class="jstree-leading-icon fa fa-download" role="presentation" data-toggle="tooltip" data-placement="top" data-container="body" data-original-title="{% trans 'Node is exportable in search' %}"></i>
             <!-- /ko -->
             
-            <span class="" data-bind="{text: graphTree.getDisplayName(node), style: { 'padding-right': graphTree.showIds() == true ? '0px' : '10px' }}"></span>
+            <span data-bind="{text: graphTree.getDisplayName(node), style: { 'padding-right': graphTree.showIds() == true ? '0px' : '10px' }}"></span>
             <!-- ko if: graphTree.showIds -->
             <span style="font-weight:bold; padding-right: 10px;" data-bind="text: ': ' + node.nodeid"></span>
             <!-- /ko -->

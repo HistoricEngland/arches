@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Left Panel -->
         <div class="left-panel graph-designer msm-tree" data-bind="resizableSidepanel:true">
             <div class="left-panel-inner-container">
-                <div class="" data-bind="with: tree" style="height: inherit">
+                <div data-bind="with: tree" style="height: inherit">
                     {% include 'views/mobile-survey-manager/mobile-survey-tree.htm' %}
                 </div>
             </div>
@@ -215,19 +215,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             {% trans 'Groups/Users' %}
                                         </p>
                                         <ul class="mpm-node-detail-metadata">
-                                            <li class="">
+                                            <li>
                                                 {% trans 'Groups' %} (<span data-bind="text: mobilesurvey.approvedGroupNames().length"></span>)
                                                 <ul class="mpm-node-detail-metadata">
-                                                    <li class="" data-bind="text:  mobilesurvey.approvedGroupNames().join(', ')">
+                                                    <li data-bind="text:  mobilesurvey.approvedGroupNames().join(', ')">
                                                     </li>
                                                 </ul>
                                             </li>
                                         </ul>
                                         <ul class="mpm-node-detail-metadata">
-                                            <li class="">
+                                            <li>
                                                 {% trans 'Users' %} (<span data-bind="text: mobilesurvey.approvedUserNames().length"></span>)
                                                 <ul class="mpm-node-detail-metadata">
-                                                    <li class="" data-bind="text: mobilesurvey.approvedUserNames().join(', ')">
+                                                    <li data-bind="text: mobilesurvey.approvedUserNames().join(', ')">
 
                                                     </li>
                                                 </ul>
@@ -245,7 +245,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--/ko-->
                                         <!--ko if: mobilesurvey.datadownloadconfig.resources().length > 0 -->
                                         <ul class="mpm-node-detail-metadata">
-                                            <li class="">
+                                            <li>
                                                 {% trans 'Limit:' %} <span data-bind="text: mobilesurvey.datadownloadconfig.count()"></span>
                                             </li>
                                         </ul>
@@ -253,7 +253,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <ul>{% trans 'Resource Types:' %}
                                                 <ul class="mpm-node-detail-metadata">
                                                     <!-- ko foreach: {data:allResources, as: 'resource'} -->
-                                                    <li class="" data-bind="text: resource.name, visible: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id)"></li>
+                                                    <li data-bind="text: resource.name, visible: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id)"></li>
                                                     <!-- /ko -->
                                                 </ul>
                                             </ul>
@@ -269,7 +269,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--ko if: selectedResources -->
                                         <!--ko foreach: {data: selectedResources, as: 'resource'} -->
                                         <ul class="mpm-node-detail-metadata">
-                                            <li class="">
+                                            <li>
                                                 <div data-bind="text: resource.name + ' (' + resource.cards().length + ' data entry cards)'"></div>
                                                 <!--ko foreach: {data: resource.cards, as: 'card'} -->
                                                 <ul class="mpm-node-detail-metadata">
@@ -285,7 +285,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--/ko-->
                                         <!--ko ifnot: selectedResources().length > 0 -->
                                         <ul class="mpm-node-detail-metadata">
-                                            <li class="">
+                                            <li>
                                                 <div>{% trans 'No models selected' %}</div>
                                             </li>
                                         </ul>
@@ -298,13 +298,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Data Entry Pages -->
                         <!--ko if: activePage() === 'settings'-->
-                        <div id="summary-card" class="mpm-card" style="">
+                        <div id="summary-card" class="mpm-card">
 
                             <div class="panel-body project-card-body">
                                 <div id="" class="card-content">
 
                                     <!-- Project Info -->
-                                    <div id="account-crud" class="">
+                                    <div id="account-crud">
                                         <div class="msm-crud-section">
                                             <div class="row">
                                                 <div class="col-sm-5">
@@ -423,7 +423,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'" placeholder="e.g.: http://arches_domain_name/media/lincoln.mbtiles">
                                 </div>
                                 <div class="msm-basemap-subtitle">
-                                    {% trans 'Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they do not have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from sites such as <strong><a href="https://openmaptiles.com" class="" target="_blank">https://openmaptiles.com</a></strong>.  Note that large files will require longer downloads and more storage space on mobile devices.' %}
+                                    {% trans 'Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they do not have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from sites such as <strong><a href="https://openmaptiles.com" target="_blank">https://openmaptiles.com</a></strong>.  Note that large files will require longer downloads and more storage space on mobile devices.' %}
                                 </div>
                             </div>
                             <div class="msm-crud-section">
@@ -432,7 +432,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'" placeholder="e.g.: mapbox://styles/mapbox/light-v9">
                                 </div>
                                 <div class="msm-basemap-subtitle">
-                                    {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use your own map service, or any online basemap service (such as those created with ESRI, GeoServer, or other mapping servers).  You will need to reference or create and host a MapBox style json file (see <strong><a href="https://docs.mapbox.com/mapbox-gl-js/style-spec" class="" target="_blank">https://docs.mapbox.com/mapbox-gl-js/style-spec</a></strong>)' %}
+                                    {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use your own map service, or any online basemap service (such as those created with ESRI, GeoServer, or other mapping servers).  You will need to reference or create and host a MapBox style json file (see <strong><a href="https://docs.mapbox.com/mapbox-gl-js/style-spec" target="_blank">https://docs.mapbox.com/mapbox-gl-js/style-spec</a></strong>)' %}
                                 </div>
                             </div>
                         </div>
@@ -472,7 +472,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Model Selection Dropdown -->
                             <div class="mpm-resource-selection">
                                 <div class="resource-dropdown">
-                                    <input class="" style="display:inline-block;"
+                                    <input style="display:inline-block;"
                                     data-bind="select2Query: {
                                         select2Config: getSelect2ResourcesConfig()
                                     }, attr: {disabled: locked}">
@@ -508,7 +508,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Help Message-->
-                            <div class="">
+                            <div>
                                 <p class="account-tips">
                                     {% trans 'Downloading data allows users to access and edit existing Arches information in the field. You can decide which models your field team can access, and the number of resources to download.' %}
                                 </p>
@@ -615,7 +615,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!-- Account Listing -->
                                     <div class="msm-account-listing-panel">
 
-                                        <div class="mpm-group-panel-header" style="">
+                                        <div class="mpm-group-panel-header">
 
                                             <div class="msm-group-label">
                                                 {% trans "Accounts in this group" %}

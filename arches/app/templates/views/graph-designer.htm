@@ -139,7 +139,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="tab-content set-variable-pixel-height">
                     <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
-                        <div style="height:100%;" class="" data-bind="with: graphTree">
+                        <div style="height:100%;" data-bind="with: graphTree">
                             {% include 'views/graph/graph-designer/graph-tree.htm' %}
                         </div>
                     </div>
@@ -166,7 +166,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="display: none;">
                     <div>
                         <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
-                            <span class="">{{branch_list.title}}</span>
+                            <span>{{branch_list.title}}</span>
                         </div>
                         <div class="relative">
                             <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: graphTree.toggleBranchList.bind(graphTree)"><i class="ion-close"></i></a>
@@ -198,7 +198,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="settings-panel-heading">
                 <div class="graph-designer-title">
                     <div class="name">
-                        <span class="">{% trans "Card Designer" %}</span>
+                        <span>{% trans "Card Designer" %}</span>
                     </div>
                 </div>
             </div>

@@ -2,11 +2,11 @@
 {% load i18n %}
 
 <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
-    <div class="panel ep-menu-panel relative" style="">
+    <div class="panel ep-menu-panel relative">
         <div class="panel-body">
             <ul class="list-group ep-menu-list editor-tools">
                 <li class="edit-menu-item" data-bind="">
-                    <a href="" target="" class="" data-bind="click: navigateToManager">
+                    <a href="" target="" data-bind="click: navigateToManager">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Exit Project" %} </div>
                             <span class="text-muted menu-item-subtitle">{% trans "Return to the list of available projects" %}</span>
@@ -14,7 +14,7 @@
                     </a>
                 </li>
                 <li class="edit-menu-item" data-bind="css: {'disabled': mobilesurvey.active()}">
-                    <a href="" target="" class="" data-bind="click: deleteMobileSurvey">
+                    <a href="" target="" data-bind="click: deleteMobileSurvey">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Delete Project" %} </div>
                             <!--ko ifnot: mobilesurvey.active() -->

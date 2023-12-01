@@ -26,7 +26,7 @@
 
         <!-- Buffer Definition -->
         <div class="buffer-control form-control">
-            <h5 class="">{% trans "Buffer" %}</h5>
+            <h5>{% trans "Buffer" %}</h5>
             <div class="form-inline">
                 <label for="buffer-input">{% trans "Distance" %}</label>
                 <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer-input" data-bind="textInput: buffer">
@@ -35,8 +35,8 @@
         </div>
 
         <!-- Geometry -->
-        <div class="add-new-feature buffer-control" style="">
-            <h5 class="">{% trans "Select a filter" %}</h5>
+        <div class="add-new-feature buffer-control">
+            <h5>{% trans "Select a filter" %}</h5>
             <select data-placeholder="{% trans "Draw a..." %}" data-bind="
                 value: selectedTool,
                 valueAllowUnset: true,

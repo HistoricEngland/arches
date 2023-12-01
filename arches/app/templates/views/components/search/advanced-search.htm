@@ -4,7 +4,7 @@
 <!--ko let: { self: $data }-->
 <div class="search-container advanced-search-container relative">
     <!-- Advanced Search Panel -->
-    <div class="facets-container" style="">
+    <div class="facets-container">
         <div class="list-group search-facets">
             <div class="search-facet-item header">
                 <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
@@ -36,7 +36,7 @@
             <!-- /ko -->
         </div>
     </div>
-    <div class="facets-search-container" style="">
+    <div class="facets-search-container">
         <div data-bind="visible: filter.facets().length === 0">
             <div id="rr-splash" class="rr-splash">
                 <!-- Image -->

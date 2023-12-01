@@ -92,7 +92,7 @@
                                     
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top file-select loader-select">
-                                        <div class="">
+                                        <div>
                                             <!--ko if: $parent.displayContent().validRenderer() === false -->
                                             <h4 class="loader-error-message">{% trans 'Unable to parse your file with the '%}
                                                 <span data-bind="text:$parent.displayContent().renderer.title"></span>{% trans ' loader'%}
@@ -106,7 +106,7 @@
                                             <!--ko foreach: $parent.displayContent().availableRenderers -->
                                             <div>
                                                 <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
-                                                    <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
+                                                    <div style="display:flex; flex-direction: column; background-color: #fdfdfd">
                                                         <h4 class="r-select-title" data-bind="text: $data.title"></h4>
                                                     </div>
                                                     <div>
@@ -122,7 +122,7 @@
                                     
                                                     <!-- card Tools -->
                                                     <div class="r-select-card-footer">
-                                                        <div class="">
+                                                        <div>
                                                             <div data-bind="click: function(){$parent.applyRendererToSelected($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
                                                             {% trans 'Select' %}
                                                             </div>
@@ -158,7 +158,7 @@
             <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
                 <div class="file-select-window">
                    <div class="bord-top pad-ver file-select">
-                       <div class="" style="padding: 5px">
+                       <div style="padding: 5px">
                            <h2>{% trans 'Upload Files' %}</h2>
                            <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
                        </div>
@@ -437,7 +437,7 @@
 
             <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                 <div class="relative">
-                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () {
                         card.model.get('helpactive')(false);
                     }"></a>
                 </div>

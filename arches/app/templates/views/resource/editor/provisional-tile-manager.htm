@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <div>
-    <div class="">
+    <div>
         <!-- ko if: provisionalTileViewModel.edits().length > 0 -->
         <h4 class='provisional-edits-list-header ep-form-toolbar-title'><div data-bind="text: provisionalTileViewModel.card.get('name')()"></div><span>{% trans 'Provisional Edits' %}</span></h4>
         <div class='provisional-edit-qa-tool ep-form-toolbar-title'>
@@ -17,7 +17,7 @@
                 <span class="content-title">{% trans 'Created: ' %}</span><span data-bind='text: edit.timestamp'></span>
             </div>
             <div class="rp-report-tile provisional-edit-cards">
-                <dl class="">
+                <dl>
             <!-- ko foreach: { data: $parent.provisionalTileViewModel.card.get('widgets'), as: 'widget' } -->
                 <!-- ko component: {
                     name: widget.widgetLookup[widget.get("widget_id")()].name,

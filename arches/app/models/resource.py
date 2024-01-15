@@ -557,15 +557,6 @@ class Resource(models.ResourceInstance):
             limit=limit,
             resourceinstance_graphid=resourceinstance_graphid,
         )
-
-
-        resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), resource_relations["relations"])
-        )
-
-        resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom), resource_relations["relations"])
-        )
         
         missing_related_resource = []
         
@@ -575,6 +566,16 @@ class Resource(models.ResourceInstance):
                 resource_relations["relations"].remove(resource_relation)
         
         logger.warning(f"Missing related resources: {missing_related_resource}")
+
+
+        resource_relations["relations"] = list(
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), resource_relations["relations"])
+        )
+
+        resource_relations["relations"] = list(
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom), resource_relations["relations"])
+        )
+    
 
         resource_relations["total"] = len(resource_relations["relations"])
         ret["total"] = resource_relations["total"]

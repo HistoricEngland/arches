@@ -566,6 +566,15 @@ class Resource(models.ResourceInstance):
         resource_relations["relations"] = list(
             filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom), resource_relations["relations"])
         )
+        
+        missing_related_resource = []
+        
+        for resource_relation in resource_relations["relations"]:
+            if not models.ResourceInstance.objects.filter(pk=resource_relation.resourceinstanceidto).filter(pk=resource_relation.resourceinstanceidfrom).exists():
+                missing_related_resource.append(resource_relation.resourceinstanceidfrom)
+                resource_relations["relations"].remove(resource_relation)
+        
+        logger.warning(f"Missing related resources: {missing_related_resource}")
 
         resource_relations["total"] = len(resource_relations["relations"])
         ret["total"] = resource_relations["total"]

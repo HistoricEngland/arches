@@ -559,18 +559,28 @@ class Resource(models.ResourceInstance):
         )
         
         missing_related_resource = []
-        
+        valid_relations = []
         for resource_relation in resource_relations["relations"]:
-            if not models.ResourceInstance.objects.filter(pk=resource_relation.resourceinstanceidto).filter(pk=resource_relation.resourceinstanceidfrom).exists():
-                missing_related_resource.append({resource_relation.resourceinstanceidfrom,resource_relation.resourceinstanceidto})
-                resource_relations["relations"].remove(resource_relation)
+            
+            to_resource = None
+            from_resource = None
+            
+            try:
+                to_resource = resource_relation.resourceinstanceidto
+                from_resource = resource_relation.resourceinstanceidfrom
+                valid_relations.append(resource_relation)
+            except:
+                missing_related_resource.append(resource_relation.pk)
+
+        resource_relations["total"] = len(valid_relations)
+        resource_relations["relations"] = valid_relations
                 
         if len(missing_related_resource) > 0:
-            logger.warning(f"Missing related resources: {missing_related_resource}")
+            logger.warning(f"Broken resource relation records (relation primary key): {missing_related_resource}")
 
 
         resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), resource_relations["relations"])
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), valid_relations)
         )
 
         resource_relations["relations"] = list(

@@ -573,7 +573,7 @@ class Resource(models.ResourceInstance):
                 missing_related_resource.append(resource_relation.pk)
 
         resource_relations["total"] = len(valid_relations)
-        resource_relations["relations"] = valid_relations
+        resource_relations["relations"] = []
                 
         if len(missing_related_resource) > 0:
             logger.warning(f"Broken resource relation records (relation primary key): {missing_related_resource}")

@@ -639,6 +639,15 @@ a#menu-toggle:focus {
     color: #454545;
 }
 
+.jstree-default .jstree-anchor {
+    overflow-wrap: break-word;
+    white-space: normal;
+    width: 92%;
+    min-height: 26px;
+    height: auto;
+
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/

@@ -234,6 +234,10 @@ button.search-type-btn:focus {
     transition: none;
 }
 
+#mainnav-menu i {
+    width: 20px;
+}
+
 #mainnav-menu *:focus,
 #mainnav-menu a:hover,
 .base-page .navbar-brand:focus,

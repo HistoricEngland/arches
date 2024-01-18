@@ -648,6 +648,10 @@ a#menu-toggle:focus {
 
 }
 
+.change-password-form .error-message-container {
+    display: inline-flex;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/

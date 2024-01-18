@@ -573,14 +573,14 @@ class Resource(models.ResourceInstance):
                 missing_related_resource.append(resource_relation.pk)
 
         resource_relations["total"] = len(valid_relations)
-        resource_relations["relations"] = []
+        resource_relations["relations"] = valid_relations
                 
         if len(missing_related_resource) > 0:
             logger.warning(f"Broken resource relation records (relation primary key): {missing_related_resource}")
 
 
         resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), valid_relations)
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), resource_relations["relations"])
         )
 
         resource_relations["relations"] = list(

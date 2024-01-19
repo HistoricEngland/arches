@@ -580,11 +580,11 @@ class Resource(models.ResourceInstance):
 
 
         resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), valid_relations)
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto.pk), resource_relations["relations"])
         )
 
         resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom), resource_relations["relations"])
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom.pk), resource_relations["relations"])
         )
     
 

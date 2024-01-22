@@ -15124,19 +15124,29 @@ a.jstree-anchor.permissions-widget {
 
 @media print {
 
+    * { 
+        overflow: visible !important; 
+    } 
+    .page { 
+        page-break-after:always; 
+    }
+
     header,
     nav,
     footer,
     button,
     aside,
+    #skip-link-holder,
     .print-btn,
     .ep-tools,
     .geocode-container,
     .geometry-tools-container,
     .geometry-editing-notifications,
+    .resource-component-abstract-container footer,
     #map-widget-container>.map-widget-container {
         display: none;
     }
+
 
     #content-container {
         padding: 0 !important;
@@ -15181,7 +15191,11 @@ a.jstree-anchor.permissions-widget {
     }
 
     .mapboxgl-map {
-        display: none;
+        display: block;
+    }
+
+    .workbench-card-sidebar, .mapboxgl-control-container{
+        display: none
     }
 
     .print-map {
@@ -15193,6 +15207,15 @@ a.jstree-anchor.permissions-widget {
     .print-hide {
         display: none;
         height: 0;
+    }
+
+    .report-toolbar-title{
+        float:left;
+        padding:0%;
+    }
+
+    .ep-form-toolbar-tools mar-no flex{
+        float:right;
     }
 }
 

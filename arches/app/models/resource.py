@@ -557,15 +557,36 @@ class Resource(models.ResourceInstance):
             limit=limit,
             resourceinstance_graphid=resourceinstance_graphid,
         )
+        
+        missing_related_resource = []
+        valid_relations = []
+        for resource_relation in resource_relations["relations"]:
+            
+            to_resource = None
+            from_resource = None
+            
+            try:
+                to_resource = resource_relation.resourceinstanceidto
+                from_resource = resource_relation.resourceinstanceidfrom
+                valid_relations.append(resource_relation)
+            except:
+                missing_related_resource.append(resource_relation.pk)
+
+        resource_relations["total"] = len(valid_relations)
+        resource_relations["relations"] = valid_relations
+                
+        if len(missing_related_resource) > 0:
+            logger.warning(f"Broken resource relation records (relation primary key): {missing_related_resource}")
 
 
         resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto), resource_relations["relations"])
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidto.pk), resource_relations["relations"])
         )
 
         resource_relations["relations"] = list(
-            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom), resource_relations["relations"])
+            filter(lambda x: user_can_read_resource(user, x.resourceinstanceidfrom.pk), resource_relations["relations"])
         )
+    
 
         resource_relations["total"] = len(resource_relations["relations"])
         ret["total"] = resource_relations["total"]

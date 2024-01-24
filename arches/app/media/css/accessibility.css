@@ -234,6 +234,10 @@ button.search-type-btn:focus {
     transition: none;
 }
 
+#mainnav-menu i {
+    width: 20px;
+}
+
 #mainnav-menu *:focus,
 #mainnav-menu a:hover,
 .base-page .navbar-brand:focus,
@@ -623,12 +627,12 @@ a#menu-toggle:focus {
 
 #circle {
     margin-left: -6px;
-    margin-top: -17px;
+    margin-top: -3px;
 }
 
 #circle-outline {
     margin-left: -8px;
-    margin-top: -17px;
+    margin-top: -5px;
 }
 
 .debug-notice {
@@ -637,6 +641,19 @@ a#menu-toggle:focus {
 
 .time-wheel-instructions {
     color: #454545;
+}
+
+.jstree-default .jstree-anchor {
+    overflow-wrap: break-word;
+    white-space: normal;
+    width: 92%;
+    min-height: 26px;
+    height: auto;
+
+}
+
+.change-password-form .error-message-container {
+    display: inline-flex;
 }
 
 /******************************************************************/

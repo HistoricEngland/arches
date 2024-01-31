@@ -24,18 +24,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <div id="container" class="cls-container arches-login">
 
-    <!-- BACKGROUND IMAGE -->
-    <!--===================================================
-    <div id="bg-overlay" class="bg-img img-login"></div>
-    -->
+    <header>
+		<div class="header-bar">
+			<div class="header-bar__logo">
+				<div class="header-bar__logo-heading">
+					<a href="/" class="header-bar__logo-link" aria-label="Link to homepage">
+						<img class="header-bar__logo-image" src="{{ STATIC_URL }}img/HE_Logo_RGB.svg" alt="Historic England logo">
+					</a>
+				</div>
+			</div>
+		</div>
+	</header>
 
-    <div class="cls-content arches-signin">
-        <div class="cls-content-sm panel login-panel" style="width: 350px; margin-top: 60px;">
-            <div class="panel-body">
-                {% block content %} {% endblock %}
-            </div>
-        </div>
-    </div>
+    <main>
+        {% block content %} {% endblock %}
+    </main>
 
 </div>
 

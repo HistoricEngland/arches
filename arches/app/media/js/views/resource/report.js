@@ -18,7 +18,7 @@ require([
                         self.viewModel.loading(false);
                         window.print();
                     },
-                    90000 // a generous timeout here to allow maps/images to load
+                    45000 // a generous timeout here to allow maps/images to load
                 );
             }
         }

@@ -9201,9 +9201,17 @@ a.mega-dropdown-toggle.disabled {
     font-size: 17px;
     font-weight: 500;
     margin-top: 0px;
-    width: 400px;
+    width: auto;
     padding: 14px 0 5px 25px;
     color: #555;
+}
+
+.report-toolbar-left-position{
+    float:left;
+}
+
+.report-toolbar-right-position{
+    float:right;
 }
 
 h4.report-toolbar-title {
@@ -15119,19 +15127,35 @@ a.jstree-anchor.permissions-widget {
 
 @media print {
 
+    * { 
+        overflow: visible !important; 
+    } 
+    .page { 
+        page-break-after:always; 
+    }
+
     header,
     nav,
     footer,
     button,
     aside,
+    #skip-link-holder,
     .print-btn,
     .ep-tools,
     .geocode-container,
     .geometry-tools-container,
     .geometry-editing-notifications,
+    .resource-component-abstract-container footer,
     #map-widget-container>.map-widget-container {
         display: none;
     }
+
+    #menu-toggle,
+    div.report-print-date, 
+    #mainnav-menu{
+        display:none !important;
+    }
+
 
     #content-container {
         padding: 0 !important;
@@ -15176,7 +15200,11 @@ a.jstree-anchor.permissions-widget {
     }
 
     .mapboxgl-map {
-        display: none;
+        display: block;
+    }
+
+    .workbench-card-sidebar, .mapboxgl-control-container{
+        display: none
     }
 
     .print-map {

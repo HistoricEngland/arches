@@ -121,7 +121,8 @@ a:focus,
 .hover-feature-metadata,
 .pagination > li > a.disabled,
 .graph-designer-header,
-.graph-type {
+.graph-type,
+.report-tab i {
     color: #595959;
 }
 
@@ -654,6 +655,11 @@ a#menu-toggle:focus {
 
 .change-password-form .error-message-container {
     display: inline-flex;
+}
+
+.tab-banner,
+.report-tab.active {
+    background: #1E5A8F;
 }
 
 /******************************************************************/

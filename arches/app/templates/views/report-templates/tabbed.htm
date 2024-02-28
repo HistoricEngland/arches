@@ -5,13 +5,15 @@
 {% block header %}
 <!-- ko if: tabs()[activeTabIndex()]  -->
 <div>
-    <ul class="tabbed-report-tab-list">
-    <!-- ko foreach: {data: tabs, as: 'tab'}  -->
-    <li tabindex="0" data-bind="click: function(){ $parent.setActiveTab($index()) }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }" class="report-tab" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
-        <span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon)), 'aria-label': 'Display '+ko.unwrap(tab.name)+' information'}"></i></span>
-    </li>
-    <!-- /ko -->
-</ul>
+    <div class="tabbed-report-tab-list" role="tablist">
+        <!-- ko foreach: {data: tabs, as: 'tab'}  -->
+        <div data-bind="let: {tabuid: Math.random().toString(16).slice(2)}">
+            <div tabindex="0" data-bind="click: function(){ $parent.setActiveTab($index()); document.querySelector('.rp-tabpanel-id').setAttribute('id', tabuid); }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }, attr: { 'aria-expanded': ko.unwrap($parent.activeTabIndex) === $index() ? 'true' : 'false', 'aria-controls': tabuid }" class="report-tab" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" role="tab">
+                <span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon)), 'aria-label': 'Display '+ko.unwrap(tab.name)+' information'}"></i></span>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
 </div>
 <div class="tab-banner">
     <div style="display: flex; flex-direction: row">
@@ -38,7 +40,7 @@
 {% block header_form %}
 <div style="display: flex; flex-direction: row">
 <div id="card-save-tile-btn" class="install-buttons">
-    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab">{% trans "Add Tab" %}</button>
+    <button class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab">{% trans "Add Tab" %}</button>
 </div>
 </div>
 <div data-bind="sortable: {
@@ -54,7 +56,7 @@
         </div>
         <div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
-                <input type="" placeholder="{% trans "Tab Name" %}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
+                <input type="" placeholder="{% trans "Tab Name" %}" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
             </div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
                 <!--ko if: $parent.icons().length > 0 -->
@@ -104,7 +106,7 @@
     }"></div>
     <!--/ko-->
     <!-- ko if: !tabs()[activeTabIndex()].empty_component || !activeTabEmpty()  -->
-    <div class="rp-report-section relative rp-report-section-root">
+    <div id="" class="rp-report-section relative rp-report-section-root rp-tabpanel-id" role="tabpanel" aria-live="polite">
         <!-- ko if: tabs()[activeTabIndex()].side_component  -->
         <div class="tabbed-report-sidepanel-wrapper">
             <div class="tabbed-report-sidepanel" data-bind="component: {

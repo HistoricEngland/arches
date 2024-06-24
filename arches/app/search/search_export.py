@@ -270,11 +270,18 @@ class SearchResultsExporter(object):
         node_value = tile["data"][str(node.nodeid)]
         try:
             for feature_index, feature in enumerate(node_value["features"]):
-                feature["geometry"]["coordinates"] = self.set_precision(feature["geometry"]["coordinates"], self.precision)
-                try:
-                    feature_collections[fieldname]["features"].append(feature)
-                except KeyError:
-                    feature_collections[fieldname] = {"datatype": datatype, "features": [feature]}
+                if feature["geometry"]["type"] == "GeometryCollection":
+                    geom_list = []
+                    for geom_index, geom in enumerate(feature["geometry"]["geometries"]):
+                        geom["coordinates"] = self.set_precision(geom["coordinates"], self.precision)
+                        geom_list.append(geom)
+                    feature["geometry"]["geometries"] = geom_list
+                else:
+                    feature["geometry"]["coordinates"] = self.set_precision(feature["geometry"]["coordinates"], self.precision)
+                    try:
+                        feature_collections[fieldname]["features"].append(feature)
+                    except KeyError:
+                        feature_collections[fieldname] = {"datatype": datatype, "features": [feature]}
         except TypeError as e:
             pass
         return feature_collections

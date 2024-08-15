@@ -719,6 +719,7 @@ class ResourceReportView(MapBaseManagerView):
         context["nav"]["title"] = f"{graph.name} Report"
         context["nav"]["res_edit"] = True
         context["nav"]["print"] = True
+        context["nav"]["help"] = True
 
         return render(request, "views/resource/report.htm", context)
 

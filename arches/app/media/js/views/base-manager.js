@@ -9,7 +9,7 @@ define([
     'core-js',
     'dom-4',
     'views/components/language-switcher'
-], function($, _, ko, Backbone, PageView, data) {
+], function ($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({
         /**
@@ -30,18 +30,18 @@ define([
             data.graphs.sort(function (left, right) {
                 return left.name.toLowerCase() == right.name.toLowerCase() ? 0 : (left.name.toLowerCase() < right.name.toLowerCase() ? -1 : 1);
             });
-            data.graphs.forEach(function(graph){
-              graph.name = ko.observable(graph.name);
-              graph.iconclass = ko.observable(graph.iconclass);
+            data.graphs.forEach(function (graph) {
+                graph.name = ko.observable(graph.name);
+                graph.iconclass = ko.observable(graph.iconclass);
             });
             options.viewModel.allGraphs = ko.observableArray(data.graphs);
-            options.viewModel.graphs = ko.computed(function() {
-                return ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
+            options.viewModel.graphs = ko.computed(function () {
+                return ko.utils.arrayFilter(options.viewModel.allGraphs(), function (graph) {
                     return !graph.isresource;
                 });
             });
-            options.viewModel.resources = ko.computed(function() {
-                return  ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
+            options.viewModel.resources = ko.computed(function () {
+                return ko.utils.arrayFilter(options.viewModel.allGraphs(), function (graph) {
                     return graph.isresource;
                 });
             });
@@ -49,10 +49,10 @@ define([
             options.viewModel.userCanReadResources = data.userCanReadResources;
             options.viewModel.userCanEditResources = data.userCanEditResources;
 
-            options.viewModel.setResourceOptionDisable = function(option, item) {
-              if (item) {
-                ko.applyBindingsToNode(option, {disable: item.disable_instance_creation}, item);
-              }
+            options.viewModel.setResourceOptionDisable = function (option, item) {
+                if (item) {
+                    ko.applyBindingsToNode(option, { disable: item.disable_instance_creation }, item);
+                }
             };
 
             options.viewModel.navExpanded = ko.observable(false);
@@ -60,21 +60,38 @@ define([
                 window.nifty.window.trigger('resize');
             });
 
-            options.viewModel.inSearch = ko.pureComputed(function() {
+            options.viewModel.inSearch = ko.pureComputed(function () {
                 return window.location.pathname === "/search" || window.location.pathname === "/plugins/c8261a41-a409-4e45-b049-c925c28a57da";
             });
 
-            // Register binding of onEnterkeyClick. e.g. <div data-bind="onEnterkeyClick"> </div>
+            // Shared function to handle key press events
+            function handleKeyPress(element, event, keyCodes) {
+                var pressedKeyCode = (event.which ? event.which : event.keyCode);
+                if (keyCodes.includes(pressedKeyCode)) {
+                    $(element).click();
+                }
+                return true; // Allow default action
+            }
+
+            // Helper function to initialize key press binding
+            function initKeyPressBinding(element, valueAccessor, keyCodes) {
+                ko.utils.unwrapObservable(valueAccessor());
+                $(element).keypress(function (event) {
+                    handleKeyPress(element, event, keyCodes);
+                });
+            }
+
+            // Binding handler for Enter key
             ko.bindingHandlers.onEnterkeyClick = {
                 init: function (element, valueAccessor) {
-                    ko.utils.unwrapObservable(valueAccessor()); // Unwrap to get subscription.
-                    $(element).keypress(function (event) {
-                        var keyCode = (event.which ? event.which : event.keyCode);
-                        if (keyCode === 13) {   // Check if keypress is <enter>.
-                            $(element).click();
-                        }
-                        return true;    // Allow default action.
-                    });
+                    initKeyPressBinding(element, valueAccessor, [13]); // 13 is the key code for Enter
+                }
+            };
+
+            // Binding handler for Space key
+            ko.bindingHandlers.onSpaceClick = {
+                init: function (element, valueAccessor) {
+                    initKeyPressBinding(element, valueAccessor, [32]); // 32 is the key code for Space
                 }
             };
 

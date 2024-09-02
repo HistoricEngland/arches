@@ -120,6 +120,7 @@ a:focus,
 .account-tips,
 .hover-feature-metadata,
 .pagination > li > a.disabled,
+.pagination .disabled > a,
 .graph-designer-header,
 .graph-type {
     color: #595959;
@@ -278,6 +279,8 @@ button.search-type-btn:focus {
     background-color: #2B4E6D;
     border-color: #2B4E6D;
 }
+
+.pagination 
 
 .btn-u {
     background: #3D588A;

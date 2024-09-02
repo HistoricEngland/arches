@@ -126,6 +126,10 @@ a:focus,
     color: #595959;
 }
 
+.pagination .disabled > a {
+    opacity: 1;
+}
+
 .btn-profile-password {
     color: #1b4f7d;
 }

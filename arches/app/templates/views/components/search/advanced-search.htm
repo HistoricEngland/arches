@@ -5,7 +5,7 @@
     <div class="facets-container" style="">
         <div class="list-group search-facets">
             <div class="search-facet-item header">
-                <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
+                <p class="search-facet-item-heading h4">{% trans "Search Facets" %}</p>
                 <div class="list-filter relative">
                     <input type="text" class="form-control" placeholder="{% trans "Find ..." %}" aria-label="{% trans "Find search facets" %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
                     <!-- Clear Filter -->
@@ -16,16 +16,16 @@
             <!-- ko foreach: searchableGraphs -->
             <!-- ko if: cards().length > 0  -->
             <div class="search-facet-item disabled">
-                <h4 class="search-facet-item-heading" data-bind="click: function () { collapsed(!collapsed()) }">
+                <p class="search-facet-item-heading h4" data-bind="click: function () { collapsed(!collapsed()) }">
                     <strong data-bind="text: name"></strong>
                     <span><i class="fa report-expander print-hide"
                             data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
-                </h4>
+                </p>
             </div>
             <div data-bind="visible: !collapsed()">
                 <!-- ko foreach: cards -->
                 <a href="#" class="search-facet-item" data-bind="click: addFacet">
-                    <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
+                    <p class="search-facet-item-heading h4" data-bind="text: name"></p>
                     <p class="list-group-item-text"></p>
                 </a>
                 <!-- /ko -->

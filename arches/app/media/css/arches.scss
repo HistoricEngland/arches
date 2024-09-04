@@ -22,6 +22,36 @@
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
+
+//adds heading tag classes to help with styling Can be removed from 7.5 onwards
+.h1 {
+    font-size: 34px
+}
+
+.h2 {
+    font-size: 28px
+}
+
+.h3 {
+    font-size: 22px
+}
+
+.h4 {
+    font-size: 16px
+}
+
+.h5 {
+    font-size: 12px
+}
+
+.h6 {
+    font-size: 10px
+}
+
+.h1,.h2,.h3,.h4,.h5,.h6 {
+    font-weight: 600
+}
+
 #skip-link-holder a, #skip-link-holder a:link, #skip-link-holder a:visited {
     color: #000;
     background-color: #fae619;
@@ -11724,6 +11754,10 @@ table.table.dataTable {
 
 .search-export .instruction {
     font-size: 15px;
+}
+.search-export-instruction-h2 {
+    font-size: 15px;
+    margin-top: 5px;
 }
 
 .search-export .instruction h2 {

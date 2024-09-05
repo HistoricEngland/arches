@@ -5,7 +5,7 @@
     <div class="facets-container" style="">
         <div class="list-group search-facets">
             <div class="search-facet-item header">
-                <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
+                <p class="search-facet-item-heading h4">{% trans "Search Facets" %}</p>
                 <div class="list-filter relative">
                     <input type="text" class="form-control" placeholder="{% trans "Find ..." %}" aria-label="{% trans "Find search facets" %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
                     <!-- Clear Filter -->
@@ -15,21 +15,26 @@
             </div>
             <!-- ko foreach: searchableGraphs -->
             <!-- ko if: cards().length > 0  -->
-            <div class="search-facet-item disabled">
-                <h4 class="search-facet-item-heading" data-bind="click: function () { collapsed(!collapsed()) }">
+            <!-- ko let: {uid: Math.random().toString()} -->
+            <div tabindex="0" role="button" class="search-facet-item disabled" data-bind="onEnterkeyClick, onSpaceClick, click: function () { collapsed(!collapsed()) }, attr: {
+                        'aria-expanded': (!collapsed()).toString(),
+                        'aria-controls': uid,
+                        'aria-label': name + ' graph facets',
+                    }">
+                <div class="search-facet-item-heading h4" >
                     <strong data-bind="text: name"></strong>
                     <span><i class="fa report-expander print-hide"
                             data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
-                </h4>
+                </div>
             </div>
-            <div data-bind="visible: !collapsed()">
+            <div data-bind="visible: !collapsed()" role="list" data-bind="attr: {id: uid }">
                 <!-- ko foreach: cards -->
-                <a href="#" class="search-facet-item" data-bind="click: addFacet">
-                    <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
-                    <p class="list-group-item-text"></p>
+                <a href="#" role="button" data-bind="click: addFacet, attr: {'aria-label': 'Add ' + name + ' facet to advanced search'}" class="search-facet-item">
+                    <p data-bind="text: name"></p>
                 </a>
                 <!-- /ko -->
             </div>
+            <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
         </div>

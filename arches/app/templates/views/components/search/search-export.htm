@@ -6,30 +6,32 @@
 
     <div class="search-export">
         <div class="instruction">
-            <h2> {% trans "1. Format" %} </h2>
+            <div class="search-export-instruction-h2 h2">
+                <span> {% trans "1. Format" %} </span>
+            </div>
             <p class="container-fluid small">
                 {% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" %}
             </p>
         </div>
         <div class="parameter">
-            <div>
-                <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
+            <div role="radiogroup">
+                <label role="radio" data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
                 </label>
                 <!-- ko if: hasExportHtmlTemplates() -->
-                <label data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
+                <label role="radio" data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false"> {% trans "html" %}
                 </label>
                 <!-- /ko -->
-                <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
+                <label role="radio" data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
                 </label>
 
-                <label data-bind="css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, click: function () { if (hasResourceTypeFilter()) {format('tilexl')} }" class="form-radio form-normal form-text">
+                <label role="radio" data-bind="css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, click: function () { if (hasResourceTypeFilter()) {format('tilexl')} }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilexl'" value="false"> {% trans "tile excel" %}
                 </label>
                 <!-- ko if: total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} -->
-                <label data-bind="css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, click: function () { if (hasResourceTypeFilter()) {format('geojson')} }" class="form-radio form-normal form-text">
+                <label role="radio" data-bind="css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, click: function () { if (hasResourceTypeFilter()) {format('geojson')} }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'geojson'" value="false"> {% trans "geojson url" %}
                 </label>
                 <!-- ko if: format() === 'geojson' && hasResourceTypeFilter -->
@@ -43,7 +45,9 @@
         </div>
 
         <div class="instruction">
-            <h2> {% trans "2. Coordinate Precision" %} </h2>
+            <div class="search-export-instruction-h2 h2">
+                <span> {% trans "2. Coordinate Precision" %} </span>
+            </div>
             <p class="container-fluid small">
                 {% trans "Tell us how many decimal places of precision you'd like for geo-data results" %} 
             </p>
@@ -53,7 +57,9 @@
         </div>
         
         <div class="instruction">
-            <h2> {% trans "3. Report Link" %} </h2>
+            <div class="search-export-instruction-h2 h2">
+                <span> {% trans "3. Report Link" %} </span>
+            </div>
             <p class="container-fluid small">
                 {% trans "Only applicable to CSV and shapefile exports" %} 
             </p>
@@ -64,7 +70,9 @@
         <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
         <div>
             <div class="instruction">
-                <h2>{% trans "4. Name this export" %}</h2>
+                <div class="search-export-instruction-h2 h2">
+                    <span> {% trans "4. Name this export" %} </span>
+                </div>
             </div>
             <div class="parameter">
                 <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export" aria-label="Name of arches export"></input>
@@ -72,7 +80,9 @@
         </div>
         <div>
             <div class="instruction">
-                <h2> {% trans "5. Email Address" %} </h2>
+                <div class="search-export-instruction-h2 h2">
+                    <span> {% trans "5. Email Address" %} </span>
+                </div>
                 <p class="container-fluid small">
                     {% trans "This download may take some time.  Tell us where to email a download link to your results" %}
                 </p>

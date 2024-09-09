@@ -14,7 +14,7 @@
 
         <!-- Date Type -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "Type" %}</h3>
+            <p class="search-label h3">{% trans "Type" %}</p>
             <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} ">
                 <option value="">{% trans "Search all dates" %}</option>
                 <!-- ko foreach: { data: graph_models, as: 'graph' } -->
@@ -31,7 +31,7 @@
 
         <!-- Date Selector -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "Within" %}</h3>
+            <p class="search-label h3">{% trans "Within" %}</p>
             <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%' }">
                 <option value="custom">{% trans "Custom date range" %}</option>
                 <option value="today">{% trans "Today" %}</option>
@@ -49,7 +49,7 @@
     <div id="calendar">
         <!-- From Date -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "From" %}</h3>
+            <p class="search-label h3">{% trans "From" %}</p>
             <div id="search-from-c" class="hide-datepicker-time-option">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'" aria-label="Start date">
             </div>
@@ -57,14 +57,14 @@
 
         <!-- To Date -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "To" %}</h3>
+            <p class="search-label h3">{% trans "To" %}</p>
             <div id="search-from-b" class="hide-datepicker-time-option">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'" aria-label="End date">
             </div>
         </div>
     </div>
 
-    <h3 class="time-wheel-title">{% trans "Time Wheel" %}</h3>
+    <p class="time-wheel-title h3">{% trans "Time Wheel" %}</p>
     <div class="time-wheel-instructions">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
     <hr class="title-underline"><div class="sequence" data-bind="visible: loading">{% trans 'Loading time wheel...' %}</div>
     <div class="time-wheel-wrap relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}, css:{'time-wheel-loading-mask': loading}">

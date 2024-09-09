@@ -120,9 +120,16 @@ a:focus,
 .account-tips,
 .hover-feature-metadata,
 .pagination > li > a.disabled,
+.pagination .disabled > a,
+.pagination .disabled > a:hover,
 .graph-designer-header,
 .graph-type {
     color: #595959;
+}
+
+.pagination .disabled > a,
+.pagination .disabled > a:hover {
+    opacity: 1;
 }
 
 .btn-profile-password {

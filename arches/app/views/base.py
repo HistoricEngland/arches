@@ -40,9 +40,8 @@ class BaseManagerView(TemplateView):
     template_name = ""
 
     def help_url_based_on_user(self, user):
-        groups_length = len(user.groups.all())
         guest_filter = user.groups.filter(name='Guest').exists()
-        if groups_length == 1 and guest_filter == True:
+        if guest_filter == True:
             return settings.BASIC_HELP_LINK
         else:
             return settings.ADVANCED_HELP_LINK

@@ -23,6 +23,11 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.search import allow_user_to_export_results
+from arches.setup import get_version
+try:
+    from arches_her import __software_version__
+except:
+    __software_version__ = None
 
 
 def livereload(request):
@@ -32,14 +37,17 @@ def livereload(request):
 def map_info(request):
     geo_utils = GeoUtils()
     if settings.DEFAULT_BOUNDS is not None:
-        hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
+        hex_bin_bounds = geo_utils.get_bounds_from_geojson(
+            settings.DEFAULT_BOUNDS)
         default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
     else:
         hex_bin_bounds = (0, 0, 1, 1)
-        default_center = {"coordinates": [6.602384, 0.245926]}  # an island off the coast of Africa
+        # an island off the coast of Africa
+        default_center = {"coordinates": [6.602384, 0.245926]}
 
     try:
-        group_map_settings = GroupMapSettings.objects.get(group=request.user.groups.all()[0])
+        group_map_settings = GroupMapSettings.objects.get(
+            group=request.user.groups.all()[0])
         min_zoom = group_map_settings.min_zoom
         max_zoom = group_map_settings.max_zoom
         default_zoom = group_map_settings.default_zoom
@@ -54,7 +62,8 @@ def map_info(request):
             "zoom": default_zoom,
             "map_min_zoom": min_zoom,
             "map_max_zoom": max_zoom,
-            "map_search_auto_zoom" : "true" if settings.MAP_SEARCH_AUTO_ZOOM else "false", # needs to be set from the settings and to be added to the System Settings Graph so it can be changed by the sys admin
+            # needs to be set from the settings and to be added to the System Settings Graph so it can be changed by the sys admin
+            "map_search_auto_zoom": "true" if settings.MAP_SEARCH_AUTO_ZOOM else "false",
             "mapbox_api_key": settings.MAPBOX_API_KEY,
             "hex_bin_size": settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100,
             "mapbox_sprites": settings.MAPBOX_SPRITES,
@@ -70,6 +79,7 @@ def app_settings(request):
     return {
         "app_settings": {
             "VERSION": __version__,
+            "SOFTWARE_VERSION": __software_version__ if __software_version__ else __version__,
             "APP_NAME": settings.APP_NAME,
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,

@@ -6,8 +6,6 @@ try:
 except ModuleNotFoundError as e:
     print(e)
 
-# Change this every time you release a new version
-# For example, for Keystone version 1.2.2 use VERSION = (1, 2, 2, "final", 0)
 VERSION = (6, 1, 1, "beta", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
 
 __version__ = get_version(VERSION)

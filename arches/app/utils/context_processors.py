@@ -37,8 +37,7 @@ def livereload(request):
 def map_info(request):
     geo_utils = GeoUtils()
     if settings.DEFAULT_BOUNDS is not None:
-        hex_bin_bounds = geo_utils.get_bounds_from_geojson(
-            settings.DEFAULT_BOUNDS)
+        hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
         default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
     else:
         hex_bin_bounds = (0, 0, 1, 1)
@@ -46,8 +45,7 @@ def map_info(request):
         default_center = {"coordinates": [6.602384, 0.245926]}
 
     try:
-        group_map_settings = GroupMapSettings.objects.get(
-            group=request.user.groups.all()[0])
+        group_map_settings = GroupMapSettings.objects.get(group=request.user.groups.all()[0])
         min_zoom = group_map_settings.min_zoom
         max_zoom = group_map_settings.max_zoom
         default_zoom = group_map_settings.default_zoom

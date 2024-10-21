@@ -24,10 +24,6 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.search import allow_user_to_export_results
 from arches.setup import get_version
-try:
-    from arches_her import __software_version__
-except:
-    __software_version__ = None
 
 
 def livereload(request):

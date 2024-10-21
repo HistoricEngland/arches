@@ -77,7 +77,7 @@ def app_settings(request):
     return {
         "app_settings": {
             "VERSION": __version__,
-            "SOFTWARE_VERSION": __software_version__ if __software_version__ else __version__,
+            "APP_VERSION": settings.APP_VERSION,
             "APP_NAME": settings.APP_NAME,
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,

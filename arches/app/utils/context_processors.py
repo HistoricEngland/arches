@@ -36,7 +36,8 @@ def map_info(request):
         default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
     else:
         hex_bin_bounds = (0, 0, 1, 1)
-        default_center = {"coordinates": [6.602384, 0.245926]}  # an island off the coast of Africa
+        # an island off the coast of Africa
+        default_center = {"coordinates": [6.602384, 0.245926]}
 
     try:
         group_map_settings = GroupMapSettings.objects.get(group=request.user.groups.all()[0])
@@ -54,7 +55,8 @@ def map_info(request):
             "zoom": default_zoom,
             "map_min_zoom": min_zoom,
             "map_max_zoom": max_zoom,
-            "map_search_auto_zoom" : "true" if settings.MAP_SEARCH_AUTO_ZOOM else "false", # needs to be set from the settings and to be added to the System Settings Graph so it can be changed by the sys admin
+            # needs to be set from the settings and to be added to the System Settings Graph so it can be changed by the sys admin
+            "map_search_auto_zoom": "true" if settings.MAP_SEARCH_AUTO_ZOOM else "false",
             "mapbox_api_key": settings.MAPBOX_API_KEY,
             "hex_bin_size": settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100,
             "mapbox_sprites": settings.MAPBOX_SPRITES,
@@ -70,6 +72,7 @@ def app_settings(request):
     return {
         "app_settings": {
             "VERSION": __version__,
+            "APP_VERSION": settings.APP_VERSION,
             "APP_NAME": settings.APP_NAME,
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,

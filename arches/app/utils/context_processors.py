@@ -23,7 +23,6 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.search import allow_user_to_export_results
-from arches.setup import get_version
 
 
 def livereload(request):

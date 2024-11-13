@@ -7,7 +7,7 @@
     var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
-        urlArgs: '_dc={{ app_settings.VERSION }}',
+        urlArgs: '_dc={{ app_settings.APP_VERSION|default_if_none:app_settings.VERSION }}',
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),

@@ -167,7 +167,7 @@ define([
                             _.each(card.nodes, function(node) {
                                 facet[node.nodeid] = ko.observable(facet[node.nodeid]);
                                 node.label = node.name;
-                            });
+                            }).sort((a, b) => a.sortorder - b.sortorder);
                             facet.op = ko.observable(facet.op);
                             this.filter.facets.push({
                                 card: card,

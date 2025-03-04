@@ -50,15 +50,7 @@ define([
                             return node.nodegroup_id === card.nodegroup_id;
                         });
                         card.addFacet = function() {
-                            _.each(card.nodes, function(node) {
-                                if (self.cardNameDict[node.nodegroup_id] && node.nodeid === node.nodegroup_id) {
-                                    node.label = self.cardNameDict[node.nodegroup_id];
-                                } else if (node.nodeid !== node.nodegroup_id && self.widgetLookup[node.nodeid]) {
-                                    node.label = self.widgetLookup[node.nodeid].label;
-                                } else {
-                                    node.label = node.name;
-                                }
-                            });
+                            self.applyNodeOrderAndLabels(card);
                             self.newFacet(card);
                         };
                     }, this);
@@ -143,7 +135,23 @@ define([
                 this.filter.facets.push(facet);
             },
 
+            applyNodeOrderAndLabels: function(card){
+                var self = this;
+                _.each(card.nodes, function(node) {
+                    if (self.cardNameDict[node.nodegroup_id] && node.nodeid === node.nodegroup_id) {
+                        node.label = self.cardNameDict[node.nodegroup_id];
+                    } else if (node.nodeid !== node.nodegroup_id && self.widgetLookup[node.nodeid]) {
+                        const widget = self.widgetLookup[node.nodeid];
+                        node.label = widget.label;
+                        node.sortorder = widget.sortorder;
+                    } else {
+                        node.label = node.name;
+                    }
+                }).sort((a, b) => a.sortorder - b.sortorder);
+            },
+
             restoreState: function() {
+                var self = this;
                 var query = this.query();
                 if (componentName in query) {
                     var facets = JSON.parse(query[componentName]);
@@ -162,6 +170,7 @@ define([
                             return _.contains(cardNodeIds, nodeIds[0]);
                         }, this);
                         if (card) {
+                            self.applyNodeOrderAndLabels(card);
                             _.each(card.nodes, function(node) {
                                 facet[node.nodeid] = ko.observable(facet[node.nodeid]);
                             });

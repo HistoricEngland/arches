@@ -52,22 +52,36 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <script src="https://js.monitor.azure.com/scripts/b/ai.2.min.js"></script>
+    <script src="https://unpkg.com/@opentelemetry/api/build/esm/index.js"></script>
+    <script src="https://unpkg.com/@opentelemetry/sdk-trace-web/build/esm/index.js"></script>
+    <script src="https://unpkg.com/@opentelemetry/exporter-collector/build/esm/index.js"></script>
     <script>
         // ##### OpenTelemetry Monitoring #####
         var aikey = '#{appinsights-key}#';
         if (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(aikey) == true) {
             console.log("aikey valid"); // Validating the instrumentation key format, do not log key in production
             try {
-                // Initialize OpenTelemetry with Azure Monitor
-                const otel = new OpenTelemetry.ApplicationInsights({
-                    connectionString: `InstrumentationKey=${aikey}`
+                // Import OpenTelemetry modules
+                const { WebTracerProvider } = opentelemetry.sdkTraceWeb;
+                const { CollectorTraceExporter } = opentelemetry.exporterCollector;
+                const { SimpleSpanProcessor } = opentelemetry.sdkTraceBase;
+
+                // Initialize OpenTelemetry
+                const provider = new WebTracerProvider();
+                const exporter = new CollectorTraceExporter({
+                    url: `https://dc.services.visualstudio.com/v2/track` // Correct Azure Monitor endpoint
                 });
+                provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+                provider.register();
+
+                const tracer = provider.getTracer('example-tracer');
 
                 // Start tracking page views and other telemetry
-                otel.start();
-                otel.trackPageView(); // Tracks the initial page load
-                otel.trackEvent({ name: "Page Loaded" }); // Custom event for page load
-                otel.trackMetric({ name: "Page Load Time", value: performance.now() }); // Custom metric for page load time
+                const pageLoadSpan = tracer.startSpan('page-load');
+                pageLoadSpan.end();
+
+                tracer.startSpan('Page Loaded').end();
+                tracer.startSpan('Page Load Time', { attributes: { value: performance.now() } }).end();
             }
             catch (error) {
                 console.error("Error initializing OpenTelemetry:", error);

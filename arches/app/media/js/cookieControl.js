@@ -53,6 +53,8 @@ const config = {
       cookies: [
         'ai_user',
         'ai_session',
+        'ai_authUser',
+        'ai_*',
         '_ga',
         '_gid',
         '_gat*',
@@ -67,8 +69,10 @@ const config = {
         '__utmv'
       ],
       onAccept: function () {
+        // Analytics cookies have been accepted
       },
       onRevoke: function () {
+        // Application Insights cookies are now managed by the SDK's disableCookiesUsage configuration
       }
     }
   ]

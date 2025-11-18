@@ -39,9 +39,9 @@ jobs:
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev
           echo Postgres and ES dependencies installed
 
-      - uses: ankane/setup-elasticsearch@v1
+      - uses: ankane/setup-elasticsearch@b6f405b74469280752a0a6cff528483d8cb98380
         with:
-          elasticsearch-version: 8
+          elasticsearch-version: 7
 
       - name: Start CouchDB
         uses: archesproject/couchdb-github-action@master

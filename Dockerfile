@@ -30,17 +30,17 @@ RUN set -ex \
         docbook-mathml \
         libgdal-dev \
         libpq-dev \
-        python3.9 \
-        python3.9-dev \
+        python3.8 \
+        python3.8-dev \
         curl \
-        python3.9-distutils \
+        python3.8-distutils \
         libldap2-dev libsasl2-dev ldap-utils \
         dos2unix \
         " \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends $BUILD_DEPS \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3.9 get-pip.py
+    && python3.8 get-pip.py
 
 RUN pip3 wheel --no-cache-dir -b /tmp -r ${WHEELS}/requirements.txt  \
     && pip3 wheel --no-cache-dir -b /tmp -r ${WHEELS}/requirements_dev.txt  \
@@ -70,9 +70,9 @@ RUN set -ex \
         libgdal-dev \
         python3-venv \
         postgresql-client-12 \
-        python3.9 \
-        python3.9-distutils \
-        python3.9-venv \
+        python3.8 \
+        python3.8-distutils \
+        python3.8-venv \
     " \
     && apt-get install -y --no-install-recommends curl \
     && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
@@ -81,7 +81,7 @@ RUN set -ex \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends $RUN_DEPS \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3.9 get-pip.py \
+    && python3.8 get-pip.py \
     && apt-get install -y nodejs \
     && npm install -g yarn
 
@@ -98,9 +98,8 @@ WORKDIR ${WEB_ROOT}
 
 RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
 
-RUN python3.9 -m venv ENV \
+RUN python3.8 -m venv ENV \
     && . ENV/bin/activate \
-    && pip install --upgrade pip==23.1.2 setuptools wheel \
     && pip install requests \
     && pip install -f ${WHEELS} django-auth-ldap \
     && pip install -f ${WHEELS} gunicorn \

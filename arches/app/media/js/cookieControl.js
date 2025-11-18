@@ -42,8 +42,6 @@ const config = {
   },
 
   necessaryCookies: [
-    'ai_user',
-    'ai_session',
     'csrftoken',
     'Arches_*'
   ],
@@ -53,6 +51,10 @@ const config = {
       label: 'Analytics cookies',
       description: 'Analytics cookies help us to improve our website by collecting and reporting information on its usage.',
       cookies: [
+        'ai_user',
+        'ai_session',
+        'ai_authUser',
+        'ai_*',
         '_ga',
         '_gid',
         '_gat*',
@@ -67,8 +69,10 @@ const config = {
         '__utmv'
       ],
       onAccept: function () {
+        // Analytics cookies have been accepted
       },
       onRevoke: function () {
+        // Application Insights cookies are now managed by the SDK's disableCookiesUsage configuration
       }
     }
   ]

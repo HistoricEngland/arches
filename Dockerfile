@@ -100,6 +100,7 @@ RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
 
 RUN python3.9 -m venv ENV \
     && . ENV/bin/activate \
+    && pip install --upgrade pip==23.1.2 setuptools wheel \
     && pip install requests \
     && pip install -f ${WHEELS} django-auth-ldap \
     && pip install -f ${WHEELS} gunicorn \

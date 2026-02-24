@@ -42,8 +42,8 @@ from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
 from arches.app.views.resource import RelatedResourcesView, get_resource_relationship_types
 from arches.app.utils.skos import SKOSWriter
-from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_concept, group_required
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
+from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
@@ -1473,13 +1473,24 @@ class Tile(APIBase):
             return JSONResponse(str(e), status=404)
 
         # filter tiles from attribute query based on user permissions
-        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
-        if str(tile.nodegroup_id) in permitted_nodegroups:
+        permitted_nodegroups = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
+        if tile.nodegroup_id in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
             return JSONResponse(_("Tile not found."), status=404)
 
     def post(self, request, tileid):
+        resourceid = json.loads(request.POST.get("data"))["resourceinstance_id"]
+        # Important! The resource instance permission decorator on the TileView
+        # will not be called by the instance of TileView below.
+        # Resource edit perms must be checked here.
+        if resourceid and models.ResourceInstance.objects.filter(pk=resourceid):
+            if not user_can_edit_resource(request.user, resourceid):
+                return JSONResponse(
+                    _("User is not permitted to edit this resource"), status=403
+                )
         tileview = TileView()
         tileview.action = "update_tile"
         # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
@@ -1584,6 +1595,7 @@ class InstancePermission(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(check_tile_permissions, name="dispatch")
 class NodeValue(APIBase):
     def post(self, request):
         datatype_factory = DataTypeFactory()
@@ -1595,15 +1607,13 @@ class NodeValue(APIBase):
         operation = request.POST.get("operation")
         transaction_id = request.POST.get("transaction_id")
 
-        # get node model return error if not found
         try:
             node = models.Node.objects.get(nodeid=nodeid)
         except Exception as e:
-            return JSONResponse(e, status=404)
+            return JSONResponse(_("Node not found"), status=404)
 
         # check if user has permissions to write to node
-        user_has_perms = request.user.has_perm("write_nodegroup", node)
-
+        user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
         if user_has_perms:
             # get datatype of node
             try:
@@ -1614,19 +1624,30 @@ class NodeValue(APIBase):
             # transform data to format expected by tile
             data = datatype.transform_value_for_tile(data, format=format)
 
-            # get existing data and append new data if operation='append'
+        try:
+            tile = models.TileModel.objects.get(tileid=tileid)
+            if not user_can_edit_resource(request.user, tile.resourceinstance_id):
+                return JSONResponse(
+                    _("User is not permitted to edit this resource"), status=403
+                )
             if operation == "append":
-                tile = models.TileModel.objects.get(tileid=tileid)
                 data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
             new_tile = TileProxyModel.update_node_value(
-                nodeid, data, tileid, request=request, resourceinstanceid=resourceid, transaction_id=transaction_id
+                nodeid,
+                data,
+                tileid,
+                request=request,
+                resourceinstanceid=resourceid,
+                transaction_id=transaction_id,
             )
 
             response = JSONResponse(new_tile, status=200)
         else:
-            response = JSONResponse(_("User does not have permission to edit this node."), status=403)
+            response = JSONResponse(
+                _("User does not have permission to edit this node."), status=403
+            )
 
         return response
 

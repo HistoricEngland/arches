@@ -1596,7 +1596,7 @@ class InstancePermission(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 @method_decorator(
-    group_required("Resource Editor", raise_exception=True), name="dispatch"
+    group_required("Resource Editor"), name="dispatch"
 )
 class NodeValue(APIBase):
     def post(self, request):

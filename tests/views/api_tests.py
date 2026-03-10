@@ -442,7 +442,7 @@ class APITests(ArchesTestCase):
         """
         Test all Resources API methods (GET, POST, PUT, DELETE) for privileged and unprivileged users.
         """
-        breakpoint()
+        #breakpoint()
         privileged_user = User.objects.create_user(username="privileged", password="privileged")
         unprivileged_user = User.objects.create_user(username="unprivileged", password="unprivileged")
         resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")

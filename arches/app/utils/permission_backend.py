@@ -199,6 +199,7 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
                 if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups.add(nodegroup)
         else:
+            breakpoint()
             # if no explicit permissions, check group permissions
             group_perms = set()
             for group in user.groups.all():
@@ -211,7 +212,10 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
                 else:
                     if set(formatted_perms) == group_perms:
                         permitted_nodegroups.add(nodegroup)
-            # If no group permissions, do not add nodegroup (not accessible)
+            else:
+                # Add nodegroup if no group permissions are set. Default to permissive.
+                permitted_nodegroups.add(nodegroup)
+            
 
     return permitted_nodegroups
 

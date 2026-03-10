@@ -44,60 +44,7 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 class APITests(ArchesTestCase):
 
     def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    @classmethod
-    def setUpClass(cls):
-        geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
-        cls.loadOntology()
-        with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
-            json = JSONDeserializer().deserialize(f)
-            cls.unique_graph = Graph(json["graph"][0])
-            cls.unique_graph.save()
-
-        with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
-            json = JSONDeserializer().deserialize(f)
-            cls.ambiguous_graph = Graph(json["graph"][0])
-            cls.ambiguous_graph.save()
-
-        with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
-            json = JSONDeserializer().deserialize(f)
-            cls.phase_type_assignment_graph = Graph(json["graph"][0])
-            cls.phase_type_assignment_graph.save()
-
-        # Load the test package to provide resources graph.
-        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-
-    def test_api_base_view(self):
-        """
-        Test that our custom header parameters get pushed on to the GET QueryDict
-
-        """
-
-        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
-        view = APIBase.as_view()
-
-        # request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
-        # request.user = None
-        # response = view(request)
-        # self.assertEqual(request.GET.get("ver"), "2.0")
-
-        # request = factory.get(reverse("mobileprojects"), kwargs={})
-        # request.user = None
-        # response = view(request)
-        # self.assertEqual(request.GET.get("ver"), "2.1")
-
-    def test_api_resources_archesjson(self):
-        """
-        Test that resources POST and PUT accept arches-json format data.
-        """
-        # ==Arrange=========================================================================================
-
-        test_resource_simple = {
+            self.test_resource_simple = {
             "displaydescription": " We're knights of the Round Table, we dance whene'er we're able.",
             "displayname": " Knights of Camelot",
             "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122",
@@ -236,8 +183,58 @@ class APITests(ArchesTestCase):
             ],
         }
 
-        
-        payload = JSONSerializer().serialize(test_resource_simple)
+    def tearDown(self):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
+        cls.loadOntology()
+        with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
+            json = JSONDeserializer().deserialize(f)
+            cls.unique_graph = Graph(json["graph"][0])
+            cls.unique_graph.save()
+
+        with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
+            json = JSONDeserializer().deserialize(f)
+            cls.ambiguous_graph = Graph(json["graph"][0])
+            cls.ambiguous_graph.save()
+
+        with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
+            json = JSONDeserializer().deserialize(f)
+            cls.phase_type_assignment_graph = Graph(json["graph"][0])
+            cls.phase_type_assignment_graph.save()
+
+        # Load the test package to provide resources graph.
+        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+
+    def test_01_api_base_view(self):
+        """
+        Test that our custom header parameters get pushed on to the GET QueryDict
+
+        """
+
+        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
+        view = APIBase.as_view()
+
+        # request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
+        # request.user = None
+        # response = view(request)
+        # self.assertEqual(request.GET.get("ver"), "2.0")
+
+        # request = factory.get(reverse("mobileprojects"), kwargs={})
+        # request.user = None
+        # response = view(request)
+        # self.assertEqual(request.GET.get("ver"), "2.1")
+
+    def test_02_api_resources_archesjson(self):
+        """
+        Test that resources POST and PUT accept arches-json format data.
+        """
+        # ==Arrange=========================================================================================
+       
+        payload = JSONSerializer().serialize(self.test_resource_simple)
         content_type = "application/json"
         self.client.login(username="admin", password="admin")
 
@@ -272,11 +269,11 @@ class APITests(ArchesTestCase):
         # ==Arrange=========================================================================================
 
         # modify test_resource_simple
-        test_resource_simple["tiles"][0]["data"][
+        self.test_resource_simple["tiles"][0]["data"][
             "65f87f4c-95bd-11e8-b7a6-acde48001122"
         ] = "We do routines and chorus scenes with footwork impec-cable.."
-        test_resource_simple["legacyid"] = "we eat ham and jam and Spam a lot."  # legacyid has a unique index constraint.
-        payload_modified = JSONSerializer().serialize(test_resource_simple)
+        self.test_resource_simple["legacyid"] = "we eat ham and jam and Spam a lot."  # legacyid has a unique index constraint.
+        payload_modified = JSONSerializer().serialize(self.test_resource_simple)
 
         # ==PUT=============================================================================================
 
@@ -332,9 +329,9 @@ class APITests(ArchesTestCase):
         # ==Arrange=========================================================================================
 
         # modify resourceinstanceid on modified test_resource_simple to that of initial POST resource.
-        test_resource_simple["resourceinstanceid"] = my_resource_resourceinstanceid
-        test_resource_simple["legacyid"] = "we sing from the diaphragm a lot."  # legacyid has a unique index constraint.
-        payload_modified = JSONSerializer().serialize(test_resource_simple)
+        self.test_resource_simple["resourceinstanceid"] = my_resource_resourceinstanceid
+        self.test_resource_simple["legacyid"] = "we sing from the diaphragm a lot."  # legacyid has a unique index constraint.
+        payload_modified = JSONSerializer().serialize(self.test_resource_simple)
 
         # ==Act : PUT resource changes to initial POST database resource to overwrite=======================
         resp_put = self.client.put(
@@ -382,26 +379,57 @@ class APITests(ArchesTestCase):
         # ==================================================================================================
 
 
-    def test_api_permissions(self):
+    def test_03_api_permissions(self):
         """
         Test API responses for users with and without sufficient privileges.
         """
+        breakpoint()
         # Create privileged and unprivileged users
         privileged_user = User.objects.create_user(username="privileged", password="privileged")
         unprivileged_user = User.objects.create_user(username="unprivileged", password="unprivileged")
-
+        
         # Add privileged user to Resource Editor group
         resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
         privileged_user.groups.add(resource_editor_group)
 
+
+        # Set up test resource data
+        # ==Arrange=========================================================================================
+       
+        payload = JSONSerializer().serialize(self.test_resource_simple)
+        content_type = "application/json"
+        self.client.login(username="admin", password="admin")
+
+        # ==POST============================================================================================
+
+        # ==Act : POST resource to database (N.B. resourceid supplied will be overwritten by arches)========
+        resp_post = self.client.post(
+            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+            payload,
+            content_type,
+        )
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
+        my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
+        self.assertEqual(my_resource[0]["legacyid"], "I have to push the pram a lot.", "POST returned resource with correct legacyid")  # Success, we were returned the right one.
+        my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
+        # ==================================================================================================
+
+
+        # POST
+        # resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
+        self.assertNotEqual(resp_post.status_code, 403, "Set up test resource data  - Admin should not get 403 Forbidden")
+        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertNotEqual(resp_priv.status_code, 403, "Admin user should not GET 403 Forbidden")
+
         # Test privileged user can access protected API endpoint
         self.client.login(username="privileged", password="privileged")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}))
+        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
         self.assertNotEqual(resp_priv.status_code, 403, "Privileged user should not get 403 Forbidden")
 
         # Test unprivileged user gets 403 Forbidden
         self.client.login(username="unprivileged", password="unprivileged")
-        resp_unpriv = self.client.get(reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}))
+        resp_unpriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
         self.assertEqual(resp_unpriv.status_code, 403, "Unprivileged user should get 403 Forbidden")
 
         # Clean up
@@ -410,27 +438,54 @@ class APITests(ArchesTestCase):
         resource_editor_group.delete()
 
     
-    def test_resources_api_methods_permissions(self):
+    def test_04_resources_api_methods_permissions(self):
         """
         Test all Resources API methods (GET, POST, PUT, DELETE) for privileged and unprivileged users.
         """
+        breakpoint()
         privileged_user = User.objects.create_user(username="privileged", password="privileged")
         unprivileged_user = User.objects.create_user(username="unprivileged", password="unprivileged")
         resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
         privileged_user.groups.add(resource_editor_group)
 
-        resource_id = "075957c4-d97f-4986-8d27-c32b6dec8e62"
-        url = reverse("resources", kwargs={"resourceid": resource_id})
+
+        # Set up test resource data
+        # ==Arrange=========================================================================================
+       
+        payload = JSONSerializer().serialize(self.test_resource_simple)
         content_type = "application/json"
-        payload = JSONSerializer().serialize({
-            "displaydescription": "Test resource description",
-            "displayname": "Test resource",
-            "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122",
-            "legacyid": "test-legacy-id",
-            "map_popup": "Test popup",
-            "resourceinstanceid": resource_id,
-            "tiles": [],
-        })
+        self.client.login(username="admin", password="admin")
+
+        # ==POST============================================================================================
+
+        # ==Act : POST resource to database (N.B. resourceid supplied will be overwritten by arches)========
+        resp_post = self.client.post(
+            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+            payload,
+            content_type,
+        )
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
+        my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
+        self.assertEqual(my_resource[0]["legacyid"], "I have to push the pram a lot.", "POST returned resource with correct legacyid")  # Success, we were returned the right one.
+        my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
+        # ==================================================================================================
+
+        # Admin user tests
+        url = reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid})
+        # self.client.login(username="admin", password="admin")
+        # # POST
+        # resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
+        self.assertNotEqual(resp_post.status_code, 403, "Admin user POST should not get 403 Forbidden")
+        # GET
+        resp_get = self.client.get(url + "?format=arches-json")
+        self.assertNotEqual(resp_get.status_code, 403, "Admin user GET should not get 403 Forbidden")
+        # PUT
+        resp_put = self.client.put(url + "?format=arches-json", payload, content_type)
+        self.assertNotEqual(resp_put.status_code, 403, "Admin user PUT should not get 403 Forbidden")
+        # DELETE
+        resp_delete = self.client.delete(url)
+        self.assertNotEqual(resp_delete.status_code, 403, "Admin user DELETE should not get 403 Forbidden")
 
         # Privileged user tests
         self.client.login(username="privileged", password="privileged")

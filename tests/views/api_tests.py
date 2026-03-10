@@ -385,14 +385,20 @@ class APITests(ArchesTestCase):
         Test API responses for users with and without sufficient privileges.
         """
         breakpoint()
-        # Create privileged and unprivileged users
+        # Create privileged and deprivileged users
         privileged_user = User.objects.create_user(username="privileged", password="privileged")
-        unprivileged_user = User.objects.create_user(username="unprivileged", password="unprivileged")
+        deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
+        deprivileged_group_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
         
         # Add privileged user to Resource Editor group
         resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
         privileged_user.groups.add(resource_editor_group)
 
+        # Add deprivileged group user to a group with deny permissions
+        group = Group.objects.create(name="UnprivilegedGroup")
+        deprivileged_group_user = User.objects.create_user(username="unprivilegeduser", password="testpassword")
+        deprivileged_group_user.groups.add(group)
+        deprivileged_group_user.save()
 
         # Set up test resource data
         # ==Arrange=========================================================================================
@@ -416,8 +422,12 @@ class APITests(ArchesTestCase):
         my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
         # ==================================================================================================
 
+        # Add deprivileged user to no_access_to_resourceinstance object permission for the test resourceinstance
         resource_instance = Resource.objects.get(resourceinstanceid=my_resource[0]["resourceinstanceid"])
-        assign_perm("no_access_to_resourceinstance", unprivileged_user, resource_instance)
+        assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
+
+        # Add deprivileged group to no_access_to_resourceinstance object permission for the test resourceinstance
+        assign_perm("no_access_to_resourceinstance", group, resource_instance)
 
         # POST
         # resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
@@ -430,17 +440,16 @@ class APITests(ArchesTestCase):
         resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
         self.assertNotEqual(resp_priv.status_code, 403, "Privileged user should not get 403 Forbidden")
 
-        # Test unprivileged user gets 403 Forbidden
-
-        self.client.login(username="unprivileged", password="unprivileged")
+        # Test deprivileged user gets 403 Forbidden
+        self.client.login(username="deprivileged", password="deprivileged")
         resp_unpriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_unpriv.status_code, 403, "Unprivileged user should get 403 Forbidden")
+        self.assertEqual(resp_unpriv.status_code, 403, "Deprivileged user should get 403 Forbidden")
 
         # Clean up
         privileged_user.delete()
-        unprivileged_user.delete()
+        deprivileged_user.delete()
         resource_editor_group.delete()
-
+        deprivileged_group_user.delete()
     
     def test_04_resources_api_methods_permissions(self):
         """
@@ -448,7 +457,7 @@ class APITests(ArchesTestCase):
         """
         #breakpoint()
         privileged_user = User.objects.create_user(username="privileged", password="privileged")
-        unprivileged_user = User.objects.create_user(username="unprivileged", password="unprivileged")
+        deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
         resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
         privileged_user.groups.add(resource_editor_group)
 
@@ -506,22 +515,22 @@ class APITests(ArchesTestCase):
         resp_delete = self.client.delete(url)
         self.assertNotEqual(resp_delete.status_code, 403, "Privileged user DELETE should not get 403 Forbidden")
 
-        # Unprivileged user tests
-        self.client.login(username="unprivileged", password="unprivileged")
+        # Deprivileged user tests
+        self.client.login(username="deprivileged", password="deprivileged")
         # POST
-        resp_post_unpriv = self.client.post(url + "?format=arches-json", payload, content_type)
-        self.assertEqual(resp_post_unpriv.status_code, 403, "Unprivileged user POST should get 403 Forbidden")
+        resp_post_depriv = self.client.post(url + "?format=arches-json", payload, content_type)
+        self.assertEqual(resp_post_depriv.status_code, 403, "Deprivileged user POST should get 403 Forbidden")
         # GET
-        resp_get_unpriv = self.client.get(url + "?format=arches-json")
-        self.assertEqual(resp_get_unpriv.status_code, 403, "Unprivileged user GET should get 403 Forbidden")
+        resp_get_depriv = self.client.get(url + "?format=arches-json")
+        self.assertEqual(resp_get_depriv.status_code, 403, "Deprivileged user GET should get 403 Forbidden")
         # PUT
-        resp_put_unpriv = self.client.put(url + "?format=arches-json", payload, content_type)
-        self.assertEqual(resp_put_unpriv.status_code, 403, "Unprivileged user PUT should get 403 Forbidden")
+        resp_put_depriv = self.client.put(url + "?format=arches-json", payload, content_type)
+        self.assertEqual(resp_put_depriv.status_code, 403, "Deprivileged user PUT should get 403 Forbidden")
         # DELETE
-        resp_delete_unpriv = self.client.delete(url)
-        self.assertEqual(resp_delete_unpriv.status_code, 403, "Unprivileged user DELETE should get 403 Forbidden")
+        resp_delete_depriv = self.client.delete(url)
+        self.assertEqual(resp_delete_depriv.status_code, 403, "Deprivileged user DELETE should get 403 Forbidden")
 
         # Clean up
         privileged_user.delete()
-        unprivileged_user.delete()
+        deprivileged_user.delete()
         resource_editor_group.delete()

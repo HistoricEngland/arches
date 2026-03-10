@@ -400,7 +400,7 @@ class APITests(ArchesTestCase):
         deprivileged_group_user.groups.add(group)
         deprivileged_group_user.save()
 
-        # Set up test resource data
+        # Set up test resource data under admin user
         # ==Arrange=========================================================================================
        
         payload = JSONSerializer().serialize(self.test_resource_simple)
@@ -442,8 +442,13 @@ class APITests(ArchesTestCase):
 
         # Test deprivileged user gets 403 Forbidden
         self.client.login(username="deprivileged", password="deprivileged")
-        resp_unpriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_unpriv.status_code, 403, "Deprivileged user should get 403 Forbidden")
+        resp_depriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_depriv.status_code, 403, "Deprivileged user should get 403 Forbidden")
+
+        # Test deprivileged_group_user user gets 403 Forbidden
+        self.client.login(username="deprivileged_group", password="deprivileged_group")
+        resp_degrp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_degrp_priv.status_code, 403, "Deprivileged group user should get 403 Forbidden")
 
         # Clean up
         privileged_user.delete()

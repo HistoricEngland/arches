@@ -36,6 +36,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User, Group, AnonymousUser
+from guardian.shortcuts import assign_perm
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/api_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -415,6 +416,8 @@ class APITests(ArchesTestCase):
         my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
         # ==================================================================================================
 
+        resource_instance = Resource.objects.get(resourceinstanceid=my_resource[0]["resourceinstanceid"])
+        assign_perm("no_access_to_resourceinstance", unprivileged_user, resource_instance)
 
         # POST
         # resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
@@ -428,6 +431,7 @@ class APITests(ArchesTestCase):
         self.assertNotEqual(resp_priv.status_code, 403, "Privileged user should not get 403 Forbidden")
 
         # Test unprivileged user gets 403 Forbidden
+
         self.client.login(username="unprivileged", password="unprivileged")
         resp_unpriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
         self.assertEqual(resp_unpriv.status_code, 403, "Unprivileged user should get 403 Forbidden")

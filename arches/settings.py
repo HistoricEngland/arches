@@ -41,7 +41,7 @@ DATABASES = {
         "NAME": "arches",  # Or path to database file if using sqlite3.
         "USER": "postgres",  # Not used with sqlite3.
         "PASSWORD": "postgis",  # Not used with sqlite3.
-        "HOST": "localhost",  # Set to empty string for localhost. Not used with sqlite3.
+        "HOST": "db-archesher",  # Set to empty string for localhost. Not used with sqlite3.
         "PORT": "5432",  # Set to empty string for default. Not used with sqlite3.
         "POSTGIS_TEMPLATE": "template_postgis",
     }
@@ -58,7 +58,7 @@ ANONYMOUS_USER_NAME = None
 ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
-ELASTICSEARCH_HOSTS = [{"host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+ELASTICSEARCH_HOSTS = [{"host": "elasticsearch-archesher", "port": ELASTICSEARCH_HTTP_PORT}]
 ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches"
@@ -318,7 +318,7 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
-MOBILE_OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+MOBILE_OAUTH_CLIENT_ID = "Q6kohQ5aYxEFUjY5dmP4rMyX1qZilDELgBAq9Iqe"  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
 MOBILE_IMAGE_SIZE_LIMITS = {
     # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%

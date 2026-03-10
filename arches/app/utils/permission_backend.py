@@ -198,8 +198,20 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
             else:
                 if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups.add(nodegroup)
-        else:  # if no explicit permissions, object is considered accessible by all with group permissions
-            permitted_nodegroups.add(nodegroup)
+        else:
+            # if no explicit permissions, check group permissions
+            group_perms = set()
+            for group in user.groups.all():
+                group_explicit_perms = get_perms(group, nodegroup)
+                group_perms.update(group_explicit_perms)
+            if group_perms:
+                if any_perm:
+                    if len(set(formatted_perms) & group_perms):
+                        permitted_nodegroups.add(nodegroup)
+                else:
+                    if set(formatted_perms) == group_perms:
+                        permitted_nodegroups.add(nodegroup)
+            # If no group permissions, do not add nodegroup (not accessible)
 
     return permitted_nodegroups
 

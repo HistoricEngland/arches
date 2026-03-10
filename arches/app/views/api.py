@@ -899,7 +899,7 @@ class Resources(APIBase):
             except models.ResourceInstance.DoesNotExist:
                 return JSONResponse(status=404)
         else:
-            return JSONResponse(status=500)
+            return JSONResponse(status=403)
 
         return JSONResponse(status=200)
 

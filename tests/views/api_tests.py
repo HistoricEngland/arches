@@ -507,30 +507,38 @@ class APITests(ArchesTestCase):
         # # POST
         # resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
         self.assertNotEqual(resp_post.status_code, 403, "Admin user POST should not get 403 Forbidden")
+        self.assertEqual(resp_post.status_code, 201, "Admin user POST should get 201 Created")
         # GET
         resp_get = self.client.get(url + "?format=arches-json")
         self.assertNotEqual(resp_get.status_code, 403, "Admin user GET should not get 403 Forbidden")
+        self.assertEqual(resp_get.status_code, 200, "Admin user GET should get 200 OK")
         # PUT
         resp_put = self.client.put(url + "?format=arches-json", payload, content_type)
         self.assertNotEqual(resp_put.status_code, 403, "Admin user PUT should not get 403 Forbidden")
+        self.assertEqual(resp_put.status_code, 201, "Admin user PUT should get 201 Created")
         # DELETE
         resp_delete = self.client.delete(url)
         self.assertNotEqual(resp_delete.status_code, 403, "Admin user DELETE should not get 403 Forbidden")
+        self.assertEqual(resp_delete.status_code, 200, "Admin user DELETE should get 200 OK")
 
         # Privileged user tests
         self.client.login(username="privileged", password="privileged")
         # POST
         resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
         self.assertNotEqual(resp_post.status_code, 403, "Privileged user POST should not get 403 Forbidden")
+        self.assertEqual(resp_post.status_code, 201, "Privileged user POST should get 201 Created")
         # GET
         resp_get = self.client.get(url + "?format=arches-json")
         self.assertNotEqual(resp_get.status_code, 403, "Privileged user GET should not get 403 Forbidden")
+        self.assertEqual(resp_get.status_code, 200, "Privileged user GET should get 200 OK")
         # PUT
         resp_put = self.client.put(url + "?format=arches-json", payload, content_type)
         self.assertNotEqual(resp_put.status_code, 403, "Privileged user PUT should not get 403 Forbidden")
+        self.assertEqual(resp_put.status_code, 201, "Privileged user PUT should get 201 Created")
         # DELETE
         resp_delete = self.client.delete(url)
         self.assertNotEqual(resp_delete.status_code, 403, "Privileged user DELETE should not get 403 Forbidden")
+        self.assertEqual(resp_delete.status_code, 200, "Privileged user DELETE should get 200 OK")
 
         # Deprivileged user tests
         self.client.login(username="deprivileged", password="deprivileged")

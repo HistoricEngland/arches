@@ -385,7 +385,8 @@ class APITests(ArchesTestCase):
         Test API responses for users with and without sufficient privileges.
         """
         breakpoint()
-        # Create privileged and deprivileged users
+
+        # Create privileged, deprivileged users and deprivileged group users
         privileged_user = User.objects.create_user(username="privileged", password="privileged")
         deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
         deprivileged_group_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
@@ -394,10 +395,9 @@ class APITests(ArchesTestCase):
         resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
         privileged_user.groups.add(resource_editor_group)
 
-        # Add deprivileged group user to a group with deny permissions
-        group = Group.objects.create(name="UnprivilegedGroup")
-        deprivileged_group_user = User.objects.create_user(username="unprivilegeduser", password="testpassword")
-        deprivileged_group_user.groups.add(group)
+        # Add deprivileged group user to a group (add deny permissions when test *resourceinstance* created below)
+        group_unprivileged = Group.objects.create(name="UnprivilegedGroup")
+        deprivileged_group_user.groups.add(group_unprivileged)
         deprivileged_group_user.save()
 
         # Set up test resource data under admin user
@@ -422,12 +422,14 @@ class APITests(ArchesTestCase):
         my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
         # ==================================================================================================
 
-        # Add deprivileged user to no_access_to_resourceinstance object permission for the test resourceinstance
+        # Retrieve the resource instance
         resource_instance = Resource.objects.get(resourceinstanceid=my_resource[0]["resourceinstanceid"])
+
+        # Add deprivileged user to no_access_to_resourceinstance object permission for the test *resourceinstance*
         assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
 
-        # Add deprivileged group to no_access_to_resourceinstance object permission for the test resourceinstance
-        assign_perm("no_access_to_resourceinstance", group, resource_instance)
+        # Add deprivileged group to no_access_to_resourceinstance object permission for the test *resourceinstance*
+        assign_perm("no_access_to_resourceinstance", group_unprivileged, resource_instance)
 
         # POST
         # resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
@@ -463,8 +465,18 @@ class APITests(ArchesTestCase):
         #breakpoint()
         privileged_user = User.objects.create_user(username="privileged", password="privileged")
         deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
+        deprivileged_group_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
         resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
         privileged_user.groups.add(resource_editor_group)
+        
+        # Add privileged user to Resource Editor group
+        resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
+        privileged_user.groups.add(resource_editor_group)
+
+        # Add deprivileged group user to a group (add deny permissions when test *resourceinstance* created below)
+        group_unprivileged = Group.objects.create(name="UnprivilegedGroup")
+        deprivileged_group_user.groups.add(group_unprivileged)
+        deprivileged_group_user.save()
 
 
         # Set up test resource data
@@ -538,4 +550,5 @@ class APITests(ArchesTestCase):
         # Clean up
         privileged_user.delete()
         deprivileged_user.delete()
+        deprivileged_group_user.delete()
         resource_editor_group.delete()

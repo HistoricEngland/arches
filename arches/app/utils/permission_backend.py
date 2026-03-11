@@ -386,7 +386,9 @@ def user_can_edit_resource(user, resourceid=None):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if resourceid not in [None, ""]:
+        # if no resourceid for preexisting record is provided, check if user can edit any instance of the resource model. 
+        # If resourceid is provided, check user can edit that specific instance. 
+        if resourceid and ResourceInstance.objects.filter(resourceinstanceid=resourceid).exists():
             result = check_resource_instance_permissions(user, resourceid, "change_resourceinstance")
             if result is not None:
                 if result["permitted"] == "unknown":

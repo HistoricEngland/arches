@@ -24,6 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import os
+from arches.app.datatypes import url
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
@@ -45,7 +46,7 @@ from guardian.shortcuts import assign_perm
 class APITests(ArchesTestCase):
 
     def setUp(self):
-            self.test_resource_simple = {
+            self.test_resource_existing_record = {
             "displaydescription": " We're knights of the Round Table, we dance whene'er we're able.",
             "displayname": " Knights of Camelot",
             "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122",
@@ -183,6 +184,9 @@ class APITests(ArchesTestCase):
                 },
             ],
         }
+            self.test_resource_simple = {"resourceinstanceid": "1dbfe5fe-b6fe-484b-a58c-4d080d427e80", 
+                                                  "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122", 
+                                                  "legacyid": "", "tiles": []}
 
     def tearDown(self):
         pass
@@ -304,41 +308,48 @@ class APITests(ArchesTestCase):
 
     def test_api_methods_permissions(self):
         api_methods = ["post", "get", "put", "delete"]
-        payload_initial = JSONSerializer().serialize(self.test_resource_simple)
         content_type = "application/json"
-        url = reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json"
+
+        payload_existing_record = JSONSerializer().serialize(self.test_resource_existing_record)
+        url_existing_record = reverse("resources", kwargs={"resourceid": self.test_resource_existing_record["resourceinstanceid"]}) + "?format=arches-json"
+
+        payload_user_record = JSONSerializer().serialize(self.test_resource_simple)
+        url_user_record = reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json"
+
 
         breakpoint()
 
 
         for username, user in self.users.items():
+
+            # Create a resource as admin to test permissions for other users on an existing resource, and to provide a resourceinstanceid for testing PUT with existing resourceinstanceid and DELETE.
+            self.client.login(username="AdminUser", password="AdminUser")
+            resp_existing = self.client.put(url_existing_record, payload_existing_record, content_type)            
+            if resp_existing.status_code != 201:
+                self.fail(f"Failed to create test pre-existing-resource: {resp_existing.status_code}")
+
             for method in api_methods:
                 with self.subTest(user=username, method=method):                    
+                    # Login as the user for this subtest, or logout if AnonymousUser.
                     if username != "AnonymousUser":
                         self.client.login(username=username, password=username)
                     else:
                         self.client.logout()
+
                     if method == "post":
-                        response = self.client.post(url, payload_initial, content_type)
-                        if response.status_code != 201:
-                            # If POST fails, subsequent GET/PUT/DELETE tests will also fail since resource won't be created, so we can create one under the admin user to allow testing of permissions for other methods.
-                            self.client.login(username="AdminUser", password="AdminUser")
-                            admin_post = self.client.post(url, payload_initial, content_type)
-                            my_resource = JSONDeserializer().deserialize(admin_post.content)  # get the resourceinstance returned.
-                            self.test_resource_simple["resourceinstanceid"] = my_resource[0]["resourceinstanceid"]  # set resourceinstanceid to the returned value.
-                        else:
-                            self.test_resource_simple["resourceinstanceid"] = JSONDeserializer().deserialize(response.content)[0]["resourceinstanceid"]  # set resourceinstanceid to the returned value.
-                        # and emend url and payload_put
-                        url = reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json"
-                        payload_put = JSONSerializer().serialize({"resourceinstanceid": self.test_resource_simple["resourceinstanceid"], 
-                                                                "graph_id": self.test_resource_simple["graph_id"], 
-                                                                "legacyid": "", "tiles": []})
+                        # POST - Used to create a new resource. (The resourceinstanceid in the payload is usually ignored or overwritten by the server.)
+                        response = self.client.post(url_user_record, payload_user_record, content_type)   
+                        if response.status_code == 201:
+                            # If POST succeeded, amend legacyid on payload_user_record to avoid key violations.
+                            payload_user_record["legacyid"] = payload_user_record["legacyid"] + "Spam, "                            
                     elif method == "get":
-                        response = self.client.get(url)
-                    elif method == "put":
-                        response = self.client.put(url, payload_put, content_type)
+                        response = self.client.get(url_existing_record)
+                    elif method =="put":
+                        # PUT -  Used to update an existing resource, or create it if it does not exist (upsert). (The resourceinstanceid in the URI and payload must match.)
+                        # payload_existing_record["legacyid"] = "we eat ham and jam and Spam a lot."  # LegacyId has a unique constraint.
+                        response = self.client.put(url_existing_record, payload_existing_record, content_type) 
                     elif method == "delete":
-                        response = self.client.delete(url)
+                        response = self.client.delete(url_existing_record)
                     self.assertEqual(response.status_code, self.expected_status[username][method], f"{username} {method} failed")
 
     
@@ -600,114 +611,114 @@ class APITests(ArchesTestCase):
     #     resource_editor_group.delete()
     #     deprivileged_group_user.delete()
     
-    # def test_04_resources_api_methods_permissions(self):
-        """
-        Test all Resources API methods (GET, POST, PUT, DELETE) for privileged and unprivileged users.
-        """
-        #breakpoint()
-        privileged_user = User.objects.create_user(username="privileged", password="privileged")
-        deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
-        deprivileged_group_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
-        resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
-        privileged_user.groups.add(resource_editor_group)
+    # # def test_04_resources_api_methods_permissions(self):
+    #     """
+    #     Test all Resources API methods (GET, POST, PUT, DELETE) for privileged and unprivileged users.
+    #     """
+    #     #breakpoint()
+    #     privileged_user = User.objects.create_user(username="privileged", password="privileged")
+    #     deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
+    #     deprivileged_group_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
+    #     resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
+    #     privileged_user.groups.add(resource_editor_group)
         
-        # Add privileged user to Resource Editor group
-        resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
-        privileged_user.groups.add(resource_editor_group)
+    #     # Add privileged user to Resource Editor group
+    #     resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
+    #     privileged_user.groups.add(resource_editor_group)
 
-        # Add deprivileged group user to a group (add deny permissions when test *resourceinstance* created below)
-        group_unprivileged = Group.objects.create(name="UnprivilegedGroup")
-        deprivileged_group_user.groups.add(group_unprivileged)
-        deprivileged_group_user.save()
+    #     # Add deprivileged group user to a group (add deny permissions when test *resourceinstance* created below)
+    #     group_unprivileged = Group.objects.create(name="UnprivilegedGroup")
+    #     deprivileged_group_user.groups.add(group_unprivileged)
+    #     deprivileged_group_user.save()
 
 
-        # Set up test resource data
-        # ==Arrange=========================================================================================
+    #     # Set up test resource data
+    #     # ==Arrange=========================================================================================
        
-        payload = JSONSerializer().serialize(self.test_resource_simple)
-        content_type = "application/json"
-        self.client.login(username="admin", password="admin")
+    #     payload = JSONSerializer().serialize(self.test_resource_simple)
+    #     content_type = "application/json"
+    #     self.client.login(username="admin", password="admin")
 
-        # ==POST============================================================================================
+    #     # ==POST============================================================================================
 
-        # ==Act : POST resource to database (N.B. resourceid supplied will be overwritten by arches)========
-        resp_post = self.client.post(
-            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
-            payload,
-            content_type,
-        )
-        # ==Assert==========================================================================================
-        self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
-        my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
-        self.assertEqual(my_resource[0]["legacyid"], "I have to push the pram a lot.", "POST returned resource with correct legacyid")  # Success, we were returned the right one.
-        my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
-        # ==================================================================================================
+    #     # ==Act : POST resource to database (N.B. resourceid supplied will be overwritten by arches)========
+    #     resp_post = self.client.post(
+    #         reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+    #         payload,
+    #         content_type,
+    #     )
+    #     # ==Assert==========================================================================================
+    #     self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
+    #     my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
+    #     self.assertEqual(my_resource[0]["legacyid"], "I have to push the pram a lot.", "POST returned resource with correct legacyid")  # Success, we were returned the right one.
+    #     my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
+    #     # ==================================================================================================
 
-        url = reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid})
+    #     url = reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid})
 
-        # Admin user tests
+    #     # Admin user tests
         
-        # # POST
-        # # Used to create a new resource.
-        # # The resourceinstanceid in the payload is usually ignored or overwritten by the server.
-        self.assertNotEqual(resp_post.status_code, 403, "Admin user POST should not get 403 Forbidden")
-        self.assertEqual(resp_post.status_code, 201, "Admin user POST should get 201 Created")
-        # GET
-        resp_get = self.client.get(url + "?format=arches-json")
-        self.assertNotEqual(resp_get.status_code, 403, "Admin user GET should not get 403 Forbidden")
-        self.assertEqual(resp_get.status_code, 200, "Admin user GET should get 200 OK")
-        # DELETE
-        resp_delete = self.client.delete(url)
-        self.assertNotEqual(resp_delete.status_code, 403, "Admin user DELETE should not get 403 Forbidden")
-        self.assertEqual(resp_delete.status_code, 200, "Admin user DELETE should get 200 OK")
-        # # PUT
-        # # Used to update an existing resource, or create it if it does not exist (upsert). 
-        # # The resourceinstanceid in the URI and payload must match.
+    #     # # POST
+    #     # # Used to create a new resource.
+    #     # # The resourceinstanceid in the payload is usually ignored or overwritten by the server.
+    #     self.assertNotEqual(resp_post.status_code, 403, "Admin user POST should not get 403 Forbidden")
+    #     self.assertEqual(resp_post.status_code, 201, "Admin user POST should get 201 Created")
+    #     # GET
+    #     resp_get = self.client.get(url + "?format=arches-json")
+    #     self.assertNotEqual(resp_get.status_code, 403, "Admin user GET should not get 403 Forbidden")
+    #     self.assertEqual(resp_get.status_code, 200, "Admin user GET should get 200 OK")
+    #     # DELETE
+    #     resp_delete = self.client.delete(url)
+    #     self.assertNotEqual(resp_delete.status_code, 403, "Admin user DELETE should not get 403 Forbidden")
+    #     self.assertEqual(resp_delete.status_code, 200, "Admin user DELETE should get 200 OK")
+    #     # # PUT
+    #     # # Used to update an existing resource, or create it if it does not exist (upsert). 
+    #     # # The resourceinstanceid in the URI and payload must match.
 
-        payload_put = JSONSerializer().serialize({"resourceinstanceid": my_resource_resourceinstanceid, 
-                                                  "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122", 
-                                                  "legacyid": "", "tiles": []})
+    #     payload_put = JSONSerializer().serialize({"resourceinstanceid": my_resource_resourceinstanceid, 
+    #                                               "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122", 
+    #                                               "legacyid": "", "tiles": []})
 
-        resp_put = self.client.put(url + "?format=arches-json", payload_put, content_type)
-        self.assertNotEqual(resp_put.status_code, 403, "Admin user PUT should not get 403 Forbidden")
-        self.assertEqual(resp_put.status_code, 201, "Admin user PUT should get 201 Created")
+    #     resp_put = self.client.put(url + "?format=arches-json", payload_put, content_type)
+    #     self.assertNotEqual(resp_put.status_code, 403, "Admin user PUT should not get 403 Forbidden")
+    #     self.assertEqual(resp_put.status_code, 201, "Admin user PUT should get 201 Created")
 
-        # Privileged user tests
-        self.client.login(username="privileged", password="privileged")
-        # POST
-        resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
-        self.assertNotEqual(resp_post.status_code, 403, "Privileged user POST should not get 403 Forbidden")
-        self.assertEqual(resp_post.status_code, 201, "Privileged user POST should get 201 Created")
-        # GET
-        resp_get = self.client.get(url + "?format=arches-json")
-        self.assertNotEqual(resp_get.status_code, 403, "Privileged user GET should not get 403 Forbidden")
-        self.assertEqual(resp_get.status_code, 200, "Privileged user GET should get 200 OK")
-        # PUT
-        resp_put = self.client.put(url + "?format=arches-json", payload_put, content_type)
-        self.assertNotEqual(resp_put.status_code, 403, "Privileged user PUT should not get 403 Forbidden")
-        self.assertEqual(resp_put.status_code, 201, "Privileged user PUT should get 201 Created")
-        # DELETE
-        resp_delete = self.client.delete(url)
-        self.assertNotEqual(resp_delete.status_code, 403, "Privileged user DELETE should not get 403 Forbidden")
-        self.assertEqual(resp_delete.status_code, 200, "Privileged user DELETE should get 200 OK")
+    #     # Privileged user tests
+    #     self.client.login(username="privileged", password="privileged")
+    #     # POST
+    #     resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
+    #     self.assertNotEqual(resp_post.status_code, 403, "Privileged user POST should not get 403 Forbidden")
+    #     self.assertEqual(resp_post.status_code, 201, "Privileged user POST should get 201 Created")
+    #     # GET
+    #     resp_get = self.client.get(url + "?format=arches-json")
+    #     self.assertNotEqual(resp_get.status_code, 403, "Privileged user GET should not get 403 Forbidden")
+    #     self.assertEqual(resp_get.status_code, 200, "Privileged user GET should get 200 OK")
+    #     # PUT
+    #     resp_put = self.client.put(url + "?format=arches-json", payload_put, content_type)
+    #     self.assertNotEqual(resp_put.status_code, 403, "Privileged user PUT should not get 403 Forbidden")
+    #     self.assertEqual(resp_put.status_code, 201, "Privileged user PUT should get 201 Created")
+    #     # DELETE
+    #     resp_delete = self.client.delete(url)
+    #     self.assertNotEqual(resp_delete.status_code, 403, "Privileged user DELETE should not get 403 Forbidden")
+    #     self.assertEqual(resp_delete.status_code, 200, "Privileged user DELETE should get 200 OK")
 
-        # Deprivileged user tests
-        self.client.login(username="deprivileged", password="deprivileged")
-        # POST
-        resp_post_depriv = self.client.post(url + "?format=arches-json", payload, content_type)
-        self.assertEqual(resp_post_depriv.status_code, 403, "Deprivileged user POST should get 403 Forbidden")
-        # GET
-        resp_get_depriv = self.client.get(url + "?format=arches-json")
-        self.assertEqual(resp_get_depriv.status_code, 403, "Deprivileged user GET should get 403 Forbidden")
-        # PUT
-        resp_put_depriv = self.client.put(url + "?format=arches-json", payload_put, content_type)
-        self.assertEqual(resp_put_depriv.status_code, 403, "Deprivileged user PUT should get 403 Forbidden")
-        # DELETE
-        resp_delete_depriv = self.client.delete(url)
-        self.assertEqual(resp_delete_depriv.status_code, 403, "Deprivileged user DELETE should get 403 Forbidden")
+    #     # Deprivileged user tests
+    #     self.client.login(username="deprivileged", password="deprivileged")
+    #     # POST
+    #     resp_post_depriv = self.client.post(url + "?format=arches-json", payload, content_type)
+    #     self.assertEqual(resp_post_depriv.status_code, 403, "Deprivileged user POST should get 403 Forbidden")
+    #     # GET
+    #     resp_get_depriv = self.client.get(url + "?format=arches-json")
+    #     self.assertEqual(resp_get_depriv.status_code, 403, "Deprivileged user GET should get 403 Forbidden")
+    #     # PUT
+    #     resp_put_depriv = self.client.put(url + "?format=arches-json", payload_put, content_type)
+    #     self.assertEqual(resp_put_depriv.status_code, 403, "Deprivileged user PUT should get 403 Forbidden")
+    #     # DELETE
+    #     resp_delete_depriv = self.client.delete(url)
+    #     self.assertEqual(resp_delete_depriv.status_code, 403, "Deprivileged user DELETE should get 403 Forbidden")
 
-        # Clean up
-        privileged_user.delete()
-        deprivileged_user.delete()
-        deprivileged_group_user.delete()
-        resource_editor_group.delete()
+    #     # Clean up
+    #     privileged_user.delete()
+    #     deprivileged_user.delete()
+    #     deprivileged_group_user.delete()
+    #     resource_editor_group.delete()

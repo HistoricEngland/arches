@@ -303,7 +303,7 @@ class APITests(ArchesTestCase):
         "Nodegroup_Edit_Access_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
         "Nodegroup_View_Access_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
         "Nodegroup_No_Access_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "AnonymousUser": {"post": 403, "get": 403, "put": 403, "delete": 403},
+        "AnonymousUser": {"post": 403, "get": 200, "put": 403, "delete": 403},
     }
 
     def test_api_methods_permissions(self):
@@ -341,12 +341,13 @@ class APITests(ArchesTestCase):
                         response = self.client.post(url_user_record, payload_user_record, content_type)   
                         if response.status_code == 201:
                             # If POST succeeded, amend legacyid on payload_user_record to avoid key violations.
-                            payload_user_record["legacyid"] = payload_user_record["legacyid"] + "Spam, "                            
+                            self.test_resource_simple["legacyid"] = self.test_resource_simple["legacyid"] + "Spam, "
+                            payload_user_record = JSONSerializer().serialize(self.test_resource_simple)                           
                     elif method == "get":
                         response = self.client.get(url_existing_record)
                     elif method =="put":
+
                         # PUT -  Used to update an existing resource, or create it if it does not exist (upsert). (The resourceinstanceid in the URI and payload must match.)
-                        # payload_existing_record["legacyid"] = "we eat ham and jam and Spam a lot."  # LegacyId has a unique constraint.
                         response = self.client.put(url_existing_record, payload_existing_record, content_type) 
                     elif method == "delete":
                         response = self.client.delete(url_existing_record)

@@ -219,94 +219,54 @@ class APITests(ArchesTestCase):
 
     @classmethod
     def set_up_users_and_groups(cls):
-        # User permissions based upon Django's Ancillary roles.
-        #
-        # AdminUser = We will use the default admin user created by Django's createsuperuser command, which has all permissions.
-        # SuperUser = We will use the default superuser created by Django's createsuperuser command, which has all permissions.
-        # AnonymousUser = We will use Django's AnonymousUser, which is UNAUTHENTICATED but derives permissions from permissions.AnonymousUser.
         cls.users = {}
-        cls.users["AdminUser"] = User.objects.create_user(username="AdminUser", password="AdminUser", is_superuser=True, is_staff=True)
-        cls.users["SuperUser"] = User.objects.create_user(username="SuperUser", password="SuperUser", is_superuser=True, is_staff=False)
-        cls.users["AnonymousUser"] = AnonymousUser()
-        
-        # User permissions based on Arches default groups and permissions as of 2024-06, which are as follows:
-        #
-        # Resource Editor	= add_resourceinstance, change_resourceinstance, delete_resourceinstance, view_resourceinstance
-        # Resource Reviewer	= view_resourceinstance
-        # RDM Administrator	= add_resourceinstance, change_resourceinstance, delete_resourceinstance, view_resourceinstance, add_graph, change_graph, delete_graph, view_graph, add_tile, change_tile, delete_tile, view_tile
-        # Note that Resource Editor and Resource Reviewer groups have permissions for resourceinstance model only, while RDM Administrator has permissions for resourceinstance, graph and tile models.
-        cls.users["Resource_EditorUser"] = User.objects.create_user(username="Resource_EditorUser", password="Resource_EditorUser", is_superuser=False, is_staff=False)
-        resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
-        cls.users["Resource_EditorUser"].groups.add(resource_editor_group)
+        cls.users["System Administrator"] = User.objects.create_user(username="SystemAdministratorUser", password="SystemAdministratorUser", is_superuser=True, is_staff=True)
+        cls.users["Application Administrator"] = User.objects.create_user(username="ApplicationAdministratorUser", password="ApplicationAdministratorUser", is_superuser=True, is_staff=True)
+        cls.users["Graph Editor"] = User.objects.create_user(username="GraphEditorUser", password="GraphEditorUser", is_superuser=False, is_staff=False)
+        cls.users["Resource Editor"] = User.objects.create_user(username="ResourceEditorUser", password="ResourceEditorUser", is_superuser=False, is_staff=False)
+        cls.users["RDM Administrator"] = User.objects.create_user(username="RDMAdministratorUser", password="RDMAdministratorUser", is_superuser=False, is_staff=False)
+        cls.users["Mobile Project Administrator"] = User.objects.create_user(username="MobileProjectAdministratorUser", password="MobileProjectAdministratorUser", is_superuser=False, is_staff=False)
+        cls.users["Crowdsource Editor"] = User.objects.create_user(username="CrowdsourceEditorUser", password="CrowdsourceEditorUser", is_superuser=False, is_staff=False)
+        cls.users["Guest"] = User.objects.create_user(username="GuestUser", password="GuestUser", is_superuser=False, is_staff=False)
+        cls.users["Resource Reviewer"] = User.objects.create_user(username="ResourceReviewerUser", password="ResourceReviewerUser", is_superuser=False, is_staff=False)
+        # cls.users["All Workflows"] = User.objects.create_user(username="AllWorkflowsUser", password="AllWorkflowsUser", is_superuser=False, is_staff=False)
+        # cls.users["External Users"] = User.objects.create_user(username="ExternalUsersUser", password="ExternalUsersUser", is_superuser=False, is_staff=False)
+        # cls.users["No Ordnance Survey Mapping"] = User.objects.create_user(username="NoOrdnanceSurveyMappingUser", password="NoOrdnanceSurveyMappingUser", is_superuser=False, is_staff=False)
+        # cls.users["Access to Consultations and Application Areas"] = User.objects.create_user(username="AccessToConsultationsAndApplicationAreasUser", password="AccessToConsultationsAndApplicationAreasUser", is_superuser=False, is_staff=False)
+        # cls.users["Search Exporters"] = User.objects.create_user(username="SearchExportersUser", password="SearchExportersUser", is_superuser=False, is_staff=False)
 
-        cls.users["Resource_ReviewerUser"] = User.objects.create_user(username="Resource_ReviewerUser", password="Resource_ReviewerUser", is_superuser=False, is_staff=False)
-        resource_reviewer_group, _ = Group.objects.get_or_create(name="Resource Reviewer")
-        cls.users["Resource_ReviewerUser"].groups.add(resource_reviewer_group)
+        for key, user in cls.users.items():
+            group, created = Group.objects.get_or_create(name=key)
+            if created:
+                raise AssertionError(f"Group '{key}' did not already exist.")
+            user.groups.add(group)
 
-        cls.users["RDM_AdministratorUser"] = User.objects.create_user(username="RDM_AdministratorUser", password="RDM_AdministratorUser", is_superuser=False, is_staff=False)
-        rdm_administrator_group, _ = Group.objects.get_or_create(name="RDM Administrator")
-        cls.users["RDM_AdministratorUser"].groups.add(rdm_administrator_group)
 
-        # User permissions based on resourceinstance level permissions assigned via django-guardian, which are as follows:
-        #
-        # Deprivileged_User	= assigned no_access_to_resourceinstance permission for the test resourceinstance.
-        # Deprivileged_Group_User	= member of a group that is assigned no_access_to_resourceinstance permission for the test resourceinstance.
-        # No_group_no_perms = assigned no group memberships and no permissions
-        # Partial_perms_read_only = assigned view_resourceinstance permission only
-        # Partial_perms_edit_only = assigned change_resourceinstance permission only
-        # Partial_perms_delete_only = assigned delete_resourceinstance permission only
-        cls.users["Deprivileged_User"] = User.objects.create_user(username="Deprivileged_User", password="Deprivileged_User", is_superuser=False, is_staff=False)
-        cls.users["Deprivileged_Group_User"] = User.objects.create_user(username="Deprivileged_Group_User", password="Deprivileged_Group_User", is_superuser=False, is_staff=False)
-        deprivileged_group = Group.objects.create(name="DeprivilegedGroup")
-        cls.users["Deprivileged_Group_User"].groups.add(deprivileged_group)
-        cls.users["No_group_no_perms"] = User.objects.create_user(username="No_group_no_perms", password="No_group_no_perms", is_superuser=False, is_staff=False)
 
-        cls.users["Partial_perms_read_only"] = User.objects.create_user(username="Partial_perms_read_only", password="Partial_perms_read_only", is_superuser=False, is_staff=False)
-        read_only_group, _ = Group.objects.get_or_create(name="Resource Read Only")
-        cls.users["Partial_perms_read_only"].groups.add(read_only_group)
-        cls.users["Partial_perms_edit_only"] = User.objects.create_user(username="Partial_perms_edit_only", password="Partial_perms_edit_only", is_superuser=False, is_staff=False)
-        edit_only_group, _ = Group.objects.get_or_create(name="Resource Edit Only")
-        cls.users["Partial_perms_edit_only"].groups.add(edit_only_group)
-        cls.users["Partial_perms_delete_only"] = User.objects.create_user(username="Partial_perms_delete_only", password="Partial_perms_delete_only", is_superuser=False, is_staff=False)
-        delete_only_group, _ = Group.objects.get_or_create(name="Resource Delete Only")
-        cls.users["Partial_perms_delete_only"].groups.add(delete_only_group)
-        
-        # Group vs User Permission Conflicts.
-        # 
-        cls.users["Override_Group_Access_User"] = User.objects.create_user(username="Override_Group_Access_User", password="Override_Group_Access_User", is_superuser=False, is_staff=False)
-        override_group, _ = Group.objects.get_or_create(name="Override Group")
-        cls.users["Override_Group_Access_User"].groups.add(override_group)
-
-        # Nodegroup-level user permissions based on Arches default nodegroup permissions as of 2024-06, which are as follows:
-        # 
-        # Nodegroup Edit Access	= change_nodegroup permission for nodegroups with edit access.
-        # Nodegroup View Access	= view_nodegroup permission for nodegroups with view access.
-        # Nodegroup No Access	= no permissions for all nodegroups.
-        # Note that nodegroup-level permissions are currently only implemented for user permissions, not group permissions.
-        cls.users["Nodegroup_Edit_Access_User"] = User.objects.create_user(username="Nodegroup_Edit_Access_User", password="Nodegroup_Edit_Access_User", is_superuser=False, is_staff=False)
-        cls.users["Nodegroup_View_Access_User"] = User.objects.create_user(username="Nodegroup_View_Access_User", password="Nodegroup_View_Access_User", is_superuser=False, is_staff=False)
-        cls.users["Nodegroup_No_Access_User"] = User.objects.create_user(username="Nodegroup_No_Access_User", password="Nodegroup_No_Access_User", is_superuser=False, is_staff=False)
-
+    # From Database auth_group_permissions, auth_permission and auth_group tables, 
+    # select ag.*, ap.* from public.auth_group ag
+    # left join public.auth_group_permissions agp on agp.group_id = ag.id
+    # left join public.auth_permission ap on agp.permission_id = ap.id
+    # #
     expected_status = {
-        "AdminUser":     {"post": 201, "get": 200, "put": 201, "delete": 200},
-        "SuperUser":     {"post": 201, "get": 200, "put": 201, "delete": 200},
-        "Resource_EditorUser": {"post": 201, "get": 200, "put": 201, "delete": 200},
-        "Resource_ReviewerUser": {"post": 403, "get": 200, "put": 403, "delete": 403},
-        "RDM_AdministratorUser": {"post": 201, "get": 200, "put": 201, "delete": 200},
-        "Deprivileged_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "Deprivileged_Group_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "No_group_no_perms": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "Partial_perms_read_only": {"post": 403, "get": 200, "put": 403, "delete": 403},
-        "Partial_perms_edit_only": {"post": 403, "get": 403, "put": 201, "delete": 403},
-        "Partial_perms_delete_only": {"post": 403, "get": 403, "put": 403, "delete": 200},
-        "Override_Group_Access_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "Nodegroup_Edit_Access_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "Nodegroup_View_Access_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "Nodegroup_No_Access_User": {"post": 403, "get": 403, "put": 403, "delete": 403},
-        "AnonymousUser": {"post": 403, "get": 200, "put": 403, "delete": 403},
+        "System Administrator":     {"post": 201, "get": 200, "put": 201, "delete": 200},
+        "Graph Editor":     {"post": 201, "get": 200, "put": 201, "delete": 200},
+        "Resource Editor": {"post": 201, "get": 200, "put": 201, "delete": 200},
+        "RDM Administrator": {"post": 403, "get": 403, "put": 403, "delete": 403},
+        "Application Administrator": {"post": 201, "get": 200, "put": 201, "delete": 200},
+        "Mobile Project Administrator": {"post": 403, "get": 403, "put": 403, "delete": 403},
+        "Crowdsource Editor": {"post": 403, "get": 403, "put": 403, "delete": 403},
+        "Guest": {"post": 403, "get": 200, "put": 403, "delete": 403},
+        "Anonymous": {"post": 403, "get": 200, "put": 403, "delete": 403},
+        "Resource Reviewer":  {"post": 201, "get": 200, "put": 201, "delete": 200},
+        "All Workflows": {"post": 403, "get": 403, "put": 201, "delete": 403},
+        "External Users": {"post": 403, "get": 403, "put": 403, "delete": 403},
+        "No Ordnance Survey Mapping": {"post": 403, "get": 403, "put": 403, "delete": 403},
+        "Access to Consultations and Application Areas": {"post": 403, "get": 403, "put": 403, "delete": 403},
+        "Search Exporters": {"post": 403, "get": 403, "put": 403, "delete": 403},
     }
 
-    def test_api_methods_permissions(self):
+    def test_01_api_permissions_group(self):
         api_methods = ["post", "get", "put", "delete"]
         content_type = "application/json"
 
@@ -319,11 +279,13 @@ class APITests(ArchesTestCase):
 
         breakpoint()
 
+        # Add AnonymousUser for testing
+        self.users["AnonymousUser"] = AnonymousUser()
 
         for username, user in self.users.items():
 
             # Create a resource as admin to test permissions for other users on an existing resource, and to provide a resourceinstanceid for testing PUT with existing resourceinstanceid and DELETE.
-            self.client.login(username="AdminUser", password="AdminUser")
+            self.client.login(username="SystemAdministratorUser", password="SystemAdministratorUser")
             resp_existing = self.client.put(url_existing_record, payload_existing_record, content_type)            
             if resp_existing.status_code != 201:
                 self.fail(f"Failed to create test pre-existing-resource: {resp_existing.status_code}")
@@ -534,83 +496,87 @@ class APITests(ArchesTestCase):
     #     self.assertTrue("Resource matching query does not exist." in str(context_del.exception), "GET after DELETE should raise DoesNotExist")  # Check exception message.
     #     # ==================================================================================================
 
-    # def test_03_api_permissions(self):
-    #     """
-    #     Test API responses for users with and without sufficient privileges.
-    #     """
-    #     breakpoint()
+    def test_02_api_permissions_group_vs_user(self):
+        """
+        Test API responses for users with and without sufficient privileges cf. group permissions, and test that object permissions for 
+        a resourceinstance override group permissions for that resourceinstance, for both privileged and unprivileged users.
+        """
+        breakpoint()
 
-    #     # Create privileged, deprivileged users and deprivileged group users
-    #     privileged_user = User.objects.create_user(username="privileged", password="privileged")
-    #     deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
-    #     deprivileged_group_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
+        # Create privileged/deprivileged users and privileged/deprivileged group users
+        privileged_user = User.objects.create_user(username="privileged", password="privileged")
+        deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
+        privileged_group_deprivileged_user = User.objects.create_user(username="privileged_group", password="privileged_group")
+        deprivileged_group_privileged_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
         
-    #     # Add privileged user to Resource Editor group
-    #     resource_editor_group, _ = Group.objects.get_or_create(name="Resource Editor")
-    #     privileged_user.groups.add(resource_editor_group)
+        # Add privileged_group_deprivileged_user to privilegedGroup group
+        group_privileged = Group.objects.create(name="privilegedGroup")
+        privileged_group_deprivileged_user.groups.add(group_privileged)
 
-    #     # Add deprivileged group user to a group (add deny permissions when test *resourceinstance* created below)
-    #     group_unprivileged = Group.objects.create(name="UnprivilegedGroup")
-    #     deprivileged_group_user.groups.add(group_unprivileged)
-    #     deprivileged_group_user.save()
+        # Add deprivileged_group_privileged_user to deprivilegedGroup group (add deny permissions when test *resourceinstance* created below)
+        group_deprivileged = Group.objects.create(name="deprivilegedGroup")
+        deprivileged_group_privileged_user.groups.add(group_deprivileged)
 
-    #     # Set up test resource data under admin user
-    #     # ==Arrange=========================================================================================
-       
-    #     payload = JSONSerializer().serialize(self.test_resource_simple)
-    #     content_type = "application/json"
-    #     self.client.login(username="admin", password="admin")
+        # Set up test resource data under admin user      
+        payload = JSONSerializer().serialize(self.test_resource_simple)
+        content_type = "application/json"
+        self.client.login(username="admin", password="admin")
 
-    #     # ==POST============================================================================================
+        resp_post = self.client.post(
+            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+            payload,
+            content_type,
+        )
+        self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
+        # Retrieve the resource instance
+        resource_instance_data = JSONDeserializer().deserialize(resp_post.content)
+        my_resource_resourceinstanceid = resource_instance_data[0]["resourceinstanceid"]
+        resource_instance = Resource.objects.get(resourceinstanceid=my_resource_resourceinstanceid)
 
-    #     # ==Act : POST resource to database (N.B. resourceid supplied will be overwritten by arches)========
-    #     resp_post = self.client.post(
-    #         reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
-    #         payload,
-    #         content_type,
-    #     )
-    #     # ==Assert==========================================================================================
-    #     self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
-    #     my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
-    #     self.assertEqual(my_resource[0]["legacyid"], "I have to push the pram a lot.", "POST returned resource with correct legacyid")  # Success, we were returned the right one.
-    #     my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
-    #     # ==================================================================================================
+        # Add privileged user to view_resourceinstance object permission for the test *resourceinstance*
+        assign_perm("view_resourceinstance", privileged_user, resource_instance)
+        # Add privileged group to view_resourceinstance object permission for the test *resourceinstance*
+        assign_perm("view_resourceinstance", group_privileged, resource_instance)
+        # Add deprivileged user to no_access_to_resourceinstance object permission for the test *resourceinstance*
+        assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
+        # Add deprivileged group to no_access_to_resourceinstance object permission for the test *resourceinstance*
+        assign_perm("no_access_to_resourceinstance", group_deprivileged, resource_instance)
 
-    #     # Retrieve the resource instance
-    #     resource_instance = Resource.objects.get(resourceinstanceid=my_resource[0]["resourceinstanceid"])
 
-    #     # Add deprivileged user to no_access_to_resourceinstance object permission for the test *resourceinstance*
-    #     assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
+        self.client.login(username="privileged", password="privileged")
+        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_priv.status_code, 200, "privileged user should GET 200 OK")
 
-    #     # Add deprivileged group to no_access_to_resourceinstance object permission for the test *resourceinstance*
-    #     assign_perm("no_access_to_resourceinstance", group_unprivileged, resource_instance)
+        self.client.login(username="privileged", password="privileged")
+        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_priv.status_code, 200, "privileged user should GET 200 OK")
 
-    #     # POST
-    #     # resp_post = self.client.post(url + "?format=arches-json", payload, content_type)
-    #     self.assertNotEqual(resp_post.status_code, 403, "Set up test resource data  - Admin should not get 403 Forbidden")
-    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-    #     self.assertNotEqual(resp_priv.status_code, 403, "Admin user should not GET 403 Forbidden")
+        self.client.login(username="privileged_group", password="privileged_group")
+        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_priv.status_code, 200, "privileged group user should GET 200 OK")
 
-    #     # Test privileged user can access protected API endpoint
-    #     self.client.login(username="privileged", password="privileged")
-    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-    #     self.assertNotEqual(resp_priv.status_code, 403, "Privileged user should not get 403 Forbidden")
+        self.client.login(username="deprivileged_group", password="deprivileged_group")
+        resp_depriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_depriv.status_code, 403, "Deprivileged group user should get 403 Forbidden")
 
-    #     # Test deprivileged user gets 403 Forbidden
-    #     self.client.login(username="deprivileged", password="deprivileged")
-    #     resp_depriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-    #     self.assertEqual(resp_depriv.status_code, 403, "Deprivileged user should get 403 Forbidden")
+        # Test Conflicting permissions  - Individual user permissions should override group permissions      
 
-    #     # Test deprivileged_group_user user gets 403 Forbidden
-    #     self.client.login(username="deprivileged_group", password="deprivileged_group")
-    #     resp_degrp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-    #     self.assertEqual(resp_degrp_priv.status_code, 403, "Deprivileged group user should get 403 Forbidden")
+        # deprivileged_group_deprivileged_user should be forbidden to GET resource.
+        self.client.login(username="deprivileged_group", password="deprivileged_group")
+        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_priv.status_code, 403, "deprivileged_group_privileged_user user should GET 403 Forbidden due to individual user deny permission overriding group allow permission")
 
-    #     # Clean up
-    #     privileged_user.delete()
-    #     deprivileged_user.delete()
-    #     resource_editor_group.delete()
-    #     deprivileged_group_user.delete()
+        # privileged_group_deprivileged_user should be able to GET resource
+        self.client.login(username="privileged_group", password="privileged_group")
+        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+        self.assertEqual(resp_priv.status_code, 200, "privileged_group_deprivileged_user user should GET 200 OK")
+
+
+        # Clean up
+        privileged_user.delete()
+        deprivileged_user.delete()
+        privileged_group_deprivileged_user.delete()
+        deprivileged_group_privileged_user.delete()
     
     # # def test_04_resources_api_methods_permissions(self):
     #     """

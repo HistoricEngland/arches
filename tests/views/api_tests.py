@@ -214,6 +214,9 @@ class APITests(ArchesTestCase):
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
+        
+        breakpoint()
+
         cls.set_up_users_and_groups()
 
 
@@ -221,14 +224,16 @@ class APITests(ArchesTestCase):
     def set_up_users_and_groups(cls):
         cls.users = {}
         cls.users["System Administrator"] = User.objects.create_user(username="SystemAdministratorUser", password="SystemAdministratorUser", is_superuser=True, is_staff=True)
-        cls.users["Application Administrator"] = User.objects.create_user(username="ApplicationAdministratorUser", password="ApplicationAdministratorUser", is_superuser=True, is_staff=True)
-        cls.users["Graph Editor"] = User.objects.create_user(username="GraphEditorUser", password="GraphEditorUser", is_superuser=False, is_staff=False)
-        cls.users["Resource Editor"] = User.objects.create_user(username="ResourceEditorUser", password="ResourceEditorUser", is_superuser=False, is_staff=False)
-        cls.users["RDM Administrator"] = User.objects.create_user(username="RDMAdministratorUser", password="RDMAdministratorUser", is_superuser=False, is_staff=False)
-        cls.users["Mobile Project Administrator"] = User.objects.create_user(username="MobileProjectAdministratorUser", password="MobileProjectAdministratorUser", is_superuser=False, is_staff=False)
-        cls.users["Crowdsource Editor"] = User.objects.create_user(username="CrowdsourceEditorUser", password="CrowdsourceEditorUser", is_superuser=False, is_staff=False)
+        # cls.users["Application Administrator"] = User.objects.create_user(username="ApplicationAdministratorUser", password="ApplicationAdministratorUser", is_superuser=True, is_staff=True)
+        # cls.users["Graph Editor"] = User.objects.create_user(username="GraphEditorUser", password="GraphEditorUser", is_superuser=False, is_staff=False)
+        # cls.users["Resource Editor"] = User.objects.create_user(username="ResourceEditorUser", password="ResourceEditorUser", is_superuser=False, is_staff=False)
+        # cls.users["RDM Administrator"] = User.objects.create_user(username="RDMAdministratorUser", password="RDMAdministratorUser", is_superuser=False, is_staff=False)
+        # cls.users["Mobile Project Administrator"] = User.objects.create_user(username="MobileProjectAdministratorUser", password="MobileProjectAdministratorUser", is_superuser=False, is_staff=False)
+        # cls.users["Crowdsource Editor"] = User.objects.create_user(username="CrowdsourceEditorUser", password="CrowdsourceEditorUser", is_superuser=False, is_staff=False)
         cls.users["Guest"] = User.objects.create_user(username="GuestUser", password="GuestUser", is_superuser=False, is_staff=False)
-        cls.users["Resource Reviewer"] = User.objects.create_user(username="ResourceReviewerUser", password="ResourceReviewerUser", is_superuser=False, is_staff=False)
+        # cls.users["Resource Reviewer"] = User.objects.create_user(username="ResourceReviewerUser", password="ResourceReviewerUser", is_superuser=False, is_staff=False)
+
+        # Default User groups which do not seem to exist.
         # cls.users["All Workflows"] = User.objects.create_user(username="AllWorkflowsUser", password="AllWorkflowsUser", is_superuser=False, is_staff=False)
         # cls.users["External Users"] = User.objects.create_user(username="ExternalUsersUser", password="ExternalUsersUser", is_superuser=False, is_staff=False)
         # cls.users["No Ordnance Survey Mapping"] = User.objects.create_user(username="NoOrdnanceSurveyMappingUser", password="NoOrdnanceSurveyMappingUser", is_superuser=False, is_staff=False)
@@ -257,7 +262,7 @@ class APITests(ArchesTestCase):
         "Mobile Project Administrator": {"post": 403, "get": 403, "put": 403, "delete": 403},
         "Crowdsource Editor": {"post": 403, "get": 403, "put": 403, "delete": 403},
         "Guest": {"post": 403, "get": 200, "put": 403, "delete": 403},
-        "Anonymous": {"post": 403, "get": 200, "put": 403, "delete": 403},
+        "AnonymousUser": {"post": 403, "get": 200, "put": 403, "delete": 403},
         "Resource Reviewer":  {"post": 201, "get": 200, "put": 201, "delete": 200},
         "All Workflows": {"post": 403, "get": 403, "put": 201, "delete": 403},
         "External Users": {"post": 403, "get": 403, "put": 403, "delete": 403},
@@ -265,6 +270,18 @@ class APITests(ArchesTestCase):
         "Access to Consultations and Application Areas": {"post": 403, "get": 403, "put": 403, "delete": 403},
         "Search Exporters": {"post": 403, "get": 403, "put": 403, "delete": 403},
     }
+
+    
+    def _call_api_method(self, method, url, payload, content_type):
+        if method == "post":
+            return self.client.post(url, payload, content_type)
+        elif method == "get":
+            return self.client.get(url)
+        elif method == "put":
+            return self.client.put(url, payload, content_type)
+        elif method == "delete":
+            return self.client.delete(url)
+
 
     def test_01_api_permissions_group(self):
         api_methods = ["post", "get", "put", "delete"]
@@ -275,9 +292,6 @@ class APITests(ArchesTestCase):
 
         payload_user_record = JSONSerializer().serialize(self.test_resource_simple)
         url_user_record = reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json"
-
-
-        breakpoint()
 
         # Add AnonymousUser for testing
         self.users["AnonymousUser"] = AnonymousUser()
@@ -315,17 +329,90 @@ class APITests(ArchesTestCase):
                         response = self.client.delete(url_existing_record)
                     self.assertEqual(response.status_code, self.expected_status[username][method], f"{username} {method} failed")
 
-    
-    def _call_api_method(self, method, url, payload, content_type):
-        if method == "post":
-            return self.client.post(url, payload, content_type)
-        elif method == "get":
-            return self.client.get(url)
-        elif method == "put":
-            return self.client.put(url, payload, content_type)
-        elif method == "delete":
-            return self.client.delete(url)
 
+
+    # def test_02_api_permissions_group_vs_user(self):
+    #     """
+    #     Test API responses for users with and without sufficient privileges cf. group permissions, and test that object permissions for 
+    #     a resourceinstance override group permissions for that resourceinstance, for both privileged and unprivileged users.
+    #     """
+    #     breakpoint()
+
+    #     # Create privileged/deprivileged users and privileged/deprivileged group users
+    #     privileged_user = User.objects.create_user(username="privileged", password="privileged")
+    #     deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
+    #     privileged_group_deprivileged_user = User.objects.create_user(username="privileged_group", password="privileged_group")
+    #     deprivileged_group_privileged_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
+        
+    #     # Add privileged_group_deprivileged_user to privilegedGroup group
+    #     group_privileged = Group.objects.create(name="privilegedGroup")
+    #     privileged_group_deprivileged_user.groups.add(group_privileged)
+
+    #     # Add deprivileged_group_privileged_user to deprivilegedGroup group (add deny permissions when test *resourceinstance* created below)
+    #     group_deprivileged = Group.objects.create(name="deprivilegedGroup")
+    #     deprivileged_group_privileged_user.groups.add(group_deprivileged)
+
+    #     # Set up test resource data under admin user      
+    #     payload = JSONSerializer().serialize(self.test_resource_simple)
+    #     content_type = "application/json"
+    #     self.client.login(username="admin", password="admin")
+
+    #     resp_post = self.client.post(
+    #         reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+    #         payload,
+    #         content_type,
+    #     )
+    #     self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
+    #     # Retrieve the resource instance
+    #     resource_instance_data = JSONDeserializer().deserialize(resp_post.content)
+    #     my_resource_resourceinstanceid = resource_instance_data[0]["resourceinstanceid"]
+    #     resource_instance = Resource.objects.get(resourceinstanceid=my_resource_resourceinstanceid)
+
+    #     # Add privileged user to view_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("view_resourceinstance", privileged_user, resource_instance)
+    #     # Add privileged group to view_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("view_resourceinstance", group_privileged, resource_instance)
+    #     # Add deprivileged user to no_access_to_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
+    #     # Add deprivileged group to no_access_to_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("no_access_to_resourceinstance", group_deprivileged, resource_instance)
+
+
+    #     self.client.login(username="privileged", password="privileged")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 200, "privileged user should GET 200 OK")
+
+    #     self.client.login(username="deprivileged", password="deprivileged")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 403, "deprivileged user should GET 403 Forbidden")
+
+    #     self.client.login(username="privileged_group", password="privileged_group")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 200, "privileged group user should GET 200 OK")
+
+    #     self.client.login(username="deprivileged_group", password="deprivileged_group")
+    #     resp_depriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_depriv.status_code, 403, "Deprivileged group user should get 403 Forbidden")
+
+    #     # Test Conflicting permissions  - Individual user permissions should override group permissions      
+
+    #     # deprivileged_group_deprivileged_user should be forbidden to GET resource.
+    #     self.client.login(username="deprivileged_group", password="deprivileged_group")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 403, "deprivileged_group_privileged_user user should GET 403 Forbidden due to individual user deny permission overriding group allow permission")
+
+    #     # privileged_group_deprivileged_user should be able to GET resource
+    #     self.client.login(username="privileged_group", password="privileged_group")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 200, "privileged_group_deprivileged_user user should GET 200 OK")
+
+
+    #     # Clean up
+    #     privileged_user.delete()
+    #     deprivileged_user.delete()
+    #     privileged_group_deprivileged_user.delete()
+    #     deprivileged_group_privileged_user.delete()
+    
 
     # def test_01_api_base_view(self):
     #     """
@@ -496,88 +583,6 @@ class APITests(ArchesTestCase):
     #     self.assertTrue("Resource matching query does not exist." in str(context_del.exception), "GET after DELETE should raise DoesNotExist")  # Check exception message.
     #     # ==================================================================================================
 
-    def test_02_api_permissions_group_vs_user(self):
-        """
-        Test API responses for users with and without sufficient privileges cf. group permissions, and test that object permissions for 
-        a resourceinstance override group permissions for that resourceinstance, for both privileged and unprivileged users.
-        """
-        breakpoint()
-
-        # Create privileged/deprivileged users and privileged/deprivileged group users
-        privileged_user = User.objects.create_user(username="privileged", password="privileged")
-        deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
-        privileged_group_deprivileged_user = User.objects.create_user(username="privileged_group", password="privileged_group")
-        deprivileged_group_privileged_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
-        
-        # Add privileged_group_deprivileged_user to privilegedGroup group
-        group_privileged = Group.objects.create(name="privilegedGroup")
-        privileged_group_deprivileged_user.groups.add(group_privileged)
-
-        # Add deprivileged_group_privileged_user to deprivilegedGroup group (add deny permissions when test *resourceinstance* created below)
-        group_deprivileged = Group.objects.create(name="deprivilegedGroup")
-        deprivileged_group_privileged_user.groups.add(group_deprivileged)
-
-        # Set up test resource data under admin user      
-        payload = JSONSerializer().serialize(self.test_resource_simple)
-        content_type = "application/json"
-        self.client.login(username="admin", password="admin")
-
-        resp_post = self.client.post(
-            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
-            payload,
-            content_type,
-        )
-        self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
-        # Retrieve the resource instance
-        resource_instance_data = JSONDeserializer().deserialize(resp_post.content)
-        my_resource_resourceinstanceid = resource_instance_data[0]["resourceinstanceid"]
-        resource_instance = Resource.objects.get(resourceinstanceid=my_resource_resourceinstanceid)
-
-        # Add privileged user to view_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("view_resourceinstance", privileged_user, resource_instance)
-        # Add privileged group to view_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("view_resourceinstance", group_privileged, resource_instance)
-        # Add deprivileged user to no_access_to_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
-        # Add deprivileged group to no_access_to_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("no_access_to_resourceinstance", group_deprivileged, resource_instance)
-
-
-        self.client.login(username="privileged", password="privileged")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 200, "privileged user should GET 200 OK")
-
-        self.client.login(username="privileged", password="privileged")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 200, "privileged user should GET 200 OK")
-
-        self.client.login(username="privileged_group", password="privileged_group")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 200, "privileged group user should GET 200 OK")
-
-        self.client.login(username="deprivileged_group", password="deprivileged_group")
-        resp_depriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_depriv.status_code, 403, "Deprivileged group user should get 403 Forbidden")
-
-        # Test Conflicting permissions  - Individual user permissions should override group permissions      
-
-        # deprivileged_group_deprivileged_user should be forbidden to GET resource.
-        self.client.login(username="deprivileged_group", password="deprivileged_group")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 403, "deprivileged_group_privileged_user user should GET 403 Forbidden due to individual user deny permission overriding group allow permission")
-
-        # privileged_group_deprivileged_user should be able to GET resource
-        self.client.login(username="privileged_group", password="privileged_group")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 200, "privileged_group_deprivileged_user user should GET 200 OK")
-
-
-        # Clean up
-        privileged_user.delete()
-        deprivileged_user.delete()
-        privileged_group_deprivileged_user.delete()
-        deprivileged_group_privileged_user.delete()
-    
     # # def test_04_resources_api_methods_permissions(self):
     #     """
     #     Test all Resources API methods (GET, POST, PUT, DELETE) for privileged and unprivileged users.

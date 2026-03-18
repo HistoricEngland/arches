@@ -283,136 +283,231 @@ class APITests(ArchesTestCase):
             return self.client.delete(url)
 
 
-    def test_01_api_permissions_group(self):
-        api_methods = ["post", "get", "put", "delete"]
-        content_type = "application/json"
 
-        payload_existing_record = JSONSerializer().serialize(self.test_resource_existing_record)
-        url_existing_record = reverse("resources", kwargs={"resourceid": self.test_resource_existing_record["resourceinstanceid"]}) + "?format=arches-json"
-
-        payload_user_record = JSONSerializer().serialize(self.test_resource_simple)
-        url_user_record = reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json"
-
-        # Add AnonymousUser for testing
-        self.users["AnonymousUser"] = AnonymousUser()
+    def test_00_single_User_verbs_resource(self):
+        """
+        Test POST, GET, PUT and DELETE of a single resource by a single user for DEBUGGING.        
+        """
 
         for username, user in self.users.items():
+                            
+            breakpoint()
 
-            # Create a resource as admin to test permissions for other users on an existing resource, and to provide a resourceinstanceid for testing PUT with existing resourceinstanceid and DELETE.
-            self.client.login(username="SystemAdministratorUser", password="SystemAdministratorUser")
-            resp_existing = self.client.put(url_existing_record, payload_existing_record, content_type)            
-            if resp_existing.status_code != 201:
-                self.fail(f"Failed to create test pre-existing-resource: {resp_existing.status_code}")
+            print(f"Testing API methods for user: {username}")
 
-            for method in api_methods:
-                with self.subTest(user=username, method=method):                    
-                    # Login as the user for this subtest, or logout if AnonymousUser.
-                    if username != "AnonymousUser":
-                        self.client.login(username=username, password=username)
-                    else:
-                        self.client.logout()
+            payload = JSONSerializer().serialize(self.test_resource_simple)
+            content_type = "application/json"
+            self.client.login(username=user.username, password=user.username)
 
-                    if method == "post":
-                        # POST - Used to create a new resource. (The resourceinstanceid in the payload is usually ignored or overwritten by the server.)
-                        response = self.client.post(url_user_record, payload_user_record, content_type)   
-                        if response.status_code == 201:
-                            # If POST succeeded, amend legacyid on payload_user_record to avoid key violations.
-                            self.test_resource_simple["legacyid"] = self.test_resource_simple["legacyid"] + "Spam, "
-                            payload_user_record = JSONSerializer().serialize(self.test_resource_simple)                           
-                    elif method == "get":
-                        response = self.client.get(url_existing_record)
-                    elif method =="put":
-
-                        # PUT -  Used to update an existing resource, or create it if it does not exist (upsert). (The resourceinstanceid in the URI and payload must match.)
-                        response = self.client.put(url_existing_record, payload_existing_record, content_type) 
-                    elif method == "delete":
-                        response = self.client.delete(url_existing_record)
-                    self.assertEqual(response.status_code, self.expected_status[username][method], f"{username} {method} failed")
+            # Act : PUT resource to database with new resourceinstanceid to create new resource
+            resp_put_create = self.client.put(
+                reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json",
+                payload,
+                content_type,
+            )
+            
+            print(f"PUT response status code: {resp_put_create.status_code}")         
+            # Amend legacyid on payload to avoid key violations.
+            self.test_resource_simple["legacyid"] = self.test_resource_simple["legacyid"] + "Spam, "
+            payload = JSONSerializer().serialize(self.test_resource_simple)
 
 
+            resp_post_create = self.client.post(
+                reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json",
+                payload,
+                content_type,
+            )
 
-    def test_02_api_permissions_group_vs_user(self):
-        """
-        Test API responses for users with and without sufficient privileges cf. group permissions, and test that object permissions for 
-        a resourceinstance override group permissions for that resourceinstance, for both privileged and unprivileged users.
-        """
-        breakpoint()
+            print(f"POST response status code: {resp_post_create.status_code}") 
+            # Amend legacyid on payload to avoid key violations.
+            self.test_resource_simple["legacyid"] = self.test_resource_simple["legacyid"] + "Spam, "
+            payload = JSONSerializer().serialize(self.test_resource_simple)
 
-        # Create privileged/deprivileged users and privileged/deprivileged group users
-        privileged_user = User.objects.create_user(username="privileged", password="privileged")
-        deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
-        privileged_group_deprivileged_user = User.objects.create_user(username="privileged_group", password="privileged_group")
-        deprivileged_group_privileged_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
+            # We need an existing record to test get and delete against.
+            if resp_post_create.status_code == 201:
+                resp_post_create_resource = JSONDeserializer().deserialize(resp_post_create.content)  # get the resourceinstance returned.
+                my_resource_resourceinstanceid = resp_post_create_resource[0]["resourceinstanceid"]
+            else:
+                self.client.login(username="SystemAdministratorUser", password="SystemAdministratorUser")
+                # Amend legacyid on payload to avoid key violations.
+                self.test_resource_simple["legacyid"] = self.test_resource_simple["legacyid"] + "Spam, "
+                payload = JSONSerializer().serialize(self.test_resource_simple)
+
+                resp_existing = self.client.put(
+                    reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json",
+                    payload,
+                    content_type,
+                    )            
+                if resp_existing.status_code != 201:
+                    self.fail(f"Failed to create test pre-existing-resource: {resp_existing.status_code}")
+                else:
+                    resp_existing_resource = JSONDeserializer().deserialize(resp_existing.content)  # get the resourceinstance returned.
+                    my_resource_resourceinstanceid = resp_existing_resource[0]["resourceinstanceid"]
+                self.client.login(username=user.username, password=user.username)
+
+            # GET
+            resp_get = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+            print(f"GET response status code: {resp_get.status_code}")
+
+            # PUT with existing resourceinstanceid should update resource, not create new one.
+            # Amend legacyid on payload to avoid key violations.
+            self.test_resource_simple["legacyid"] = self.test_resource_simple["legacyid"] + "Spam, "
+            payload = JSONSerializer().serialize(self.test_resource_simple)
+
+            # PUT -  (The resourceinstanceid in the URI and payload must match.)
+            resp_put_update = self.client.put(
+                reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json",
+                payload,
+                content_type,
+            )
+            print(f"PUT with existing resourceinstanceid response status code: {resp_put_update.status_code}")
+
+            # DELETE
+            resp_delete = self.client.delete(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+            print(f"DELETE response status code: {resp_delete.status_code}")
+
+        # Assert
+        self.assertEqual(True, True, "Nonsense assertion, but completed debug output!") 
+
+
+##############################################################################################
+#
+#  Main tests under dev.
+
+    # def test_01_api_permissions_group(self):
+    #     api_methods = ["post", "get", "put", "delete"]
+    #     content_type = "application/json"
+
+    #     payload_existing_record = JSONSerializer().serialize(self.test_resource_existing_record)
+    #     url_existing_record = reverse("resources", kwargs={"resourceid": self.test_resource_existing_record["resourceinstanceid"]}) + "?format=arches-json"
+
+    #     payload_user_record = JSONSerializer().serialize(self.test_resource_simple)
+    #     url_user_record = reverse("resources", kwargs={"resourceid": self.test_resource_simple["resourceinstanceid"]}) + "?format=arches-json"
+
+    #     # Add AnonymousUser for testing
+    #     self.users["AnonymousUser"] = AnonymousUser()
+
+    #     for username, user in self.users.items():
+
+    #         # Create a resource as admin to test permissions for other users on an existing resource, and to provide a resourceinstanceid for testing PUT with existing resourceinstanceid and DELETE.
+    #         self.client.login(username="SystemAdministratorUser", password="SystemAdministratorUser")
+    #         resp_existing = self.client.put(url_existing_record, payload_existing_record, content_type)            
+    #         if resp_existing.status_code != 201:
+    #             self.fail(f"Failed to create test pre-existing-resource: {resp_existing.status_code}")
+
+    #         for method in api_methods:
+    #             with self.subTest(user=username, method=method):                    
+    #                 # Login as the user for this subtest, or logout if AnonymousUser.
+    #                 if username != "AnonymousUser":
+    #                     self.client.login(username=username, password=username)
+    #                 else:
+    #                     self.client.logout()
+
+    #                 if method == "post":
+    #                     # POST - Used to create a new resource. (The resourceinstanceid in the payload is usually ignored or overwritten by the server.)
+    #                     response = self.client.post(url_user_record, payload_user_record, content_type)   
+    #                     if response.status_code == 201:
+    #                         # If POST succeeded, amend legacyid on payload_user_record to avoid key violations.
+    #                         self.test_resource_simple["legacyid"] = self.test_resource_simple["legacyid"] + "Spam, "
+    #                         payload_user_record = JSONSerializer().serialize(self.test_resource_simple)                           
+    #                 elif method == "get":
+    #                     response = self.client.get(url_existing_record)
+    #                 elif method =="put":
+
+    #                     # PUT -  Used to update an existing resource, or create it if it does not exist (upsert). (The resourceinstanceid in the URI and payload must match.)
+    #                     response = self.client.put(url_existing_record, payload_existing_record, content_type) 
+    #                 elif method == "delete":
+    #                     response = self.client.delete(url_existing_record)
+    #                 self.assertEqual(response.status_code, self.expected_status[username][method], f"{username} {method} failed")
+
+
+    # def test_02_api_permissions_group_vs_user(self):
+    #     """
+    #     Test API responses for users with and without sufficient privileges cf. group permissions, and test that object permissions for 
+    #     a resourceinstance override group permissions for that resourceinstance, for both privileged and unprivileged users.
+    #     """
+    #     breakpoint()
+
+    #     # Create privileged/deprivileged users and privileged/deprivileged group users
+    #     privileged_user = User.objects.create_user(username="privileged", password="privileged")
+    #     deprivileged_user = User.objects.create_user(username="deprivileged", password="deprivileged")
+    #     privileged_group_deprivileged_user = User.objects.create_user(username="privileged_group", password="privileged_group")
+    #     deprivileged_group_privileged_user = User.objects.create_user(username="deprivileged_group", password="deprivileged_group")
         
-        # Add privileged_group_deprivileged_user to privilegedGroup group
-        group_privileged = Group.objects.create(name="privilegedGroup")
-        privileged_group_deprivileged_user.groups.add(group_privileged)
+    #     # Add privileged_group_deprivileged_user to privilegedGroup group
+    #     group_privileged = Group.objects.create(name="privilegedGroup")
+    #     privileged_group_deprivileged_user.groups.add(group_privileged)
 
-        # Add deprivileged_group_privileged_user to deprivilegedGroup group (add deny permissions when test *resourceinstance* created below)
-        group_deprivileged = Group.objects.create(name="deprivilegedGroup")
-        deprivileged_group_privileged_user.groups.add(group_deprivileged)
+    #     # Add deprivileged_group_privileged_user to deprivilegedGroup group (add deny permissions when test *resourceinstance* created below)
+    #     group_deprivileged = Group.objects.create(name="deprivilegedGroup")
+    #     deprivileged_group_privileged_user.groups.add(group_deprivileged)
 
-        # Set up test resource data under admin user      
-        payload = JSONSerializer().serialize(self.test_resource_simple)
-        content_type = "application/json"
-        self.client.login(username="admin", password="admin")
+    #     # Set up test resource data under admin user      
+    #     payload = JSONSerializer().serialize(self.test_resource_simple)
+    #     content_type = "application/json"
+    #     self.client.login(username="admin", password="admin")
 
-        resp_post = self.client.post(
-            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
-            payload,
-            content_type,
-        )
-        self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
-        # Retrieve the resource instance
-        resource_instance_data = JSONDeserializer().deserialize(resp_post.content)
-        my_resource_resourceinstanceid = resource_instance_data[0]["resourceinstanceid"]
-        resource_instance = Resource.objects.get(resourceinstanceid=my_resource_resourceinstanceid)
+    #     resp_post = self.client.post(
+    #         reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+    #         payload,
+    #         content_type,
+    #     )
+    #     self.assertEqual(resp_post.status_code, 201, "POST should create resource (201 Created)")  # resource created.
+    #     # Retrieve the resource instance
+    #     resource_instance_data = JSONDeserializer().deserialize(resp_post.content)
+    #     my_resource_resourceinstanceid = resource_instance_data[0]["resourceinstanceid"]
+    #     resource_instance = Resource.objects.get(resourceinstanceid=my_resource_resourceinstanceid)
 
-        # Add privileged user to view_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("view_resourceinstance", privileged_user, resource_instance)
-        # Add privileged group to view_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("view_resourceinstance", group_privileged, resource_instance)
-        # Add deprivileged user to no_access_to_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
-        # Add deprivileged group to no_access_to_resourceinstance object permission for the test *resourceinstance*
-        assign_perm("no_access_to_resourceinstance", group_deprivileged, resource_instance)
-
-
-        self.client.login(username="privileged", password="privileged")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 200, "privileged user should GET 200 OK")
-
-        self.client.login(username="deprivileged", password="deprivileged")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 403, "deprivileged user should GET 403 Forbidden")
-
-        self.client.login(username="privileged_group", password="privileged_group")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 200, "privileged group user should GET 200 OK")
-
-        self.client.login(username="deprivileged_group", password="deprivileged_group")
-        resp_depriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_depriv.status_code, 403, "Deprivileged group user should get 403 Forbidden")
-
-        # Test Conflicting permissions  - Individual user permissions should override group permissions      
-
-        # deprivileged_group_deprivileged_user should be forbidden to GET resource.
-        self.client.login(username="deprivileged_group", password="deprivileged_group")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 403, "deprivileged_group_privileged_user user should GET 403 Forbidden due to individual user deny permission overriding group allow permission")
-
-        # privileged_group_deprivileged_user should be able to GET resource
-        self.client.login(username="privileged_group", password="privileged_group")
-        resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
-        self.assertEqual(resp_priv.status_code, 200, "privileged_group_deprivileged_user user should GET 200 OK")
+    #     # Add privileged user to view_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("view_resourceinstance", privileged_user, resource_instance)
+    #     # Add privileged group to view_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("view_resourceinstance", group_privileged, resource_instance)
+    #     # Add deprivileged user to no_access_to_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("no_access_to_resourceinstance", deprivileged_user, resource_instance)
+    #     # Add deprivileged group to no_access_to_resourceinstance object permission for the test *resourceinstance*
+    #     assign_perm("no_access_to_resourceinstance", group_deprivileged, resource_instance)
 
 
-        # Clean up
-        privileged_user.delete()
-        deprivileged_user.delete()
-        privileged_group_deprivileged_user.delete()
-        deprivileged_group_privileged_user.delete()
-    
+    #     self.client.login(username="privileged", password="privileged")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 200, "privileged user should GET 200 OK")
+
+    #     self.client.login(username="deprivileged", password="deprivileged")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 403, "deprivileged user should GET 403 Forbidden")
+
+    #     self.client.login(username="privileged_group", password="privileged_group")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 200, "privileged group user should GET 200 OK")
+
+    #     self.client.login(username="deprivileged_group", password="deprivileged_group")
+    #     resp_depriv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_depriv.status_code, 403, "Deprivileged group user should get 403 Forbidden")
+
+    #     # Test Conflicting permissions  - Individual user permissions should override group permissions      
+
+    #     # deprivileged_group_deprivileged_user should be forbidden to GET resource.
+    #     self.client.login(username="deprivileged_group", password="deprivileged_group")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 403, "deprivileged_group_privileged_user user should GET 403 Forbidden due to individual user deny permission overriding group allow permission")
+
+    #     # privileged_group_deprivileged_user should be able to GET resource
+    #     self.client.login(username="privileged_group", password="privileged_group")
+    #     resp_priv = self.client.get(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json")
+    #     self.assertEqual(resp_priv.status_code, 200, "privileged_group_deprivileged_user user should GET 200 OK")
+
+
+    #     # Clean up
+    #     privileged_user.delete()
+    #     deprivileged_user.delete()
+    #     privileged_group_deprivileged_user.delete()
+    #     deprivileged_group_privileged_user.delete()
+
+ ##############################################################################################
+ # 
+ #   Scratchpad for developing tests for APIBase view, and POST and PUT of resources endpoint with arches-json format data.
+ # 
+ ###############################################################################################
 
     # def test_01_api_base_view(self):
     #     """

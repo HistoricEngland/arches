@@ -69,6 +69,7 @@ def map_info(request):
 
 
 def app_settings(request):
+    settings.update_from_db()
     return {
         "app_settings": {
             "VERSION": __version__,

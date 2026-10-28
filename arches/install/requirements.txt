@@ -15,6 +15,7 @@ django-revproxy==0.9.15
 django-cors-headers==3.1.1
 django-oauth-toolkit==1.2.0
 python-docx==0.8.10
+lxml==6.1.1
 PyLD[requests]==1.0.5
 pyprind==2.11.3
 pycryptodome<4.0.0,>=3.3.1
